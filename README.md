@@ -1,11 +1,17 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
 
-# BiliZepam
+# YNotBili.D
 
 第三方B站Android手表客户端
 
 </div>
+
+这是一个尝试续写BiliZepam的项目，大概，也许。
+
+不保证更新，不保证稳定。
+
+默哀。
 
 ## 介绍
 这是一个专为 **Wear OS 手表设备**设计的**第三方 B 站客户端**，基于 [哔哩终端](https://gitee.com/RobinNotBad/BiliClient) 开发。本项目借鉴了 [Re-WearBili](https://github.com/SpaceXC/Re-WearBili) 的部分开源代码和它们收集的部分 API，**本项目与 WearBili/Re-WearBili 无任何关系**。
