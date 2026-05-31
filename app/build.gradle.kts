@@ -96,7 +96,7 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
-
+    /*
     signingConfigs {
         create("release") {
             val localProps = rootProject.file("local.properties")
@@ -113,6 +113,7 @@ android {
             }
         }
     }
+    */
 
     buildTypes {
         getByName("release") {
@@ -125,7 +126,7 @@ android {
 
             val localProps = rootProject.file("local.properties")
             if (localProps.exists()) {
-                signingConfig = signingConfigs.getByName("release")
+                // signingConfig = signingConfigs.getByName("release")
             }
         }
 

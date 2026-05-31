@@ -25,8 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.huanli233.bilizepam.data.download.DownloadEntity
+import com.huanli233.bilizepam.data.download.DownloadDisplayItem
 import com.huanli233.bilizepam.data.download.DownloadStatus
+import com.huanli233.bilizepam.data.download.SourceType
 import com.huanli233.bilizepam.R
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -49,18 +50,18 @@ enum class ContentState {
 @Composable
 fun DownloadListScreen(
     onNavigateBack: () -> Unit,
-    onPlayClick: (aid: Long, cid: Long) -> Unit = { _, _ -> },
+    onPlayLocal: (path: String, title: String) -> Unit = { _, _ -> },
     viewModel: DownloadListViewModel = hiltViewModel()
 ) {
-    val downloads by viewModel.downloads.collectAsState()
-    var deleteTarget by remember { mutableStateOf<DownloadEntity?>(null) }
+    val displayItems by viewModel.displayItems.collectAsState()
+    var deleteTarget by remember { mutableStateOf<DownloadDisplayItem?>(null) }
     var deleteFile by remember { mutableStateOf(false) }
 
     val scrollState = rememberScalingLazyListState()
     val scrollBehavior = rememberEnterAlwaysScrollBehavior()
 
-    val contentState = remember(downloads) {
-        if (downloads.isEmpty()) ContentState.EMPTY else ContentState.CONTENT
+    val contentState = remember(displayItems) {
+        if (displayItems.isEmpty()) ContentState.EMPTY else ContentState.CONTENT
     }
 
     ScreenScaffold(
@@ -95,16 +96,20 @@ fun DownloadListScreen(
                         )
                     ) {
                         items(
-                            count = downloads.size,
-                            key = { index -> downloads[index].id }
+                            count = displayItems.size,
+                            key = { index -> displayItems[index].id }
                         ) { index ->
-                            val task = downloads[index]
+                            val item = displayItems[index]
                             DownloadTaskItem(
-                                task = task,
-                                onCancel = { viewModel.cancel(task.id) },
-                                onRetry = { viewModel.retry(task.id) },
-                                onDelete = { deleteTarget = task },
-                                onPlayClick = onPlayClick
+                                item = item,
+                                onCancel = if (item.dbId != null) {
+                                    { viewModel.cancel(item.dbId) }
+                                } else null,
+                                onRetry = if (item.dbId != null) {
+                                    { viewModel.retry(item.dbId) }
+                                } else null,
+                                onDelete = { deleteTarget = item },
+                                onPlayLocal = onPlayLocal
                             )
                         }
                     }
@@ -121,7 +126,7 @@ fun DownloadListScreen(
                 confirmButton = {
                     TextButton(
                         onClick = {
-                            viewModel.delete(target.id, deleteFile)
+                            viewModel.delete(target, deleteFile)
                             deleteTarget = null
                             deleteFile = false
                         }
@@ -155,39 +160,26 @@ fun DownloadListScreen(
     }
 }
 
-private fun parseAidCidFromKey(key: String): Pair<Long, Long>? {
-    val parts = key.split("_")
-    if (parts.size >= 4 && parts[0] == "video") {
-        val aid = parts[1].toLongOrNull()
-        val cid = parts[2].toLongOrNull()
-        if (aid != null && cid != null) {
-            return aid to cid
-        }
-    }
-    return null
-}
-
 @Composable
 private fun DownloadTaskItem(
-    task: DownloadEntity,
-    onCancel: () -> Unit,
-    onRetry: () -> Unit,
-    onDelete: () -> Unit,
-    onPlayClick: (aid: Long, cid: Long) -> Unit = { _, _ -> }
+    item: DownloadDisplayItem,
+    onPlayLocal: (path: String, title: String) -> Unit = { _, _ -> },
+    onCancel: (() -> Unit)? = null,
+    onRetry: (() -> Unit)? = null,
+    onDelete: () -> Unit
 ) {
     val context = LocalContext.current
 
-    val canPlay = task.status == DownloadStatus.SUCCEEDED
+    val canPlay = item.sourceType == SourceType.SCANNED || item.status == DownloadStatus.SUCCEEDED
+    val localPath = item.contentUri
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .then(
-                if (canPlay) {
+                if (canPlay && !localPath.isNullOrBlank()) {
                     Modifier.clickable {
-                        parseAidCidFromKey(task.key)?.let { (aid, cid) ->
-                            onPlayClick(aid, cid)
-                        }
+                        onPlayLocal(localPath, item.fileName)
                     }
                 } else {
                     Modifier
@@ -216,7 +208,7 @@ private fun DownloadTaskItem(
                         .clip(RoundedCornerShape(8.dp))
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
                 ) {
-                    val url = task.coverUrl
+                    val url = item.coverUrl
                     if (!url.isNullOrBlank()) {
                         AsyncImage(
                             model = ImageRequest.Builder(context)
@@ -236,7 +228,7 @@ private fun DownloadTaskItem(
                         .padding(vertical = 2.dp)
                 ) {
                     Text(
-                        text = task.fileName,
+                        text = item.fileName,
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -244,63 +236,78 @@ private fun DownloadTaskItem(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    FlowRow(
+                    Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = when (task.status) {
-                                DownloadStatus.ENQUEUED -> "等待中"
-                                DownloadStatus.RUNNING -> "下载中"
-                                DownloadStatus.CANCELED -> "已取消"
-                                DownloadStatus.SUCCEEDED -> "已完成"
-                                DownloadStatus.FAILED -> "下载失败"
+                            text = when (item.sourceType) {
+                                SourceType.SCANNED -> "本地文件"
+                                else -> when (item.status) {
+                                    DownloadStatus.ENQUEUED -> "等待中"
+                                    DownloadStatus.RUNNING -> "下载中"
+                                    DownloadStatus.CANCELED -> "已取消"
+                                    DownloadStatus.SUCCEEDED -> "已完成"
+                                    DownloadStatus.FAILED -> "下载失败"
+                                }
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        Text(
-                            text = "${task.progress}%",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        if (item.sourceType != SourceType.SCANNED) {
+                            Text(
+                                text = "${item.progress}%",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        if (item.sourceType == SourceType.SCANNED) {
+                            Text(
+                                text = "未标记",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.tertiary
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(2.dp))
 
-                    FlowRow(
+                    if (item.sourceType != SourceType.SCANNED && item.status != DownloadStatus.SUCCEEDED) {
+                        LinearProgressIndicator(
+                            progress = { (item.progress / 100f).coerceIn(0f, 1f) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp)),
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+
+                    Row(
                         horizontalArrangement = Arrangement.spacedBy(2.dp),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (task.status == DownloadStatus.RUNNING || task.status == DownloadStatus.ENQUEUED) {
+                        val needCancel = onCancel != null && (item.status == DownloadStatus.RUNNING || item.status == DownloadStatus.ENQUEUED)
+                        val needRetry = onRetry != null && item.status == DownloadStatus.FAILED
+
+                        if (needCancel) {
                             IconButton(onClick = onCancel, modifier = Modifier.size(32.dp)) {
                                 Icon(imageVector = Icons.Default.Close, contentDescription = "取消")
                             }
                         }
-
-                        if (task.status == DownloadStatus.FAILED) {
+                        if (needRetry) {
                             IconButton(onClick = onRetry, modifier = Modifier.size(32.dp)) {
                                 Icon(imageVector = Icons.Default.Refresh, contentDescription = "重试")
                             }
                         }
-
                         IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                             Icon(imageVector = Icons.Default.Delete, contentDescription = "删除")
                         }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            LinearProgressIndicator(
-                progress = { (task.progress / 100f).coerceIn(0f, 1f) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp)),
-            )
         }
     }
 }

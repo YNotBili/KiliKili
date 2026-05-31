@@ -65,6 +65,7 @@ import com.huanli233.bilizepam.ui.screens.video.VideoDetailScreen
 import com.huanli233.bilizepam.ui.screens.comment.WriteReplyScreen
 import com.huanli233.bilizepam.ui.screens.search.SearchScreen
 import com.huanli233.bilizepam.ui.screens.search.SearchResultScreen
+import android.net.Uri
 import java.net.URLDecoder
 
 @Composable
@@ -507,11 +508,32 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
+            composable(
+                route = "player_local?path={path}&title={title}",
+                arguments = listOf(
+                    navArgument("path") { type = NavType.StringType },
+                    navArgument("title") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val path = backStackEntry.arguments?.getString("path") ?: ""
+                val title = backStackEntry.arguments?.getString("title") ?: ""
+                PlayerScreen(
+                    localVideoPath = path,
+                    localVideoTitle = title,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
             composable(Screen.DownloadList.route) {
                 DownloadListScreen(
                     onNavigateBack = { contentNavController.popBackStack() },
-                    onPlayClick = { aid, cid ->
-                        contentNavController.navigate("player/$aid/$cid")
+                    onPlayLocal = { path, title ->
+                        contentNavController.navigate(
+                            "player_local?path=${Uri.encode(path)}&title=${Uri.encode(title)}"
+                        )
                     }
                 )
             }

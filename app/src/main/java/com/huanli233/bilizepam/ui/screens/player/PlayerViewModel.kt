@@ -173,16 +173,16 @@ class PlayerViewModel @Inject constructor(
     
     fun playVideo(videoUrl: String) {
         if (videoUrl.isEmpty()) return
-        
+
         viewModelScope.launch {
             try {
                 Log.d("PlayerViewModel", "Playing video: $videoUrl")
-                
+
                 // 停止当前播放
                 if (ijkPlayer.isPlaying) {
                     ijkPlayer.stop()
                 }
-                
+
                 // 设置数据源和请求头
                 val headers = mapOf(
                     "Referer" to BILIBILI_REFERER
@@ -190,10 +190,41 @@ class PlayerViewModel @Inject constructor(
                 Log.d("PlayerViewModel", "Setting headers: $headers")
                 ijkPlayer.setDataSource(videoUrl, headers)
                 ijkPlayer.prepareAsync()
-                
+
                 Log.d("PlayerViewModel", "Video prepared for playback")
             } catch (e: Exception) {
                 Log.e("PlayerViewModel", "Error playing video", e)
+            }
+        }
+    }
+
+    fun playLocalFile(path: String, title: String) {
+        if (path.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                Log.d("PlayerViewModel", "Playing local file: $path")
+
+                _uiState.value = PlayerUiState(
+                    isLocalMode = true,
+                    title = title,
+                    videoUrl = path,
+                    isLoading = false
+                )
+
+                if (ijkPlayer.isPlaying) {
+                    ijkPlayer.stop()
+                }
+
+                ijkPlayer.setDataSource(path)
+                ijkPlayer.prepareAsync()
+
+                Log.d("PlayerViewModel", "Local file prepared for playback")
+            } catch (e: Exception) {
+                Log.e("PlayerViewModel", "Error playing local file", e)
+                _uiState.value = _uiState.value.copy(
+                    error = "无法播放本地文件: ${e.message}"
+                )
             }
         }
     }
@@ -381,6 +412,7 @@ class PlayerViewModel @Inject constructor(
     }
     
     fun changeQuality(quality: Int) {
+        if (_uiState.value.isLocalMode) return
         val currentState = _uiState.value
         if (currentState.aid > 0 && currentState.cid > 0) {
             _uiState.value = currentState.copy(currentQuality = quality)
@@ -458,6 +490,7 @@ class PlayerViewModel @Inject constructor(
     }
     
     fun reportFinalProgress(currentPosition: Long) {
+        if (_uiState.value.isLocalMode) return
         val aid = _uiState.value.aid
         val cid = _uiState.value.cid
         if (aid != 0L && cid != 0L && currentPosition > 0) {
@@ -469,6 +502,7 @@ class PlayerViewModel @Inject constructor(
     }
     
     private suspend fun reportProgress(progressInSeconds: Long) {
+        if (_uiState.value.isLocalMode) return
         val aid = _uiState.value.aid
         val cid = _uiState.value.cid
         if (aid != 0L && cid != 0L) {
@@ -521,7 +555,8 @@ data class PlayerUiState(
     val historyProgress: Long = 0,
     val availableQualities: List<VideoQuality> = emptyList(),
     val currentQuality: Int = 64,
-    val videoAspectRatio: Float = 16f / 9f
+    val videoAspectRatio: Float = 16f / 9f,
+    val isLocalMode: Boolean = false
 )
 
 data class VideoPage(

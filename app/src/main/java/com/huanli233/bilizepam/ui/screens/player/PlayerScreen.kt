@@ -141,8 +141,10 @@ import kotlin.math.sqrt
 
 @Composable
 fun PlayerScreen(
-    aid: Long,
+    aid: Long = 0,
     cid: Long = 0,
+    localVideoPath: String = "",
+    localVideoTitle: String = "",
     onNavigateBack: () -> Unit,
     viewModel: PlayerViewModel = hiltViewModel()
 ) {
@@ -150,6 +152,8 @@ fun PlayerScreen(
     val context = LocalContext.current
     val settings by LocalData.settingsStateFlow.collectAsState()
     val playerSettings = settings?.playerSettings
+
+    val isLocalMode = localVideoPath.isNotEmpty()
 
     var isPlaying by remember { mutableStateOf(false) }
     var currentPosition by remember { mutableLongStateOf(0L) }
@@ -231,12 +235,16 @@ fun PlayerScreen(
         }
     }
 
-    LaunchedEffect(aid) {
-        viewModel.loadVideoInfo(aid)
+    LaunchedEffect(aid, isLocalMode) {
+        if (!isLocalMode) {
+            viewModel.loadVideoInfo(aid)
+        }
     }
 
-    LaunchedEffect(aid, cid) {
-        if (cid > 0) {
+    LaunchedEffect(aid, cid, isLocalMode) {
+        if (isLocalMode) {
+            viewModel.playLocalFile(localVideoPath, localVideoTitle)
+        } else if (cid > 0) {
             viewModel.loadVideo(aid, cid)
             
             val videoKey = "${aid}_${cid}"
@@ -1135,9 +1143,10 @@ fun PlayerScreen(
         isPlaying = isPlaying,
         currentPosition = currentPosition,
         duration = duration,
-        title = uiState.title,
+        title = if (isLocalMode && localVideoTitle.isNotEmpty()) localVideoTitle else uiState.title,
         playbackSpeed = playbackSpeed,
         isLongPressing = isLongPressing,
+        isLocalMode = isLocalMode,
         onPlayPauseClick = {
             if (isPlaying) {
                 viewModel.ijkPlayer.pause()
@@ -1249,6 +1258,7 @@ fun PlayerScreen(
     }
 
     LaunchedEffect(uiState.pages) {
+        if (isLocalMode) return@LaunchedEffect
         if (uiState.pages.isNotEmpty() && cid == 0L) {
             if (uiState.pages.size == 1) {
                 viewModel.loadVideo(aid, uiState.pages[0].cid)
@@ -1277,7 +1287,8 @@ fun PlayerControls(
     onSpeedClick: () -> Unit,
     onQualityClick: () -> Unit,
     onDownloadClick: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    isLocalMode: Boolean = false
 ) {
     val isRound = isRoundDevice()
 
@@ -1378,23 +1389,27 @@ fun PlayerControls(
                     }
 
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
-                        IconButton(onClick = onDanmakuToggle) {
-                            Icon(
-                                imageVector = if (isDanmakuVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                null,
-                                tint = if (isDanmakuVisible) Color.White else Color.White.copy(alpha = 0.5f),
-                                modifier = Modifier.size(20.dp)
-                            )
+                        if (!isLocalMode) {
+                            IconButton(onClick = onDanmakuToggle) {
+                                Icon(
+                                    imageVector = if (isDanmakuVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                    null,
+                                    tint = if (isDanmakuVisible) Color.White else Color.White.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
 
                     Box(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconButton(onClick = onQualityClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.HighQuality, null, tint = Color.White, modifier = Modifier.size(20.dp))
-                            }
-                            IconButton(onClick = onDownloadClick, modifier = Modifier.size(32.dp)) {
-                                Icon(Icons.Default.Download, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                            if (!isLocalMode) {
+                                IconButton(onClick = onQualityClick, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.Default.HighQuality, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                }
+                                IconButton(onClick = onDownloadClick, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.Default.Download, null, tint = Color.White, modifier = Modifier.size(20.dp))
+                                }
                             }
                         }
                     }
@@ -1517,18 +1532,20 @@ fun PlayerControls(
                             IconButton(onClick = onSpeedClick) {
                                 Icon(Icons.Default.Speed, null, tint = Color.White)
                             }
-                            IconButton(onClick = onDanmakuToggle) {
-                                Icon(
-                                    if (isDanmakuVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                    null,
-                                    tint = if (isDanmakuVisible) Color.White else Color.White.copy(alpha = 0.6f)
-                                )
-                            }
-                            IconButton(onClick = onQualityClick) {
-                                Icon(Icons.Default.HighQuality, null, tint = Color.White)
-                            }
-                            IconButton(onClick = onDownloadClick) {
-                                Icon(Icons.Default.Download, null, tint = Color.White)
+                            if (!isLocalMode) {
+                                IconButton(onClick = onDanmakuToggle) {
+                                    Icon(
+                                        if (isDanmakuVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                        null,
+                                        tint = if (isDanmakuVisible) Color.White else Color.White.copy(alpha = 0.6f)
+                                    )
+                                }
+                                IconButton(onClick = onQualityClick) {
+                                    Icon(Icons.Default.HighQuality, null, tint = Color.White)
+                                }
+                                IconButton(onClick = onDownloadClick) {
+                                    Icon(Icons.Default.Download, null, tint = Color.White)
+                                }
                             }
                         }
                     }
