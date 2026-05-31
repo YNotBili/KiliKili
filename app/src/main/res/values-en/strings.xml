@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">BiliZepam</string>
+    <string name="app_name">KiliKili</string>
     <string name="about_description">Lightweight Third-Party Bilibili Client</string>
     <string name="about_opensource">This program is completely open-source,\nthe code adheres to the GNU GPL-V3.0 license</string>
     <string
         name="repo_url"
-        translatable="false">https://github.com/Re-BiliTerminal/BiliZepam</string>
+        translatable="false">https://github.com/YNotBili/KiliKili</string>
     <string name="about_to_uncle">The purpose of this software is to enable low-configuration Android watches and older mobile phones to access basic Bilibili web features. Operating through Bilibili\'s web interface, this app will neither overload any APIs nor collect user privacy data. It contains no paid functions, and its code is fully open-source. If you still believe it infringes your rights, please reach out (let\'s talk it out!)\nWe also disclaim responsibility for property loss (device confiscation) or mental distress (really?) caused by student users accessing the app at inappropriate times or locations. Please stay mindful and don\'t let it interfere with your studies or daily rhythm! Keep it balanced!</string>
 
     <string name="setting_ui_desc">The valid range is 0.25~5.00 times.</string>
     <string name="setting_ui_density_desc">Minimum: 72.</string>
-    <string name="setup_introduction">This is a Fork project of BiliClient.\n\nMay you find your own small joys within this little screen!\n\nNo discussion group available yet.\nTo report issues or suggest improvements, please visit the open-source repository to submit an Issue!\nOpen-source address: https://github.com/Re-BiliTerminal/BiliZepam\n\nPlease note:\nThis software is permanently free and open-source and does not collect any of your account or personal information. Use it with peace of mind!\nIf you paid to download BiliTerminal on any platform, you’ve been scammed!\n\nClick the button below to get started!</string>
+    <string name="setup_introduction">This is a Fork project of BiliClient.\n\nMay you find your own small joys within this little screen!\n\nNo discussion group available yet.\nTo report issues or suggest improvements, please visit the open-source repository to submit an Issue!\nOpen-source address: https://github.com/YNotBili/KiliKili\n\nPlease note:\nThis software is permanently free and open-source and does not collect any of your account or personal information. Use it with peace of mind!\nIf you paid to download BiliTerminal on any platform, you’ve been scammed!\n\nClick the button below to get started!</string>
 
     <string name="egg_warmwords_warmworld">Keep in mind: If you encounter mental health–related concerns,\n24/7 National Psychological Support Hotline(China only): 010–82951332\nOr open the official Bilibili app, go to My Profile → scroll down to Recommended Services → Energy Station.\n\nIf you need this, we hope this Easter egg can offer some support.\nIf someone else might benefit, feel free to share it with them.</string>
 
@@ -87,6 +87,8 @@
     <string name="about">About</string>
     <string name="name_robin_not_bad">RobinNotBad</string>
     <string name="desc_robin_not_bad">and his Nahida (Project Initiator | Shit Code Pioneer)</string>
+    <string name="name_rj_multi_dev">RJMultiDev</string>
+    <string name="desc_rj_multi_dev">Project Maintainer</string>
     <string name="name_huanli233">huanli233</string>
     <string name="desc_huanli233">Creator of this branch</string>
     <string name="disclaimer">Disclaimer</string>
@@ -243,7 +245,7 @@
     <string name="user_follow_failed">Operation failed (Unknown reason): %1$d</string>
     <string name="user_followed">Followed</string>
     <string name="user_follow">Follow</string>
-    <string name="bilizepam_crash">BiliZepam crashed</string>
+    <string name="bilizepam_crash">KiliKili crashed</string>
     <string name="crash_stack">Crash Stack:</string>
     <string name="restart_app">Restart App</string>
     <string name="exit_app">Exit App</string>

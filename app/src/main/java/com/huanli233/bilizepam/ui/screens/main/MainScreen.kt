@@ -509,7 +509,10 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 
             composable(Screen.DownloadList.route) {
                 DownloadListScreen(
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onPlayClick = { aid, cid ->
+                        contentNavController.navigate("player/$aid/$cid")
+                    }
                 )
             }
 

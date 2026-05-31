@@ -15,13 +15,14 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://www.jitpack.io") }
         mavenLocal()
+
     }
     versionCatalogs {
         create("libs")
     }
 }
 
-rootProject.name = "BiliZepam"
+rootProject.name = "KiliKili"
 include(":app")
 include(":ijkplayer-java")
 include(":DanmakuFlameMaster")

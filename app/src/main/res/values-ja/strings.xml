@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">BiliZepam</string>
+    <string name="app_name">KiliKili</string>
     <string name="about_description">軽量なサードパーティー製B站アプリ</string>
     <string name="about_opensource">このプログラムは完全にオープンソースであり、コード部分はGNU GPL-V3.0ライセンスに従います</string>
     <string
         name="repo_url"
-        translatable="false">https://github.com/Re-BiliTerminal/BiliZepam</string>
+        translatable="false">https://github.com/YNotBili/KiliKili</string>
     <string name="about_to_uncle">本アプリの開発目的は、スペックの低いAndroidスマートウォッチや\n旧型スマートフォンでもB站ウェブ版の基本機能を利用可能にすることです。\nB站のウェブ版APIを基に動作しており、APIへの過剰なリクエスト送信や\nユーザーのプライバシー情報を収集することは一切ありません。\n有料機能は一切ありませんが、コードは完全オープンソースです。\n万一当アプリが権利を侵害しているとお考えの場合は\nご連絡ください（話し合いで解決しましょうね～）\n\nまた学生ユーザーが不適切な時間・場所で使用したことによる\n財産上の損害（デバイス没収等）や精神的損害（？）について\n当方は一切責任を負いません。\n自制いただき、学業や日常生活に支障をきたさないようお願いします!</string>
 
     <string name="setting_ui_desc">設定可能範囲は0.25〜5.00（倍）です\n調整は少しずつ行い、プレビューで表示を確認してから\n変更を確定してください。新しいページを開くと反映されます\n\n注意：極端な最小値・最大値の設定はなるべく避けてくださいね！\n設定を誤ってアプリが正常に動作しなくなった場合は\nデータを消去するか、再インストールで対応してください！</string>
     <string name="setting_ui_density_desc">最低値は72〜\n調整は少しずつ行い、プレビューで表示を確認してから\n変更を確定してください。新しいページで反映されます\n\n設定を誤ってアプリが正常に動作しなくなった場合は\nデータを消去するか再インストールしてください！\n※この設定には予期せぬ不具合が発生する可能性があります\n特別な理由がない限り変更しないでください</string>
-    <string name="setup_introduction">これはBiliClientのForkプロジェクトです。\n\nこの小さな画面の中で、あなただけの小さな楽しみを見つけられますように！\n\n現在、交流グループはありません。\n問題の報告や提案は、オープンソースのアドレスにてIssueを提出してください！\nオープンソースアドレス：https://github.com/huanli233/BiliZepam\n\nご注意ください：\n本ソフトウェアは永久に無料かつオープンソースで、\nあなたのアカウントやプライバシー情報を一切収集しませんので、\n安心してお使いください！\nもしあなたがどのプラットフォームでも有料でBiliTerminalをダウンロードした場合、\nそれは詐欺に遭っています！\n\n下のボタンをクリックして、始めましょう！</string>
+    <string name="setup_introduction">これはBiliClientのForkプロジェクトです。\n\nこの小さな画面の中で、あなただけの小さな楽しみを見つけられますように！\n\n現在、交流グループはありません。\n問題の報告や提案は、オープンソースのアドレスにてIssueを提出してください！\nオープンソースアドレス：https://github.com/YNotBili/KiliKili\n\nご注意ください：\n本ソフトウェアは永久に無料かつオープンソースで、\nあなたのアカウントやプライバシー情報を一切収集しませんので、\n安心してお使いください！\nもしあなたがどのプラットフォームでも有料でBiliTerminalをダウンロードした場合、\nそれは詐欺に遭っています！\n\n下のボタンをクリックして、始めましょう！</string>
 
     <string name="egg_warmwords_warmworld">心の健康に関わる問題に直面した時は、次の情報を覚えておいてください：\n全国24時間無料心理相談ホットライン（中国国内限定）：010‐82951332\nまたは公式アプリ「ビリビリ」で、[マイページ]→[下にスクロールしてオススメサービスを探す]→[エネルギー加油站]へ。\n\nもし必要なら、この隠し機能が役立つと嬉しいです。\n他の方が必要そうでしたら、ぜひ教えてあげてくださいね。</string>
 
@@ -87,6 +87,8 @@
     <string name="about">について</string>
     <string name="name_robin_not_bad">RobinNotBad</string>
     <string name="desc_robin_not_bad">Robinと彼のナヒーダちゃん（プロジェクト発起者｜クソコードの礎）</string>
+    <string name="name_rj_multi_dev">RJMultiDev</string>
+    <string name="desc_rj_multi_dev">プロジェクトメンテナー</string>
     <string name="name_huanli233">huanli233</string>
     <string name="desc_huanli233">このブランチの作成者</string>
     <string name="disclaimer">免責事項</string>
@@ -200,7 +202,7 @@
     <string name="user_follow_failed">操作失敗（原因不明）：%1$d</string>
     <string name="user_followed">フォロー済</string>
     <string name="user_follow">フォロー</string>
-    <string name="bilizepam_crash">BiliZepamがクラッシュしました</string>
+    <string name="bilizepam_crash">KiliKiliがクラッシュしました</string>
     <string name="crash_stack">クラッシュスタック：</string>
     <string name="restart_app">アプリを再起動</string>
     <string name="exit_app">アプリ終了</string>

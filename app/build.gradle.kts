@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import java.io.FileInputStream
@@ -15,7 +16,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.materialthemebuilder)
     alias(libs.plugins.autoresconfig)
-//    alias(libs.plugins.kapt)
 }
 
 buildscript {
@@ -51,7 +51,7 @@ fun getGitHash(): String {
         val repository = FileRepositoryBuilder.create(gitDir)
         repository.use { repo ->
             val head = repo.resolve("HEAD")
-            head?.abbreviate(8)?.name()
+            head?.abbreviate(7)?.name()
         }
     }.getOrNull() ?: "nogit"
 }
@@ -61,7 +61,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     lint {
-        baseline = file("lint-baseline.xml")
+        baseline = file("lint-baseline.xml")!!
         disable.add("MissingTranslation")
     }
 
@@ -81,6 +81,7 @@ android {
     }
 
     defaultConfig {
+        // 维持原appid以保证可迁移性？
         applicationId = "com.huanli233.bilizepam.compose"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
@@ -163,8 +164,8 @@ android {
         outputs.all {
             val versionName = this@variant.versionName
             val abi = filters.find { it.filterType == "ABI" }?.identifier ?: "universal"
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
-                "BiliZepam-${this@variant.name}-${versionName}-${abi}.apk"
+            (this as BaseVariantOutputImpl)?.outputFileName =
+                "KiliKili-${this@variant.name}-${versionName}-${abi}.apk"
         }
     }
 }

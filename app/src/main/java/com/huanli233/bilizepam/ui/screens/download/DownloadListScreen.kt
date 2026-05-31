@@ -3,6 +3,7 @@ package com.huanli233.bilizepam.ui.screens.download
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -48,6 +49,7 @@ enum class ContentState {
 @Composable
 fun DownloadListScreen(
     onNavigateBack: () -> Unit,
+    onPlayClick: (aid: Long, cid: Long) -> Unit = { _, _ -> },
     viewModel: DownloadListViewModel = hiltViewModel()
 ) {
     val downloads by viewModel.downloads.collectAsState()
@@ -101,7 +103,8 @@ fun DownloadListScreen(
                                 task = task,
                                 onCancel = { viewModel.cancel(task.id) },
                                 onRetry = { viewModel.retry(task.id) },
-                                onDelete = { deleteTarget = task }
+                                onDelete = { deleteTarget = task },
+                                onPlayClick = onPlayClick
                             )
                         }
                     }
@@ -152,17 +155,44 @@ fun DownloadListScreen(
     }
 }
 
+private fun parseAidCidFromKey(key: String): Pair<Long, Long>? {
+    val parts = key.split("_")
+    if (parts.size >= 4 && parts[0] == "video") {
+        val aid = parts[1].toLongOrNull()
+        val cid = parts[2].toLongOrNull()
+        if (aid != null && cid != null) {
+            return aid to cid
+        }
+    }
+    return null
+}
+
 @Composable
 private fun DownloadTaskItem(
     task: DownloadEntity,
     onCancel: () -> Unit,
     onRetry: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onPlayClick: (aid: Long, cid: Long) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
 
+    val canPlay = task.status == DownloadStatus.SUCCEEDED
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (canPlay) {
+                    Modifier.clickable {
+                        parseAidCidFromKey(task.key)?.let { (aid, cid) ->
+                            onPlayClick(aid, cid)
+                        }
+                    }
+                } else {
+                    Modifier
+                }
+            ),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

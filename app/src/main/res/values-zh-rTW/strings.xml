@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">BiliZepam</string>
+    <string name="app_name">KiliKili</string>
     <string name="about_description">輕量的第三方B站用戶端</string>
     <string name="about_opensource">本程式完全開源，程式碼部分遵循GNU GPL-V3.0協議</string>
-    <string name="repo_url" translatable="false">https://github.com/Re-BiliTerminal/BiliZepam</string>
+    <string name="repo_url" translatable="false">https://github.com/YNotBili/KiliKili</string>
     <string name="about_to_uncle">本軟體開發的目的是使配置較低的安卓手錶與老舊手機能夠使用B站網頁端提供的部分基本功能。本軟體基於B站網頁端介面執行，不會對任何介面進行惡意轟炸，也不會收集任何使用者隱私資訊。軟體不存在付費功能，程式碼完全開源。如果您仍然認為本軟體侵犯了您的權利，請聯絡我們（有事好商量嗚嗚嗚）\n同時，我們也不對學生使用者在不恰當的時間、地點使用本軟體導致的財產損失（裝置被沒收）或精神傷害（？）負責。請盡量自控，不要影響到自己的學習和生活哦！</string>
 
     <string name="setting_ui_desc">有效範圍為0.25~5.00（倍）</string>
     <string name="setting_ui_density_desc">最低72，請謹慎調整該項</string>
-    <string name="setup_introduction">這是嗶哩終端的Fork項目，\n\n願你在這一方小小的螢幕中，找到屬於自己的小小的快樂！\n\n暫無交流群\n回饋問題、提交建議請前往開源地址提交Issue！\n開源地址：https://github.com/Re-BiliTerminal/BiliZepam\n\n請注意：\n本軟體永久免費開源，不會收集你的任何帳號及隱私資訊，請放心使用！\n若你在任何平台付費下載到嗶哩終端，那麼你被坑了！</string>
+    <string name="setup_introduction">這是嗶哩終端的Fork項目，\n\n願你在這一方小小的螢幕中，找到屬於自己的小小的快樂！\n\n暫無交流群\n回饋問題、提交建議請前往開源地址提交Issue！\n開源地址：https://github.com/YNotBili/KiliKili\n\n請注意：\n本軟體永久免費開源，不會收集你的任何帳號及隱私資訊，請放心使用！\n若你在任何平台付費下載到嗶哩終端，那麼你被坑了！</string>
 
     <string name="egg_warmwords_warmworld">請記住，如果遇到心理健康相關問題：\n全國24小時免費心理諮商熱線：010\-82951332\n或官方手機端嗶哩嗶哩，打開 我的-下滑找到推薦服務-能量加油站。\n\n如果你需要這個，那麼希望這個彩蛋能幫到你。\n如果其他人需要，那就請推薦給他/她吧。</string>
 
@@ -79,6 +79,8 @@
     <string name="about">關於</string>
     <string name="name_robin_not_bad">RobinNotBad</string>
     <string name="desc_robin_not_bad">和他的納西妲醬（項目發起者|屎山奠基人）</string>
+    <string name="name_rj_multi_dev">RJMultiDev</string>
+    <string name="desc_rj_multi_dev">專案維護者</string>
     <string name="name_huanli233">huanli233</string>
     <string name="desc_huanli233">此分支的建立者</string>
     <string name="disclaimer">免責宣告</string>
@@ -192,7 +194,7 @@
     <string name="user_follow_failed">操作失敗（原因未知）：%1$d</string>
     <string name="user_followed">已關注</string>
     <string name="user_follow">關注</string>
-    <string name="bilizepam_crash">BiliZepam崩潰了</string>
+    <string name="bilizepam_crash">KiliKili崩潰了</string>
     <string name="crash_stack">崩潰堆疊：</string>
     <string name="restart_app">重啟應用</string>
     <string name="exit_app">退出應用</string>
