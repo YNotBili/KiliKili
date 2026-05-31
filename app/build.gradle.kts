@@ -96,14 +96,13 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
-    /*
+
     signingConfigs {
         create("release") {
             val localProps = rootProject.file("local.properties")
             if (localProps.exists()) {
                 val props = Properties()
                 props.load(localProps.inputStream())
-
                 if (props.containsKey("KEY_PATH")) {
                     storeFile = file(props.getProperty("KEY_PATH") ?: "key.jks")
                     storePassword = props.getProperty("KEY_PASSWORD")
@@ -113,7 +112,7 @@ android {
             }
         }
     }
-    */
+
 
     buildTypes {
         getByName("release") {
@@ -126,7 +125,7 @@ android {
 
             val localProps = rootProject.file("local.properties")
             if (localProps.exists()) {
-                // signingConfig = signingConfigs.getByName("release")
+                signingConfig = signingConfigs.getByName("release")
             }
         }
 

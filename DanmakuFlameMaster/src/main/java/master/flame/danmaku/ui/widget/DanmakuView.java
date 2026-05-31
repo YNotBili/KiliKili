@@ -27,10 +27,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.LinkedList;
-import java.util.Locale;
-
 import master.flame.danmaku.controller.DrawHandler;
 import master.flame.danmaku.controller.DrawHandler.Callback;
 import master.flame.danmaku.controller.DrawHelper;
@@ -42,6 +38,11 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.SystemClock;
+
+import java.util.LinkedList;
+import java.util.Locale;
+
+import static master.flame.danmaku.danmaku.util.AndroidUtils.getIdOfThread;
 
 public class DanmakuView extends View implements IDanmakuView, IDanmakuViewController {
 
@@ -82,7 +83,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
 
     @SuppressWarnings("deprecation")
     private void init() {
-        mUiThreadId = Thread.currentThread().getId();
+        mUiThreadId = getIdOfThread(Thread.currentThread());
         setBackgroundColor(Color.TRANSPARENT);
         setDrawingCacheBackgroundColor(Color.TRANSPARENT);
         DrawHelper.useDrawColorToClearCanvas(true, false);
@@ -498,7 +499,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if (!isViewReady()) {
             return;
         }
-        if (!mDanmakuVisible || Thread.currentThread().getId() == mUiThreadId) {
+        if (!mDanmakuVisible || getIdOfThread(Thread.currentThread()) == mUiThreadId) {
             mClearFlag = true;
             postInvalidateCompat();
         } else {
