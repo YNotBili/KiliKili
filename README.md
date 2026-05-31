@@ -1,33 +1,23 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <div align="center">
 
-# YNotBili.D
+# KiliKili
 
 第三方B站Android手表客户端
 
 </div>
 
-这是一个尝试续写BiliZepam的项目，大概，也许。
+这是一个尝试续写BiliZepam的项目。
 
 不保证更新，不保证稳定。
 
-默哀。
-
 ## 介绍
-这是一个专为 **Wear OS 手表设备**设计的**第三方 B 站客户端**，基于 [哔哩终端](https://gitee.com/RobinNotBad/BiliClient) 开发。本项目借鉴了 [Re-WearBili](https://github.com/SpaceXC/Re-WearBili) 的部分开源代码和它们收集的部分 API，**本项目与 WearBili/Re-WearBili 无任何关系**。
+这是一个专为 **Wear OS 手表设备**设计的**第三方 B 站客户端**，曾经基于 [哔哩终端](https://gitee.com/RobinNotBad/BiliClient) 开发。本项目借鉴了 [Re-WearBili](https://github.com/SpaceXC/Re-WearBili) 的部分开源代码和它们收集的部分 API，**本项目与 WearBili/Re-WearBili 无任何关系**。
 
 项目使用 **ExoPlayer** 作为内置播放器，支持在手表上直接播放视频。
 
 ## 关于此分支
 此分支试图重写大部分代码，以增强原项目的可读性和维护性。同时，使用 ``Material3`` 并改进界面观感和操作逻辑。
-
-### 架构迁移
-**项目已从传统的 Android Views 架构完全迁移至 Jetpack Compose**，这是一次重大的技术革新：
-
-- **UI 框架**：从 Hikage + Views 迁移到声明式 UI（Jetpack Compose）
-- **架构模式**：采用 MVVM 架构，使用 StateFlow 进行状态管理
-- **Material Design**：全面使用 Material3 组件和设计规范
-- **Wear OS 支持**：针对手表设备优化，使用 Wear Compose Material3
 
 ### 技术栈
 - `Kotlin` - 主要开发语言
