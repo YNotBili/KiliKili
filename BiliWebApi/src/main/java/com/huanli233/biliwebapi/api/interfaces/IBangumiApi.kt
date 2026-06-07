@@ -26,4 +26,34 @@ interface IBangumiApi {
     data class MediaIdResult(
         val media_id: Long
     )
+
+    /**
+     * 获取追番列表
+     */
+    @GET("/x/space/bangumi/follow/list")
+    suspend fun getFollowedBangumi(
+        @Query("pn") page: Int = 1,
+        @Query("ps") pageSize: Int = 15,
+        @Query("type") type: Int = 1
+    ): ApiResponse<FollowedBangumiResult>
+
+    data class FollowedBangumiResult(
+        val list: List<FollowedBangumiItem> = emptyList(),
+        val total: Int = 0
+    )
+
+    data class FollowedBangumiItem(
+        val season_id: Long,
+        val media_id: Long,
+        val title: String = "",
+        val cover: String = "",
+        val evaluate: String = "",
+        val total_count: Int = 0,
+        val progress: String = "",
+        val newest_ep_id: Long = 0,
+        val newest_ep_index: String = "",
+        val is_finish: Int = 0,
+        val is_started: Int = 0,
+        val attention: Int = 0
+    )
 }

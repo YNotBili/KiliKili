@@ -65,6 +65,20 @@ import com.huanli233.bilizepam.ui.screens.video.VideoDetailScreen
 import com.huanli233.bilizepam.ui.screens.comment.WriteReplyScreen
 import com.huanli233.bilizepam.ui.screens.search.SearchScreen
 import com.huanli233.bilizepam.ui.screens.search.SearchResultScreen
+import com.huanli233.bilizepam.ui.screens.ranking.RankingScreen
+import com.huanli233.bilizepam.ui.screens.timeline.TimelineScreen
+import com.huanli233.bilizepam.ui.screens.message.MessageCenterScreen
+import com.huanli233.bilizepam.ui.screens.message.PrivateMsgScreen
+import com.huanli233.bilizepam.ui.screens.vip.VipScreen
+import com.huanli233.bilizepam.ui.screens.member.CoinLogScreen
+import com.huanli233.bilizepam.ui.screens.member.ExpLogScreen
+import com.huanli233.bilizepam.ui.screens.member.LoginRecordScreen
+import com.huanli233.bilizepam.ui.screens.message.LikeMessagesScreen
+import com.huanli233.bilizepam.ui.screens.message.ReplyMessagesScreen
+import com.huanli233.bilizepam.ui.screens.message.SystemMessagesScreen
+import com.huanli233.bilizepam.ui.screens.message.ConversationScreen
+import com.huanli233.bilizepam.ui.screens.message.DanmakuSendScreen
+import com.huanli233.bilizepam.ui.screens.dynamic.SendDynamicScreen
 import android.net.Uri
 import java.net.URLDecoder
 
@@ -668,6 +682,156 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onUserClick = { mid ->
                         contentNavController.navigate("user/$mid")
                     }
+                )
+            }
+
+            // ===== 新功能路由 =====
+
+            composable(Screen.Ranking.route) {
+                RankingScreen(
+                    onVideoClick = { videoInfo ->
+                        contentNavController.navigate(
+                            Screen.VideoDetail.createRoute(videoInfo.aid, videoInfo.bvid)
+                        )
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Timeline.route) {
+                TimelineScreen(
+                    onBangumiClick = { seasonId ->
+                        contentNavController.navigate("bangumi/$seasonId")
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.MessageCenter.route) {
+                MessageCenterScreen(
+                    onLikeClick = {
+                        contentNavController.navigate(Screen.LikeMessages.route)
+                    },
+                    onReplyClick = {
+                        contentNavController.navigate(Screen.ReplyMessages.route)
+                    },
+                    onAtClick = {
+                        contentNavController.navigate("at_messages")
+                    },
+                    onSystemClick = {
+                        contentNavController.navigate(Screen.SystemMessages.route)
+                    },
+                    onPrivateMsgClick = {
+                        contentNavController.navigate(Screen.PrivateMessages.route)
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.LikeMessages.route) {
+                LikeMessagesScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ReplyMessages.route) {
+                ReplyMessagesScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.SystemMessages.route) {
+                SystemMessagesScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.Conversation.route,
+                arguments = listOf(
+                    navArgument("talkerUid") { type = NavType.LongType },
+                    navArgument("talkerName") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val talkerUid = backStackEntry.arguments?.getLong("talkerUid") ?: 0L
+                val talkerName = URLDecoder.decode(
+                    backStackEntry.arguments?.getString("talkerName") ?: "", "UTF-8"
+                )
+                ConversationScreen(
+                    talkerUid = talkerUid,
+                    talkerName = talkerName,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.DanmakuSend.route,
+                arguments = listOf(
+                    navArgument("cid") { type = NavType.LongType },
+                    navArgument("aid") { type = NavType.LongType; defaultValue = 0L },
+                    navArgument("bvid") { type = NavType.StringType; defaultValue = "" }
+                )
+            ) { backStackEntry ->
+                val cid = backStackEntry.arguments?.getLong("cid") ?: 0L
+                val aid = backStackEntry.arguments?.getLong("aid") ?: 0L
+                val bvid = backStackEntry.arguments?.getString("bvid") ?: ""
+                DanmakuSendScreen(
+                    cid = cid,
+                    aid = aid,
+                    bvid = bvid,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onSendSuccess = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.FollowingBangumi.route) {
+                com.huanli233.bilizepam.ui.screens.bangumi.FollowingBangumiScreen(
+                    onBangumiClick = { mediaId ->
+                        contentNavController.navigate("bangumi/$mediaId")
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.LoginRecords.route) {
+                LoginRecordScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.SendDynamic.route) {
+                SendDynamicScreen(
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onPublishSuccess = { dynamicId ->
+                        contentNavController.navigate("dynamic_detail/$dynamicId")
+                    }
+                )
+            }
+
+            composable(Screen.PrivateMessages.route) {
+                PrivateMsgScreen(
+                    onSessionClick = { talkerUid ->
+                        // TODO: 跳转到私信聊天详情页
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.VipCenter.route) {
+                VipScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.CoinLog.route) {
+                CoinLogScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ExpLog.route) {
+                ExpLogScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 

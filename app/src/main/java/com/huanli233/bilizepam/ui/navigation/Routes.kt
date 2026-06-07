@@ -45,6 +45,32 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
     }
     
     data object MySpace : Screen("my_space", R.string.my_space)
+
+    // ===== 新功能屏幕 =====
+    data object Ranking : Screen("ranking", R.string.ranking)
+    data object Timeline : Screen("timeline", R.string.timeline)
+    data object MessageCenter : Screen("message_center", R.string.message_center)
+    data object VipCenter : Screen("vip_center", R.string.vip_center)
+    data object CoinLog : Screen("coin_log", R.string.coin_log)
+    data object ExpLog : Screen("exp_log", R.string.exp_log)
+    data object PrivateMessages : Screen("private_messages", R.string.private_messages)
+    data object LikeMessages : Screen("like_messages", R.string.like_messages)
+    data object ReplyMessages : Screen("reply_messages", R.string.reply_messages)
+    data object AtMessages : Screen("at_messages", R.string.at_messages)
+    data object SystemMessages : Screen("system_messages", R.string.system_messages)
+    data object Conversation : Screen("conversation/{talkerUid}/{talkerName}", R.string.private_messages) {
+        fun createRoute(talkerUid: Long, talkerName: String): String {
+            return "conversation/$talkerUid/${URLEncoder.encode(talkerName, "UTF-8")}"
+        }
+    }
+    data object DanmakuSend : Screen("danmaku_send/{cid}?aid={aid}&bvid={bvid}", R.string.send_danmaku) {
+        fun createRoute(cid: Long, aid: Long = 0, bvid: String = ""): String {
+            return "danmaku_send/$cid?aid=$aid&bvid=$bvid"
+        }
+    }
+    data object FollowingBangumi : Screen("following_bangumi", R.string.following_bangumi)
+    data object LoginRecords : Screen("login_records", R.string.login_records)
+    data object SendDynamic : Screen("send_dynamic", R.string.send_dynamic)
 }
 
 val allScreens = listOf(
@@ -57,5 +83,12 @@ val allScreens = listOf(
     Screen.ThemeColor,
     Screen.ViewPreview,
     Screen.Search,
-    Screen.MySpace
+    Screen.MySpace,
+    Screen.Ranking,
+    Screen.Timeline,
+    Screen.MessageCenter,
+    Screen.VipCenter,
+    Screen.CoinLog,
+    Screen.ExpLog,
+    Screen.PrivateMessages
 )

@@ -9,6 +9,12 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.CardMembership
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.google.gson.Gson
 import com.huanli233.bilizepam.R
@@ -23,6 +29,12 @@ val DEFAULT_MENU_LIST = listOf(
     menuItem("dynamic", Screen.Dynamic.route, R.string.dynamic, Icons.Outlined.Newspaper, requireLoggedIn = true),
     menuItem("download_manager", Screen.DownloadList.route, R.string.download_manager, Icons.Outlined.Download),
     menuItem("my_space", Screen.MySpace.route, R.string.my_space, Icons.Outlined.Person, requireLoggedIn = true),
+    menuItem("message_center", Screen.MessageCenter.route, R.string.message_center, Icons.Outlined.Notifications, requireLoggedIn = true),
+    menuItem("ranking", Screen.Ranking.route, R.string.ranking, Icons.Outlined.Star),
+    menuItem("timeline", Screen.Timeline.route, R.string.timeline, Icons.Outlined.Schedule),
+    menuItem("vip_center", Screen.VipCenter.route, R.string.vip_center, Icons.Outlined.CardMembership, requireLoggedIn = true),
+    menuItem("coin_log", Screen.CoinLog.route, R.string.coin_log, Icons.Outlined.AccountBalanceWallet, requireLoggedIn = true),
+    menuItem("exp_log", Screen.ExpLog.route, R.string.exp_log, Icons.Outlined.TrendingUp, requireLoggedIn = true),
     menuItem("search", Screen.Search.route, R.string.search, Icons.Outlined.Search),
     menuItem("settings", Screen.Settings.route, R.string.settings, Icons.Outlined.Settings, required = true)
 )

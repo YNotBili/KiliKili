@@ -507,5 +507,20 @@
     <string name="clear_history">清除历史</string>
     <string name="no_results">没有找到相关内容</string>
     <string name="error_occurred">出错了</string>
+    <string name="ranking">排行榜</string>
+    <string name="timeline">追番时间表</string>
+    <string name="message_center">消息中心</string>
+    <string name="vip_center">会员中心</string>
+    <string name="coin_log">硬币记录</string>
+    <string name="exp_log">经验记录</string>
+    <string name="private_messages">私信</string>
+    <string name="like_messages">点赞消息</string>
+    <string name="reply_messages">回复消息</string>
+    <string name="at_messages">@消息</string>
+    <string name="system_messages">系统通知</string>
+    <string name="send_dynamic">发布动态</string>
+    <string name="send_danmaku">发送弹幕</string>
+    <string name="following_bangumi">追番列表</string>
+    <string name="login_records">登录记录</string>
 
 </resources>
