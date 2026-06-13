@@ -87,6 +87,6 @@
     *** *$lambda$*$*(tv.danmaku.ijk.media.player.IMediaPlayer, int, int, int, int);
 }
 
--keepclassmembers class com.huanli233.bilizepam.ui.screens.player.PlayerViewModel {
+-keepclassmembers class rj.kilikili.ui.screens.player.PlayerViewModel {
     <methods>;
 }

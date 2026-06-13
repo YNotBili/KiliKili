@@ -23,7 +23,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import com.huanli233.bilizepam.R
+import rj.kilikili.R
 
 @Composable
 @ReadOnlyComposable

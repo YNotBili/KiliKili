@@ -57,7 +57,7 @@ fun getGitHash(): String {
 }
 
 android {
-    namespace = "com.huanli233.bilizepam"
+    namespace = "rj.kilikili"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     lint {
@@ -82,7 +82,7 @@ android {
 
     defaultConfig {
         // 维持原appid以保证可迁移性？
-        applicationId = "com.huanli233.bilizepam.compose"
+        applicationId = "rj.kilikili"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = getGitCommitCount()
@@ -187,7 +187,7 @@ protobuf {
 
 autoResConfig {
     generateClass = true
-    generatedClassFullName = "com.huanli233.bilizepam.Locales"
+    generatedClassFullName = "rj.kilikili.Locales"
     generateRes = true
     generatedResPrefix = null
     generatedArrayFirstItem = "SYSTEM"

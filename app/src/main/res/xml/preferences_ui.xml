@@ -5,20 +5,20 @@
     <Preference
         app:title="@string/view_preview">
         <intent
-            android:targetPackage="com.huanli233.bilizepam"
-            android:targetClass="com.huanli233.bilizepam.ui.activity.setup.UiPreviewActivity" />
+            android:targetPackage="rj.kilikili"
+            android:targetClass="rj.kilikili.ui.activity.setup.UiPreviewActivity" />
     </Preference>
 
     <PreferenceCategory
         app:title="@string/scale">
-        <com.huanli233.bilizepam.ui.preferences.FloatEditTextPreference
+        <rj.kilikili.ui.preferences.FloatEditTextPreference
             app:key="ui_scale"
             app:title="@string/interface_scale"
             app:summary="@string/setting_ui_desc"
             app:defaultValue="1.0"
             app:minFloatValue="0.25"
             app:maxFloatValue="5.0" />
-        <com.huanli233.bilizepam.ui.preferences.IntEditTextPreference
+        <rj.kilikili.ui.preferences.IntEditTextPreference
             app:key="density"
             app:title="@string/density"
             app:summary="@string/setting_ui_density_desc"
@@ -29,7 +29,7 @@
 
     <PreferenceCategory
         app:title="@string/preference">
-        <com.huanli233.bilizepam.ui.preferences.MaterialListPreference
+        <rj.kilikili.ui.preferences.MaterialListPreference
             app:key="night_mode"
             app:title="@string/dark_theme"
             app:entries="@array/dark_theme_modes"
@@ -41,8 +41,8 @@
         <Preference
             app:title="@string/theme_color">
             <intent
-                android:targetPackage="com.huanli233.bilizepam"
-                android:targetClass="com.huanli233.bilizepam.ui.activity.setting.ThemeColorActivity" />
+                android:targetPackage="rj.kilikili"
+                android:targetClass="rj.kilikili.ui.activity.setting.ThemeColorActivity" />
         </Preference>
         <com.huanli233.materialpreferences.MaterialSwitchPreference
             app:key="round_mode"

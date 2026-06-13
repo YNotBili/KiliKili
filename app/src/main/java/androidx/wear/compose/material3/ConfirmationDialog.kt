@@ -66,7 +66,7 @@ import androidx.wear.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.wear.compose.material3.tokens.MotionTokens.DurationShort2
 import androidx.wear.compose.material3.tokens.MotionTokens.DurationShort3
 import androidx.wear.compose.material3.tokens.ShapeTokens
-import com.huanli233.bilizepam.R
+import rj.kilikili.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

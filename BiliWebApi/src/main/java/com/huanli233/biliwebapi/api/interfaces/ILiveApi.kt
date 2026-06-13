@@ -4,6 +4,7 @@ import com.huanli233.biliwebapi.bean.ApiResponse
 import com.huanli233.biliwebapi.bean.live.DEFAULT_QN
 import com.huanli233.biliwebapi.bean.live.LivePlayInfo
 import com.huanli233.biliwebapi.bean.live.LiveRoom
+import com.huanli233.biliwebapi.bean.live.RecommendLiveData
 import com.huanli233.biliwebapi.httplib.Domains
 import com.huanli233.biliwebapi.httplib.annotation.API
 import retrofit2.http.GET
@@ -31,4 +32,20 @@ interface ILiveApi {
         @Query("panorama") panorama: Int = 1,
     ): ApiResponse<LivePlayInfo>
 
+    /** 获取直播推荐 */
+    @API(Domains.LIVE_API_URL)
+    @GET("/xlive/web-interface/v1/second/getUserRecommend")
+    suspend fun getRecommendLive(): ApiResponse<RecommendLiveData>
+
+    /** 获取关注直播列表 */
+    @API(Domains.LIVE_API_URL)
+    @GET("/xlive/web-ucenter/v1/xfetter/GetWebList")
+    suspend fun getFollowedLive(
+        @Query("pn") page: Int = 1,
+        @Query("ps") pageSize: Int = 10
+    ): ApiResponse<FollowedLiveData>
+
+    data class FollowedLiveData(
+        val list: List<LiveRoom> = emptyList()
+    )
 }

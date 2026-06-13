@@ -522,5 +522,13 @@
     <string name="send_danmaku">发送弹幕</string>
     <string name="following_bangumi">追番列表</string>
     <string name="login_records">登录记录</string>
+    <string name="recommend_live">推荐直播</string>
+    <string name="followed_live">关注直播</string>
+    <string name="live_room">直播房间</string>
+    <string name="creative_center">创作中心</string>
+    <string name="medal_wall">粉丝徽章</string>
+    <string name="edit_signature">编辑签名</string>
+    <string name="quality_chooser">画质选择</string>
+    <string name="message_settings">消息设置</string>
 
 </resources>

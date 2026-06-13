@@ -51,8 +51,8 @@ import androidx.wear.compose.material3.PaddingDefaults.verticalContentPadding
 import androidx.wear.compose.material3.internal.Icons
 import androidx.wear.compose.material3.internal.Strings
 import androidx.wear.compose.material3.internal.getString
-import com.huanli233.bilizepam.ui.dialog.BasicFullScreenDialog
-import com.huanli233.bilizepam.ui.dialog.FullScreenDialogProperties
+import rj.kilikili.ui.dialog.BasicFullScreenDialog
+import rj.kilikili.ui.dialog.FullScreenDialogProperties
 
 /**
  * AlertDialogs provide important prompts in a user flow. They can require an action, communicate

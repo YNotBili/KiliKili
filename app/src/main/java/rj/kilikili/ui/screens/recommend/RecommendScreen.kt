@@ -1,0 +1,337 @@
+package rj.kilikili.ui.screens.recommend
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import rj.kilikili.ui.widget.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material3.PaddingDefaults
+import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.TimeText
+import androidx.wear.compose.material3.verticalContentPadding
+import rj.kilikili.R
+import rj.kilikili.data.setting.LocalData
+import rj.kilikili.ui.components.scrollAwareTopBar
+import com.huanli233.biliwebapi.bean.video.VideoInfo
+import kotlinx.coroutines.launch
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RecommendScreen(
+    viewModel: RecommendViewModel = hiltViewModel(),
+    onVideoClick: (VideoInfo) -> Unit = {},
+    onMenuClick: () -> Unit = {},
+    onPopularClick: () -> Unit = {},
+    onPreciousClick: () -> Unit = {}
+) {
+    val videos = viewModel.videos.collectAsLazyPagingItems()
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScalingLazyListState()
+    var isRefreshing by remember { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    
+    // Create ScrollBehavior for TopBar
+    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    
+    LaunchedEffect(videos.loadState.refresh) {
+        if (videos.loadState.refresh is LoadState.NotLoading && isRefreshing) {
+            isRefreshing = false
+        }
+    }
+
+    ScreenScaffold(
+        scrollState = scrollState,
+        topBar = scrollAwareTopBar(
+            title = stringResource(R.string.recommend),
+            showBackIcon = false,
+            showMenuIcon = true,
+            onMenuClick = onMenuClick,
+            scrollBehavior = scrollBehavior
+        ),
+        topBarScrollBehavior = scrollBehavior // Pass the same ScrollBehavior to ScreenScaffold
+    ) { paddingValues ->
+        val currentLoadState = if (isRefreshing) LoadState.Loading else videos.loadState.refresh
+        
+        Crossfade(
+            targetState = currentLoadState,
+            animationSpec = tween(durationMillis = 300),
+            label = "ContentStateTransition",
+            modifier = Modifier.fillMaxSize()
+        ) { state ->
+            when (state) {
+                is LoadState.Loading -> {
+                    if (videos.itemCount == 0 || isRefreshing) {
+                        LoadingView(
+                            state = LoadingState.LOADING,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        // 有内容时的加载更多，显示内容
+                        ContentView(
+                            videos = videos,
+                            scrollState = scrollState,
+                            paddingValues = paddingValues,
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                isRefreshing = true
+                                videos.refresh()
+                            },
+                            onPopularClick = onPopularClick,
+                            onPreciousClick = onPreciousClick,
+                            onVideoClick = onVideoClick
+                        )
+                    }
+                }
+                is LoadState.Error -> {
+                    if (videos.itemCount == 0) {
+                        LoadingView(
+                            state = LoadingState.ERROR,
+                            errorMessage = state.error.message,
+                            onRetry = { videos.retry() },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        // 有内容时的错误，显示内容
+                        ContentView(
+                            videos = videos,
+                            scrollState = scrollState,
+                            paddingValues = paddingValues,
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                isRefreshing = true
+                                videos.refresh()
+                            },
+                            onPopularClick = onPopularClick,
+                            onPreciousClick = onPreciousClick,
+                            onVideoClick = onVideoClick
+                        )
+                    }
+                }
+                is LoadState.NotLoading -> {
+                    if (videos.itemCount == 0) {
+                        LoadingView(
+                            state = LoadingState.EMPTY,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    } else {
+                        // 正常内容显示
+                        ContentView(
+                            videos = videos,
+                            scrollState = scrollState,
+                            paddingValues = paddingValues,
+                            isRefreshing = isRefreshing,
+                            onRefresh = {
+                                isRefreshing = true
+                                videos.refresh()
+                            },
+                            onPopularClick = onPopularClick,
+                            onPreciousClick = onPreciousClick,
+                            onVideoClick = onVideoClick
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContentView(
+    videos: LazyPagingItems<VideoInfo>,
+    scrollState: ScalingLazyListState,
+    paddingValues: PaddingValues,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onPopularClick: () -> Unit,
+    onPreciousClick: () -> Unit,
+    onVideoClick: (VideoInfo) -> Unit
+) {
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ScalingLazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = scrollState,
+            contentPadding = paddingValues
+        ) {
+            item {
+                QuickAccessButtons(
+                    onPopularClick = onPopularClick,
+                    onPreciousClick = onPreciousClick
+                )
+            }
+
+            items(
+                count = videos.itemCount,
+                key = { index -> videos.peek(index)?.aid?.takeIf { it != 0L } ?: index }
+            ) { index ->
+                val video = videos[index]
+                if (video != null && video.bvid.isNotEmpty()) {
+                    VideoCard(
+                        videoInfo = video,
+                        onClick = { onVideoClick(video) }
+                    )
+                }
+            }
+
+            item {
+                LoadingFooter(videos)
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickAccessButtons(
+    onPopularClick: () -> Unit,
+    onPreciousClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+    ) {
+        Card(
+            onClick = onPopularClick,
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+            modifier = Modifier.height(32.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.LocalFireDepartment,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = "热门",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Medium
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        }
+        
+        Card(
+            onClick = onPreciousClick,
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            ),
+            modifier = Modifier.height(32.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+                Text(
+                    text = "必刷",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Medium
+                    ),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoadingFooter(videos: LazyPagingItems<VideoInfo>) {
+    when (videos.loadState.append) {
+        is LoadState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is LoadState.Error -> {
+            val error = (videos.loadState.append as LoadState.Error).error
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "加载失败: ${error.message}",
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+        }
+        else -> {}
+    }
+}
+

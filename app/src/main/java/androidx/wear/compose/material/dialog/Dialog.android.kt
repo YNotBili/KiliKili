@@ -47,8 +47,8 @@ import androidx.wear.compose.material.STANDARD_OUT
 import androidx.wear.compose.material.SwipeToDismissBox
 import androidx.wear.compose.material.Vignette
 import androidx.wear.compose.material.VignettePosition
-import com.huanli233.bilizepam.ui.dialog.BasicFullScreenDialog
-import com.huanli233.bilizepam.ui.dialog.FullScreenDialogProperties
+import rj.kilikili.ui.dialog.BasicFullScreenDialog
+import rj.kilikili.ui.dialog.FullScreenDialogProperties
 
 /**
  * [Dialog] displays a full-screen dialog, layered over any other content. It takes a single slot,

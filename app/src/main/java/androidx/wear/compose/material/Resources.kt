@@ -19,7 +19,7 @@ package androidx.wear.compose.material
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import com.huanli233.bilizepam.R
+import rj.kilikili.R
 
 internal enum class ImageResources {
     CircularVignetteBottom,
