@@ -71,6 +71,9 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
     data object FollowingBangumi : Screen("following_bangumi", R.string.following_bangumi)
     data object LoginRecords : Screen("login_records", R.string.login_records)
     data object SendDynamic : Screen("send_dynamic", R.string.send_dynamic)
+    data object LiveMedalWall : Screen("live_medal_wall", R.string.live_medal_wall)
+    data object FollowTags : Screen("follow_tags", R.string.follow_tags)
+    data object PopularSeries : Screen("popular_series", R.string.popular_series)
 }
 
 val allScreens = listOf(

@@ -79,6 +79,9 @@ import rj.kilikili.ui.screens.message.SystemMessagesScreen
 import rj.kilikili.ui.screens.message.ConversationScreen
 import rj.kilikili.ui.screens.message.DanmakuSendScreen
 import rj.kilikili.ui.screens.dynamic.SendDynamicScreen
+import rj.kilikili.ui.screens.live.LiveMedalWallScreen
+import rj.kilikili.ui.screens.follow.FollowTagScreen
+import rj.kilikili.ui.screens.popular.PopularSeriesScreen
 import android.net.Uri
 import java.net.URLDecoder
 
@@ -831,6 +834,30 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 
             composable(Screen.ExpLog.route) {
                 ExpLogScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.LiveMedalWall.route) {
+                LiveMedalWallScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.FollowTags.route) {
+                FollowTagScreen(
+                    onTagClick = { tagId, name ->
+                        // TODO: 跳转到分组用户列表
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.PopularSeries.route) {
+                PopularSeriesScreen(
+                    onSeriesClick = { seriesId, name ->
+                        // TODO: 跳转到系列详情
+                    },
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
