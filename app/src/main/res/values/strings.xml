@@ -533,5 +533,8 @@
     <string name="live_medal_wall">粉丝勋章</string>
     <string name="follow_tags">关注分组</string>
     <string name="popular_series">热门系列</string>
+    <string name="hot_search">热搜</string>
+    <string name="fans_list">粉丝列表</string>
+    <string name="danmaku_filter">弹幕过滤</string>
 
 </resources>

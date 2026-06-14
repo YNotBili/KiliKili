@@ -38,10 +38,6 @@ class BiliTerminal : MultiDexApplication() {
 
     override fun onCreate() {
         super.onCreate()
-
-        // 包名迁移检测
-        rj.kilikili.hotupdate.DataMigration.migrate(this)
-
         XLog.init(
             if (BuildConfig.DEBUG) LogLevel.DEBUG else LogLevel.ERROR,
             AndroidPrinter()

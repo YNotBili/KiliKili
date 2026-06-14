@@ -82,6 +82,7 @@ import rj.kilikili.ui.screens.dynamic.SendDynamicScreen
 import rj.kilikili.ui.screens.live.LiveMedalWallScreen
 import rj.kilikili.ui.screens.follow.FollowTagScreen
 import rj.kilikili.ui.screens.popular.PopularSeriesScreen
+import rj.kilikili.ui.screens.search.HotSearchScreen
 import android.net.Uri
 import java.net.URLDecoder
 
@@ -857,6 +858,15 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 PopularSeriesScreen(
                     onSeriesClick = { seriesId, name ->
                         // TODO: 跳转到系列详情
+                    },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(Screen.HotSearch.route) {
+                HotSearchScreen(
+                    onSearch = { query ->
+                        contentNavController.navigate(Screen.SearchResult.createRoute(query))
                     },
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
