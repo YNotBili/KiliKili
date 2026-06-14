@@ -89,4 +89,7 @@ message AppSettings {
 
   string language = 8;
   string search_history = 9;
+
+  // 内部设置：是否使用 HD 登录协议（android_hd 客户端）
+  int32 is_hd = 11;
 }

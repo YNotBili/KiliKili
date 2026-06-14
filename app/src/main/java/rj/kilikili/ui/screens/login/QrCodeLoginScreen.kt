@@ -1,3 +1,5 @@
+// @Removal: 旧登录方式，已被 HdQrCodeLoginScreen 替代
+
 package rj.kilikili.ui.screens.login
 
 import android.graphics.Bitmap

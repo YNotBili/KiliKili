@@ -8,6 +8,8 @@ import com.huanli233.biliwebapi.bean.login.Password
 import com.huanli233.biliwebapi.bean.login.Password.KeyAndHash
 import com.huanli233.biliwebapi.bean.login.QrCode
 import com.huanli233.biliwebapi.bean.login.Sms
+import com.huanli233.biliwebapi.bean.login.TvQrCodeAuth
+import com.huanli233.biliwebapi.bean.login.TvQrCodePoll
 import com.huanli233.biliwebapi.httplib.Domains
 import com.huanli233.biliwebapi.httplib.annotation.API
 import com.huanli233.biliwebapi.httplib.annotation.Queries
@@ -76,4 +78,30 @@ interface ILoginApi {
     @API(Domains.BASE_API_URL)
     @POST("/x/internal/gaia-gateway/ExClimbWuzhi")
     suspend fun activeCookie(@Body payload: CookieActivePayload): ApiResponse<Void>
+
+    // ===== HD/TV 登录端点 =====
+
+    /**
+     * HD 扫码登录：获取 TV 端 auth_code
+     * 使用 mobi_app=android_hd / platform=android
+     */
+    @POST("/x/passport-tv-login/qrcode/auth_code")
+    @FormUrlEncoded
+    suspend fun getTvAuthCode(
+        @Field("local_id") localId: String = "0",
+        @Field("mobi_app") mobiApp: String = "android_hd",
+        @Field("platform") platform: String = "android"
+    ): ApiResponse<TvQrCodeAuth>
+
+    /**
+     * HD 扫码登录：轮询扫码结果
+     */
+    @POST("/x/passport-tv-login/qrcode/poll")
+    @FormUrlEncoded
+    suspend fun tvQrCodePoll(
+        @Field("auth_code") authCode: String,
+        @Field("local_id") localId: String = "0",
+        @Field("mobi_app") mobiApp: String = "android_hd",
+        @Field("platform") platform: String = "android"
+    ): ApiResponse<TvQrCodePoll>
 }
