@@ -16,7 +16,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import rj.kilikili.BiliTerminal
+import rj.kilikili.KiliKili
 import rj.kilikili.data.di.AppDependenciesEntryPoint
 import rj.kilikili.data.download.DownloadDao
 import rj.kilikili.data.download.DownloadStatus
@@ -33,7 +33,7 @@ class DownloadWorker(
 ) : CoroutineWorker(appContext, params) {
 
     private val entryPoint = EntryPoints.get(
-        BiliTerminal.application,
+        KiliKili.application,
         AppDependenciesEntryPoint::class.java
     )
 

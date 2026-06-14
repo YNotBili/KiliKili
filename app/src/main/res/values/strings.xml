@@ -536,5 +536,6 @@
     <string name="hot_search">热搜</string>
     <string name="fans_list">粉丝列表</string>
     <string name="danmaku_filter">弹幕过滤</string>
+    <string name="blacklist">黑名单</string>
 
 </resources>

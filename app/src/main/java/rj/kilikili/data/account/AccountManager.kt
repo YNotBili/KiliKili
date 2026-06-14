@@ -1,6 +1,6 @@
 package rj.kilikili.data.account
 
-import rj.kilikili.BiliTerminal
+import rj.kilikili.KiliKili
 import rj.kilikili.R
 import rj.kilikili.applicationContext
 import rj.kilikili.data.di.AppDependenciesEntryPoint
@@ -15,7 +15,7 @@ object AccountManager {
 
     val repository by lazy {
         val hiltEntryPoint = EntryPointAccessors.fromApplication(
-            BiliTerminal.application,
+            KiliKili.application,
             AppDependenciesEntryPoint::class.java
         )
         hiltEntryPoint.accountRepository()

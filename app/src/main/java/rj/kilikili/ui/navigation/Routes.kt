@@ -75,6 +75,10 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
     data object FollowTags : Screen("follow_tags", R.string.follow_tags)
     data object PopularSeries : Screen("popular_series", R.string.popular_series)
     data object HotSearch : Screen("hot_search", R.string.hot_search)
+    data object FansList : Screen("fans_list/{mid}", R.string.fans_list) {
+        fun createRoute(mid: Long) = "fans_list/$mid"
+    }
+    data object Blacklist : Screen("blacklist", R.string.blacklist)
 }
 
 val allScreens = listOf(
@@ -94,5 +98,11 @@ val allScreens = listOf(
     Screen.VipCenter,
     Screen.CoinLog,
     Screen.ExpLog,
-    Screen.PrivateMessages
+    Screen.PrivateMessages,
+    Screen.LiveMedalWall,
+    Screen.FollowTags,
+    Screen.PopularSeries,
+    Screen.HotSearch,
+    Screen.FansList,
+    Screen.Blacklist
 )

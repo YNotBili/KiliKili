@@ -3,7 +3,7 @@ package rj.kilikili.api
 import android.annotation.SuppressLint
 import android.os.Build
 import com.huanli233.biliwebapi.ApiDebugLogger
-import rj.kilikili.BiliTerminal
+import rj.kilikili.KiliKili
 import rj.kilikili.applicationScope
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.data.account.AccountRepository
@@ -38,7 +38,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 private val hiltEntryPoint = EntryPoints.get(
-    BiliTerminal.application,
+    KiliKili.application,
     AppDependenciesEntryPoint::class.java
 )
 

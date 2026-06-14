@@ -22,6 +22,7 @@ import rj.kilikili.ui.viewmodel.SearchViewModel
 fun SearchScreen(
     onMenuClick: () -> Unit,
     onSearch: (String) -> Unit,
+    onHotSearch: () -> Unit = {},
     viewModel: SearchViewModel = hiltViewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -115,7 +116,7 @@ fun SearchScreen(
 
             if (searchQuery.isEmpty() && searchHistory.isEmpty()) {
                 item {
-                    EmptySearchState()
+                    EmptySearchState(onHotSearch = onHotSearch)
                 }
             }
         }
@@ -214,7 +215,9 @@ private fun HistoryItem(
 }
 
 @Composable
-private fun EmptySearchState() {
+private fun EmptySearchState(
+    onHotSearch: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,5 +229,16 @@ private fun EmptySearchState() {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        Spacer(modifier = Modifier.height(12.dp))
+        Card(
+            onClick = onHotSearch,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "热搜榜",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(12.dp)
+            )
+        }
     }
 }

@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @HiltAndroidApp
-class BiliTerminal : MultiDexApplication() {
+class KiliKili : MultiDexApplication() {
 
     init {
         application = this
@@ -85,7 +85,7 @@ class BiliTerminal : MultiDexApplication() {
     }
 
     companion object {
-        lateinit var application: BiliTerminal
+        lateinit var application: KiliKili
             private set
 
         fun setDefaultNightMode(mode: Int) {

@@ -83,6 +83,7 @@ import rj.kilikili.ui.screens.live.LiveMedalWallScreen
 import rj.kilikili.ui.screens.follow.FollowTagScreen
 import rj.kilikili.ui.screens.popular.PopularSeriesScreen
 import rj.kilikili.ui.screens.search.HotSearchScreen
+import rj.kilikili.ui.screens.follow.FansScreen
 import android.net.Uri
 import java.net.URLDecoder
 
@@ -662,6 +663,9 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onMenuClick = { isMenuExpanded = !isMenuExpanded },
                     onSearch = { query ->
                         contentNavController.navigate(Screen.SearchResult.createRoute(query))
+                    },
+                    onHotSearch = {
+                        contentNavController.navigate(Screen.HotSearch.route)
                     }
                 )
             }
@@ -868,6 +872,18 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onSearch = { query ->
                         contentNavController.navigate(Screen.SearchResult.createRoute(query))
                     },
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.FansList.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                FansScreen(
+                    mid = mid,
+                    onUserClick = { uid -> contentNavController.navigate("user/$uid") },
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
