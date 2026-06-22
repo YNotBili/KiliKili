@@ -61,7 +61,7 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     lint {
-        baseline = file("lint-baseline.xml")!!
+        baseline = file("lint-baseline.xml")
         disable.add("MissingTranslation")
     }
 

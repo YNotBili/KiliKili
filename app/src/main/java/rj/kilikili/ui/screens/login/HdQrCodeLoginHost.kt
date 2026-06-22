@@ -81,7 +81,7 @@ fun HdQrCodeLoginHost(
                     val qrUrl = state.qrCodeUrl
                     if (qrUrl != null) {
                         val bitmap by produceState<android.graphics.Bitmap?>(initialValue = null, key1 = qrUrl) {
-                            QRCodeUtil.createQRCodeBitmap(qrUrl, 512, 512)
+                            value = QRCodeUtil.createQRCodeBitmap(qrUrl, 512, 512)
                         }
                         bitmap?.let { bmp ->
                             Card(
