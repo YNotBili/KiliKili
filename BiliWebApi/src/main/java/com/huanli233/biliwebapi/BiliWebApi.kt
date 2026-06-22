@@ -3,6 +3,7 @@ package com.huanli233.biliwebapi
 import android.util.Log
 import com.google.gson.Gson
 import com.huanli233.biliwebapi.bean.ApiResponse
+import com.huanli233.biliwebapi.httplib.AppSignInterceptor
 import com.huanli233.biliwebapi.httplib.BilibiliApiInterceptor
 import com.huanli233.biliwebapi.httplib.CookieManager
 import com.huanli233.biliwebapi.httplib.Domains
