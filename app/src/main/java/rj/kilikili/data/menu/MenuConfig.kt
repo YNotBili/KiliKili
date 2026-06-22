@@ -35,11 +35,6 @@ val DEFAULT_MENU_LIST = listOf(
     menuItem("message_center", Screen.MessageCenter.route, R.string.message_center, Icons.Outlined.Notifications, requireLoggedIn = true),
     menuItem("ranking", Screen.Ranking.route, R.string.ranking, Icons.Outlined.Star),
     menuItem("timeline", Screen.Timeline.route, R.string.timeline, Icons.Outlined.Schedule),
-    menuItem("vip_center", Screen.VipCenter.route, R.string.vip_center, Icons.Outlined.CardMembership, requireLoggedIn = true),
-    menuItem("coin_log", Screen.CoinLog.route, R.string.coin_log, Icons.Outlined.AccountBalanceWallet, requireLoggedIn = true),
-    menuItem("exp_log", Screen.ExpLog.route, R.string.exp_log, Icons.Outlined.TrendingUp, requireLoggedIn = true),
-    menuItem("live_medal_wall", Screen.LiveMedalWall.route, R.string.live_medal_wall, Icons.Outlined.Favorite, requireLoggedIn = true),
-    menuItem("follow_tags", Screen.FollowTags.route, R.string.follow_tags, Icons.Outlined.Bookmark, requireLoggedIn = true),
     menuItem("popular_series", Screen.PopularSeries.route, R.string.popular_series, Icons.Outlined.Category),
     menuItem("search", Screen.Search.route, R.string.search, Icons.Outlined.Search),
     menuItem("settings", Screen.Settings.route, R.string.settings, Icons.Outlined.Settings, required = true)

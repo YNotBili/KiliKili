@@ -42,6 +42,11 @@ interface IUserSpaceApi {
     data class LikeVideoResult(val list: List<LikedVideo> = emptyList())
     data class LikedVideo(val aid: Long = 0, val title: String = "", val pic: String = "", val duration: Long = 0)
     data class PopularSeriesListResult(val list: List<PopularSeriesItem> = emptyList())
-    data class PopularSeriesItem(val series_id: Int = 0, val series_name: String = "", val cover: String = "")
+    data class PopularSeriesItem(
+        val number: Int = 0,
+        val name: String = "",
+        val subject: String = "",
+        val status: Int = 0
+    )
     data class PopularSeriesDetailResult(val list: List<VideoInfo> = emptyList())
 }

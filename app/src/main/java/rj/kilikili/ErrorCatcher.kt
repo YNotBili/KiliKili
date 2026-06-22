@@ -1,9 +1,7 @@
 package rj.kilikili
 
 import android.content.Context
-import android.content.Intent
-import android.os.Process
-//import rj.kilikili.ui.activity.CrashActivity
+import rj.kilikili.ui.activity.CrashActivity
 import java.lang.ref.WeakReference
 
 class ErrorCatcher : Thread.UncaughtExceptionHandler {
@@ -16,18 +14,12 @@ class ErrorCatcher : Thread.UncaughtExceptionHandler {
 
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
         try {
-//            context?.startActivity(
-//                Intent(context, CrashActivity::class.java).apply {
-//                    putExtra("stack", throwable)
-//                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//                }
-//            )
+            context?.startActivity(CrashActivity.createIntent(context!!, throwable))
         } catch (t: Throwable) {
             t.printStackTrace()
         }
 
         throwable.printStackTrace()
-        Process.killProcess(Process.myPid())
     }
 
     companion object {

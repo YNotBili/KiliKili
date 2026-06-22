@@ -37,7 +37,7 @@ class AppSignInterceptor : Interceptor {
         }
 
         // 添加 app 签名
-        AppSignUtil.sign(params, appSign.appKey, appSign.appSecret)
+        AppSignUtil.sign(params, appSign.appkey, appSign.appsecret)
 
         // 重建 form body
         val newBody = FormBody.Builder()

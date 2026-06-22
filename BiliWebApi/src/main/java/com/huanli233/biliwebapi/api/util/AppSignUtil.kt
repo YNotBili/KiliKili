@@ -2,6 +2,8 @@ package com.huanli233.biliwebapi.api.util
 
 import java.net.URLEncoder
 import java.security.MessageDigest
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 object AppSignUtil {
 
@@ -20,16 +22,17 @@ object AppSignUtil {
      *
      * @return 原地修改后的 params map
      */
+    @OptIn(ExperimentalTime::class)
     fun sign(
         params: MutableMap<String, String>,
         appKey: String = APP_KEY_HD,
         appSecret: String = APP_SEC_HD,
     ): Map<String, String> {
         params["appkey"] = appKey
-        params["ts"] = (System.currentTimeMillis() / 1000).toString()
+        params["ts"] = (Clock.System.now().epochSeconds).toString()
 
         val sortedKeys = params.keys.sorted()
-        val raw = sortedKeys.joinToString("") { key ->
+        val raw = sortedKeys.joinToString("&") { key ->
             URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(params[key]!!, "UTF-8")
         }
 
@@ -49,7 +52,7 @@ object AppSignUtil {
         params["ts"] = (System.currentTimeMillis() / 1000).toString()
 
         val sortedKeys = params.keys.sorted()
-        val raw = sortedKeys.joinToString("") { key ->
+        val raw = sortedKeys.joinToString("&") { key ->
             URLEncoder.encode(key, "UTF-8") + "=" + URLEncoder.encode(params[key]!!.toString(), "UTF-8")
         }
 

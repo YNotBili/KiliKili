@@ -97,7 +97,7 @@ private fun ExpLogList(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        items(logs, key = { "${it.time}-${it.delta}" }) { log ->
+        items(logs, key = { "${it.time}_${it.delta}_${it.reason.hashCode()}" }) { log ->
             ExpLogCard(log = log)
         }
     }

@@ -104,9 +104,12 @@ private fun VipContent(
     onCheckIn: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val vipTypeText = when (info.vipType) {
-        2 -> if (info.vipIsAnnual) "年度大会员" else "大会员"
-        1 -> "月度大会员"
+    val isVipActive = info.isVip && info.vipDueDate > 0 && info.vipDueDate > System.currentTimeMillis()
+
+    val vipTypeText = when {
+        !isVipActive -> "不是大会员"
+        info.vipType == 2 -> if (info.vipIsAnnual) "年度大会员" else "大会员"
+        info.vipType == 1 -> "月度大会员"
         else -> "普通用户"
     }
 
@@ -121,7 +124,7 @@ private fun VipContent(
                     .padding(8.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (info.isVip)
+                    containerColor = if (isVipActive)
                         MaterialTheme.colorScheme.primaryContainer
                     else MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -137,7 +140,7 @@ private fun VipContent(
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold
                         ),
-                        color = if (info.isVip) MaterialTheme.colorScheme.onPrimaryContainer
+                        color = if (isVipActive) MaterialTheme.colorScheme.onPrimaryContainer
                         else MaterialTheme.colorScheme.onSurfaceVariant
                     )
 

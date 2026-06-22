@@ -49,6 +49,12 @@
         <activity
             android:name=".ui.activity.setup.UiPreviewActivity" />
 
+        <activity
+            android:name=".ui.activity.CrashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.BiliZepam.Material3"
+            android:process=":crash" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="rj.kilikili.fileprovider"

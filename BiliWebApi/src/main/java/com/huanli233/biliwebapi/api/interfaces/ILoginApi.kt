@@ -20,6 +20,8 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @API(Domains.PASSPORT_URL)
 interface ILoginApi {
@@ -86,6 +88,7 @@ interface ILoginApi {
      * HD 扫码登录：获取 TV 端 auth_code
      * 使用 mobi_app=android_hd / platform=android
      */
+    @OptIn(ExperimentalTime::class)
     @AppSign
     @POST("/x/passport-tv-login/qrcode/auth_code")
     @FormUrlEncoded
@@ -98,6 +101,7 @@ interface ILoginApi {
     /**
      * HD 扫码登录：轮询扫码结果
      */
+    @OptIn(ExperimentalTime::class)
     @AppSign
     @POST("/x/passport-tv-login/qrcode/poll")
     @FormUrlEncoded

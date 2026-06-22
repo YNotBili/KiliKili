@@ -38,12 +38,13 @@ data class CookieEntity(
         val builder = Cookie.Builder()
             .name(name)
             .value(value)
-            .path(path.toString())
+            .path(path ?: "/")
             .apply {
+                val cleanDomain = domain?.trimStart('.') ?: "bilibili.com"
                 if (hostOnly) {
-                    hostOnlyDomain(domain.toString())
+                    hostOnlyDomain(cleanDomain)
                 } else {
-                    domain(domain.toString())
+                    domain(cleanDomain)
                 }
             }
 

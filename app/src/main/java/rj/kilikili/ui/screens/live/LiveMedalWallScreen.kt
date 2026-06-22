@@ -87,7 +87,7 @@ fun LiveMedalWallScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        items(state.medals, key = { it.medal_id }) { medal ->
+                        items(state.medals, key = { "${it.medal_id}_${it.target_id}" }) { medal ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()

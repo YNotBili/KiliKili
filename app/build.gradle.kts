@@ -1,9 +1,8 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import java.io.FileInputStream
-import java.util.Properties
-import java.util.stream.StreamSupport
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.*
 
 plugins {
     alias(libs.plugins.android.application)
@@ -27,34 +26,34 @@ buildscript {
     }
 }
 
-fun getGitCommitCount(): Int {
-    return kotlin.runCatching {
-        val gitDir = project.rootDir.resolve(".git")
-        val repository = FileRepositoryBuilder.create(gitDir)
-        repository.use { repo ->
-            val head = repo.resolve("HEAD")
-            StreamSupport.stream(Git(repo).log().add(head).call().spliterator(), false).count().toInt()
+fun getGitCommitCount(): Int = kotlin.runCatching {
+    FileRepositoryBuilder
+        .create(project.rootDir.resolve(".git"))
+        .use { repo ->
+            Git(repo).use { git ->
+                val head = repo.resolve("HEAD")
+                git.log().add(head).call().count()
+            }
         }
-    }.getOrNull() ?: -1
-}
+}.getOrNull() ?: 1
 
-fun readVersion(): String {
-    val versionFile = file("version.properties")
-    val props = Properties()
-    props.load(FileInputStream(versionFile))
-    return props["VERSION"].toString()
-}
+fun readVersion(): String = kotlin.runCatching {
+    file("version.properties").inputStream().use { stream ->
+        Properties().apply {
+            load(stream)
+        }.getProperty("VERSION")
+    }
+}.getOrNull()?.trim() ?: "0.0.0"
 
-fun getGitHash(): String {
-    return kotlin.runCatching {
-        val gitDir = project.rootDir.resolve(".git")
-        val repository = FileRepositoryBuilder.create(gitDir)
-        repository.use { repo ->
-            val head = repo.resolve("HEAD")
-            head?.abbreviate(7)?.name()
+fun getGitHash(): String = kotlin.runCatching {
+    FileRepositoryBuilder
+        .create(project.rootDir.resolve(".git"))
+        .use { repo ->
+            repo.resolve("HEAD")
+                ?.abbreviate(7)
+                ?.name()
         }
-    }.getOrNull() ?: "nogit"
-}
+}.getOrNull() ?: "unknown"
 
 android {
     namespace = "rj.kilikili"
@@ -81,7 +80,6 @@ android {
     }
 
     defaultConfig {
-        // 维持原appid以保证可迁移性？
         applicationId = "rj.kilikili"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
@@ -159,19 +157,19 @@ android {
         buildConfig = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = listOf("-XXLanguage:+WhenGuards")
-    }
-
     applicationVariants.all variant@{
         outputs.all {
             val versionName = this@variant.versionName
             val abi = filters.find { it.filterType == "ABI" }?.identifier ?: "universal"
-            (this as BaseVariantOutputImpl)?.outputFileName =
+            (this as BaseVariantOutputImpl).outputFileName =
                 "KiliKili-${this@variant.name}-${versionName}-${abi}.apk"
         }
     }
+}
+
+kotlin.compilerOptions {
+    jvmTarget = JvmTarget.JVM_17
+    freeCompilerArgs = listOf("-XXLanguage:+WhenGuards")
 }
 
 protobuf {

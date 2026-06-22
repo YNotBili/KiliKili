@@ -51,6 +51,7 @@ enum class ContentState {
 fun DownloadListScreen(
     onNavigateBack: () -> Unit,
     onPlayLocal: (path: String, title: String) -> Unit = { _, _ -> },
+    onMenuClick: () -> Unit = {},
     viewModel: DownloadListViewModel = hiltViewModel()
 ) {
     val displayItems by viewModel.displayItems.collectAsState()
@@ -68,8 +69,9 @@ fun DownloadListScreen(
         scrollState = scrollState,
         topBar = scrollAwareTopBar(
             title = stringResource(id = R.string.download_manager),
-            showBackIcon = true,
-            onBackClick = onNavigateBack,
+            showBackIcon = false,
+            showMenuIcon = true,
+            onMenuClick = onMenuClick,
             scrollBehavior = scrollBehavior
         ),
         topBarScrollBehavior = scrollBehavior

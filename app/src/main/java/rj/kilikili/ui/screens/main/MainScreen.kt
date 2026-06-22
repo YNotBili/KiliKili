@@ -81,6 +81,7 @@ import rj.kilikili.ui.screens.message.DanmakuSendScreen
 import rj.kilikili.ui.screens.dynamic.SendDynamicScreen
 import rj.kilikili.ui.screens.live.LiveMedalWallScreen
 import rj.kilikili.ui.screens.follow.FollowTagScreen
+import rj.kilikili.ui.screens.popular.PopularSeriesDetailScreen
 import rj.kilikili.ui.screens.popular.PopularSeriesScreen
 import rj.kilikili.ui.screens.search.HotSearchScreen
 import rj.kilikili.ui.screens.follow.FansScreen
@@ -553,7 +554,8 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                         contentNavController.navigate(
                             "player_local?path=${Uri.encode(path)}&title=${Uri.encode(title)}"
                         )
-                    }
+                    },
+                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
                 )
             }
 
@@ -573,6 +575,21 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     },
                     onNavigateToFollowing = {
                         contentNavController.navigate("following")
+                    },
+                    onNavigateToVipCenter = {
+                        contentNavController.navigate(Screen.VipCenter.route)
+                    },
+                    onNavigateToCoinLog = {
+                        contentNavController.navigate(Screen.CoinLog.route)
+                    },
+                    onNavigateToExpLog = {
+                        contentNavController.navigate(Screen.ExpLog.route)
+                    },
+                    onNavigateToLiveMedal = {
+                        contentNavController.navigate(Screen.LiveMedalWall.route)
+                    },
+                    onNavigateToFollowTags = {
+                        contentNavController.navigate(Screen.FollowTags.route)
                     },
                     onMenuClick = { isMenuExpanded = !isMenuExpanded }
                 )
@@ -702,7 +719,8 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                             Screen.VideoDetail.createRoute(videoInfo.aid, videoInfo.bvid)
                         )
                     },
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
                 )
             }
 
@@ -711,7 +729,8 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onBangumiClick = { seasonId ->
                         contentNavController.navigate("bangumi/$seasonId")
                     },
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
                 )
             }
 
@@ -732,7 +751,8 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onPrivateMsgClick = {
                         contentNavController.navigate(Screen.PrivateMessages.route)
                     },
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
                 )
             }
 
@@ -861,9 +881,29 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
             composable(Screen.PopularSeries.route) {
                 PopularSeriesScreen(
                     onSeriesClick = { seriesId, name ->
-                        // TODO: 跳转到系列详情
+                        contentNavController.navigate("popular_series/${seriesId}/${Uri.encode(name)}")
                     },
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                )
+            }
+
+            composable(
+                route = "popular_series/{seriesId}/{name}",
+                arguments = listOf(
+                    navArgument("seriesId") { type = NavType.IntType },
+                    navArgument("name") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val seriesId = backStackEntry.arguments?.getInt("seriesId") ?: 0
+                val name = URLDecoder.decode(backStackEntry.arguments?.getString("name") ?: "", "UTF-8")
+                PopularSeriesDetailScreen(
+                    seriesId = seriesId,
+                    seriesName = name,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onVideoClick = { aid, bvid ->
+                        contentNavController.navigate(Screen.VideoDetail.createRoute(aid, bvid))
+                    }
                 )
             }
 
@@ -940,11 +980,8 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 menuItems = menuConfig.menuItems,
                 onSelect = { route ->
                     contentNavController.navigate(route) {
-                        popUpTo(Screen.Recommend.route) {
-                            saveState = true
-                        }
+                        popUpTo(Screen.Recommend.route) { inclusive = true }
                         launchSingleTop = true
-                        restoreState = true
                     }
                     isMenuExpanded = false
                 },

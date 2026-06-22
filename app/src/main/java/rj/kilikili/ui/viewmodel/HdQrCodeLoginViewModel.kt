@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 data class HdQrCodeState(
     val qrCodeUrl: String? = null,
@@ -27,7 +28,7 @@ data class HdQrCodeState(
 )
 
 enum class HdQrStatus {
-    REQUESTING, WAITING, LOGIN_SUCCESS, EXPIRED, ERROR
+    REQUESTING, WAITING, SCANNED, LOGIN_SUCCESS, EXPIRED, ERROR
 }
 
 @HiltViewModel
@@ -73,12 +74,12 @@ class HdQrCodeLoginViewModel @Inject constructor(
     private fun startPolling(authCode: String) {
         pollJob = viewModelScope.launch {
             for (i in 0 until 180) {
-                delay(1000)
+                delay(1000.milliseconds)
                 if (!isActive) break
 
                 hdLoginRepository.pollQrCode(authCode)
                     .onSuccess { poll ->
-                        if (poll.status && poll.tokenInfo != null) {
+                        if (poll.tokenInfo != null) {
                             saveLoginResult(poll)
                             return@launch
                         }
@@ -90,6 +91,11 @@ class HdQrCodeLoginViewModel @Inject constructor(
                                 _uiState.value = HdQrCodeState(status = HdQrStatus.EXPIRED)
                                 return@launch
                             }
+                            // 86039/86042: 尚未扫码；86090: 已扫码未确认 → 继续轮询
+                            msg.contains("86039") || msg.contains("86042") -> { }
+                            msg.contains("86090") -> {
+                                _uiState.value = HdQrCodeState(status = HdQrStatus.SCANNED)
+                            }
                             else -> {
                                 _uiState.value = HdQrCodeState(status = HdQrStatus.ERROR, error = msg)
                                 return@launch
@@ -97,6 +103,8 @@ class HdQrCodeLoginViewModel @Inject constructor(
                         }
                     }
             }
+            // 轮询结束（180s）未扫码成功 → 过期
+            _uiState.value = HdQrCodeState(status = HdQrStatus.EXPIRED)
         }
     }
 

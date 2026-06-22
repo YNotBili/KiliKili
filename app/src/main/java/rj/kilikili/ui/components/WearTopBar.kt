@@ -98,9 +98,8 @@ private fun RoundTopBar(
                 .height(statusBarHeight)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
         )
-        
+
         // 内容区域
-        Log.d("RoundTopBar", "paddings: $statusBarHeight ${PaddingDefaults.verticalOptContentPadding()} ${PaddingDefaults.horizontalOptContentPadding()}")
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -112,8 +111,9 @@ private fun RoundTopBar(
                         )
                     )
                 )
-                .clickable(enabled = onBackClick != null || onMenuClick != null) {
-                    onBackClick?.invoke() ?: onMenuClick?.invoke()
+                .clickable(enabled = showBackIcon && onBackClick != null || showMenuIcon && onMenuClick != null) {
+                    if (showBackIcon) onBackClick?.invoke()
+                    else onMenuClick?.invoke()
                 }
                 .padding(
                     start = 12.dp + PaddingDefaults.horizontalContentPadding(),
@@ -176,7 +176,7 @@ private fun SquareTopBar(
                 .height(statusBarHeight)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
         )
-        
+
         // TopBar 背景
         Box(
             modifier = Modifier
@@ -192,13 +192,14 @@ private fun SquareTopBar(
                     )
                 )
         )
-        
+
         // 内容区域
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(enabled = onBackClick != null || onMenuClick != null) {
-                    onBackClick?.invoke() ?: onMenuClick?.invoke()
+                .clickable(enabled = showBackIcon && onBackClick != null || showMenuIcon && onMenuClick != null) {
+                    if (showBackIcon) onBackClick?.invoke()
+                    else onMenuClick?.invoke()
                 }
                 .padding(
                     start = 12.dp + PaddingDefaults.horizontalOptContentPadding(),

@@ -211,7 +211,7 @@ fun CommentItem(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.clickable {
-                                    // TODO: 展开子评论
+                                    onCommentClick(reply)
                                 }
                             )
                         } else {

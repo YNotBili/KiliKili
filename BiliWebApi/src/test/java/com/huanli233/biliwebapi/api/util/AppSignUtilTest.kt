@@ -115,7 +115,7 @@ class AppSignUtilTest {
 
         // 排序拼接
         val sortedKeys = testParams.keys.sorted()
-        val raw = sortedKeys.joinToString("") { key ->
+        val raw = sortedKeys.joinToString("&") { key ->
             java.net.URLEncoder.encode(key, "UTF-8") + "=" +
                     java.net.URLEncoder.encode(testParams[key]!!, "UTF-8")
         }

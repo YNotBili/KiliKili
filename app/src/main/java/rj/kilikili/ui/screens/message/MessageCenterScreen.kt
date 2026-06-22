@@ -55,6 +55,7 @@ fun MessageCenterScreen(
     onSystemClick: () -> Unit,
     onPrivateMsgClick: () -> Unit,
     onNavigateBack: () -> Unit,
+    onMenuClick: () -> Unit = {},
     viewModel: MessageCenterViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -67,10 +68,9 @@ fun MessageCenterScreen(
             ScrollAwareTopBar(
                 title = stringResource(R.string.message_center),
                 scrollBehavior = scrollBehavior,
-                showBackIcon = true,
-                showMenuIcon = false,
-                onBackClick = onNavigateBack,
-                onMenuClick = null
+                showBackIcon = false,
+                showMenuIcon = true,
+                onMenuClick = onMenuClick
             )
         },
         topBarScrollBehavior = scrollBehavior

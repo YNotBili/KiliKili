@@ -1,15 +1,18 @@
 package rj.kilikili.ui.screens.popular
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -21,8 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -31,9 +32,6 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.ScreenScaffold
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import rj.kilikili.ui.components.ScrollAwareTopBar
 import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -45,6 +43,7 @@ import rj.kilikili.ui.viewmodel.PopularSeriesViewModel
 fun PopularSeriesScreen(
     onSeriesClick: (Int, String) -> Unit,
     onNavigateBack: () -> Unit,
+    onMenuClick: () -> Unit = {},
     viewModel: PopularSeriesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -57,10 +56,9 @@ fun PopularSeriesScreen(
             ScrollAwareTopBar(
                 title = "热门系列",
                 scrollBehavior = scrollBehavior,
-                showBackIcon = true,
-                showMenuIcon = false,
-                onBackClick = onNavigateBack,
-                onMenuClick = null
+                showBackIcon = false,
+                showMenuIcon = true,
+                onMenuClick = onMenuClick
             )
         },
         topBarScrollBehavior = scrollBehavior
@@ -87,7 +85,7 @@ fun PopularSeriesScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(state.series, key = { it.series_id }) { item ->
+                        items(state.series) { item ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -96,26 +94,44 @@ fun PopularSeriesScreen(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                                 ),
-                                onClick = { onSeriesClick(item.series_id, item.series_name) }
+                                onClick = { onSeriesClick(item.number, item.name) }
                             ) {
-                                Column(modifier = Modifier.fillMaxWidth()) {
-                                    Box(modifier = Modifier.fillMaxWidth().size(120.dp)) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalContext.current)
-                                                .data(item.cover).crossfade(200).build(),
-                                            contentDescription = null,
-                                            modifier = Modifier.matchParentSize(),
-                                            contentScale = ContentScale.Crop
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primaryContainer),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = item.number.toString(),
+                                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = item.series_name,
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(8.dp)
-                                    )
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = item.subject,
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = item.name,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
                                 }
                             }
                         }

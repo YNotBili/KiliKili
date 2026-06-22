@@ -7,6 +7,6 @@ package com.huanli233.biliwebapi.httplib.annotation
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class AppSign(
-    val appKey: String = "dfca71928277209b",
-    val appSecret: String = "b5475a8825547a4fc26c7d518eaaa02e",
+    val appkey: String = "dfca71928277209b",
+    val appsecret: String = "b5475a8825547a4fc26c7d518eaaa02e",
 )

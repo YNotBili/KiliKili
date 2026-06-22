@@ -60,6 +60,7 @@ private val dayOfWeekNames = listOf("周日", "周一", "周二", "周三", "周
 fun TimelineScreen(
     onBangumiClick: (Long) -> Unit,
     onNavigateBack: () -> Unit,
+    onMenuClick: () -> Unit = {},
     viewModel: TimelineViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -75,10 +76,9 @@ fun TimelineScreen(
             ScrollAwareTopBar(
                 title = stringResource(R.string.timeline),
                 scrollBehavior = scrollBehavior,
-                showBackIcon = true,
-                showMenuIcon = false,
-                onBackClick = onNavigateBack,
-                onMenuClick = null
+                showBackIcon = false,
+                showMenuIcon = true,
+                onMenuClick = onMenuClick
             )
         },
         topBarScrollBehavior = scrollBehavior

@@ -1,5 +1,6 @@
 package com.huanli233.biliwebapi.httplib
 
+import com.huanli233.biliwebapi.httplib.HttpUtils.parseFormBody
 import okhttp3.FormBody
 import org.junit.Assert.*
 import org.junit.Test

@@ -17,10 +17,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WatchLater
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.CardMembership
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -58,6 +63,11 @@ fun MySpaceScreen(
     onNavigateToWatchLater: () -> Unit,
     onNavigateToFavorite: () -> Unit,
     onNavigateToFollowing: () -> Unit,
+    onNavigateToVipCenter: () -> Unit = {},
+    onNavigateToCoinLog: () -> Unit = {},
+    onNavigateToExpLog: () -> Unit = {},
+    onNavigateToLiveMedal: () -> Unit = {},
+    onNavigateToFollowTags: () -> Unit = {},
     onMenuClick: () -> Unit,
     viewModel: MySpaceViewModel = hiltViewModel()
 ) {
@@ -96,7 +106,7 @@ fun MySpaceScreen(
                         onClick = onNavigateToWatchLater
                     ),
                     MenuItemData(
-                        icon = Icons.Default.Favorite,
+                        icon = Icons.Default.Star,
                         title = stringResource(R.string.favorite),
                         onClick = onNavigateToFavorite
                     ),
@@ -104,6 +114,31 @@ fun MySpaceScreen(
                         icon = Icons.Default.People,
                         title = stringResource(R.string.following),
                         onClick = onNavigateToFollowing
+                    ),
+                    MenuItemData(
+                        icon = Icons.Outlined.CardMembership,
+                        title = stringResource(R.string.vip_center),
+                        onClick = onNavigateToVipCenter
+                    ),
+                    MenuItemData(
+                        icon = Icons.Outlined.AccountBalanceWallet,
+                        title = stringResource(R.string.coin_log),
+                        onClick = onNavigateToCoinLog
+                    ),
+                    MenuItemData(
+                        icon = Icons.Outlined.TrendingUp,
+                        title = stringResource(R.string.exp_log),
+                        onClick = onNavigateToExpLog
+                    ),
+                    MenuItemData(
+                        icon = Icons.Outlined.Favorite,
+                        title = stringResource(R.string.live_medal_wall),
+                        onClick = onNavigateToLiveMedal
+                    ),
+                    MenuItemData(
+                        icon = Icons.Outlined.Bookmark,
+                        title = stringResource(R.string.follow_tags),
+                        onClick = onNavigateToFollowTags
                     )
                 )
                 
