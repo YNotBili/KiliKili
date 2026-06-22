@@ -366,4 +366,8 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     implementation(kotlin("reflect"))
+
+    // 单元测试
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.core)
 }

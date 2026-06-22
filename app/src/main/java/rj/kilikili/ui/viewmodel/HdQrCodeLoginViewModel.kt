@@ -2,7 +2,14 @@ package rj.kilikili.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.huanli233.biliwebapi.bean.login.TvCookie
+import com.huanli233.biliwebapi.bean.login.TvQrCodePoll
+import com.huanli233.biliwebapi.bean.login.TvTokenInfo
+import rj.kilikili.data.account.AccountEntity
+import rj.kilikili.data.account.AccountRepository
+import rj.kilikili.data.account.CookieEntity
 import rj.kilikili.data.repository.HdLoginRepository
+import rj.kilikili.data.setting.LocalData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -25,7 +32,8 @@ enum class HdQrStatus {
 
 @HiltViewModel
 class HdQrCodeLoginViewModel @Inject constructor(
-    private val hdLoginRepository: HdLoginRepository
+    private val hdLoginRepository: HdLoginRepository,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HdQrCodeState())
@@ -71,8 +79,7 @@ class HdQrCodeLoginViewModel @Inject constructor(
                 hdLoginRepository.pollQrCode(authCode)
                     .onSuccess { poll ->
                         if (poll.status && poll.tokenInfo != null) {
-                            rj.kilikili.data.setting.LocalData.edit { isHd = 1 }
-                            _uiState.value = HdQrCodeState(status = HdQrStatus.LOGIN_SUCCESS)
+                            saveLoginResult(poll)
                             return@launch
                         }
                     }
@@ -92,4 +99,50 @@ class HdQrCodeLoginViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * 保存 HD 登录结果：
+     * 1. 创建 AccountEntity（mid + refreshToken）
+     * 2. 保存 Set-Cookie 中的 cookies
+     * 3. 切换为当前账号
+     * 4. 标记 isHd
+     */
+    private suspend fun saveLoginResult(poll: TvQrCodePoll) {
+        val tokenInfo = poll.tokenInfo ?: return
+        val mid = tokenInfo.mid
+        val cookies = poll.cookieInfo?.cookies.orEmpty()
+
+        // 创建账号
+        val account = AccountEntity(
+            accountId = mid,
+            refreshToken = tokenInfo.refreshToken,
+            appKey = "android_hd",
+            lastActiveTime = System.currentTimeMillis()
+        )
+
+        // 保存 cookies
+        val cookieEntities = cookies.map { it.toCookieEntity(mid) }
+
+        // 写入数据库 + 切换到该账号
+        accountRepository.addAccount(account)
+        accountRepository.addCookies(cookieEntities)
+        accountRepository.setActiveAccount(mid)
+
+        // 标记 HD 模式
+        LocalData.edit { isHd = 1 }
+
+        _uiState.value = HdQrCodeState(status = HdQrStatus.LOGIN_SUCCESS)
+    }
 }
+
+/** 将 HD 登录返回的 TvCookie 转为持久化的 CookieEntity */
+private fun TvCookie.toCookieEntity(accountId: Long) = CookieEntity(
+    accountId = accountId,
+    name = name,
+    value = value,
+    expires = if (expires > 0) expires else null,
+    domain = ".bilibili.com",
+    path = "/",
+    secure = false,
+    httpOnly = httpOnly == 1,
+)

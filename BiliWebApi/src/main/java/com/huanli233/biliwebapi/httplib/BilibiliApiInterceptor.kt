@@ -174,9 +174,8 @@ class BilibiliApiInterceptor(
         header(HeaderNames.USER_AGENT, HeaderValues.USER_AGENT_VAL)
         header(HeaderNames.REFERER, HeaderValues.REFERER)
         header(HeaderNames.ORIGIN, HeaderValues.ORIGIN)
-        header(HeaderNames.SEC_CH_UA, HeaderValues.SEC_CH_UA)
-        header(HeaderNames.SEC_CH_UA_PLATFORM, HeaderValues.SEC_CH_UA_PLATFORM)
-        header(HeaderNames.SEC_CH_UA_MOBILE, HeaderValues.SEC_CH_UA_MOBILE)
+        header("env", "prod")
+        header("app-key", "android_hd")
     }
 
     private fun Request.Builder.overrideUrl(invocation: Invocation?): Request.Builder =

@@ -50,6 +50,7 @@ open class BiliWebApi(
                         }
                     )
                     .addInterceptor(BilibiliApiInterceptor(this))
+                    .addInterceptor(AppSignInterceptor())
 //                    .addInterceptor(ApiDebugInterceptor())
     }
 

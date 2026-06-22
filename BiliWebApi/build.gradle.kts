@@ -36,4 +36,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     implementation(kotlin("reflect"))
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.core)
 }

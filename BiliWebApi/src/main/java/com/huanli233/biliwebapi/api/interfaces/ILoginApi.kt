@@ -12,6 +12,7 @@ import com.huanli233.biliwebapi.bean.login.TvQrCodeAuth
 import com.huanli233.biliwebapi.bean.login.TvQrCodePoll
 import com.huanli233.biliwebapi.httplib.Domains
 import com.huanli233.biliwebapi.httplib.annotation.API
+import com.huanli233.biliwebapi.httplib.annotation.AppSign
 import com.huanli233.biliwebapi.httplib.annotation.Queries
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -85,6 +86,7 @@ interface ILoginApi {
      * HD 扫码登录：获取 TV 端 auth_code
      * 使用 mobi_app=android_hd / platform=android
      */
+    @AppSign
     @POST("/x/passport-tv-login/qrcode/auth_code")
     @FormUrlEncoded
     suspend fun getTvAuthCode(
@@ -96,6 +98,7 @@ interface ILoginApi {
     /**
      * HD 扫码登录：轮询扫码结果
      */
+    @AppSign
     @POST("/x/passport-tv-login/qrcode/poll")
     @FormUrlEncoded
     suspend fun tvQrCodePoll(

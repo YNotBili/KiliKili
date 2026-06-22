@@ -14,11 +14,8 @@ object HeaderNames {
 
 object HeaderValues {
     const val USER_AGENT_VAL: String =
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.5414.75 Safari/537.36"
+        "Mozilla/5.0 BiliDroid/2.0.1 (bbcallen@gmail.com) os/android model/android_hd mobi_app/android_hd build/2001100 channel/master innerVer/2001100 osVer/15 network/2"
     const val REFERER: String = "https://www.bilibili.com"
-    const val SEC_CH_UA: String = "\"Chromium\";v=\"109\", \"Not_A Brand\";v=\"99\""
-    const val SEC_CH_UA_PLATFORM: String = "\"Windows\""
-    const val SEC_CH_UA_MOBILE: String = "?0"
     const val ORIGIN: String = "https://www.bilibili.com"
 }
 
