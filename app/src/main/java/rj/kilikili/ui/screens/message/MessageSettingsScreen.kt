@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
@@ -49,8 +49,8 @@ fun MessageSettingsScreen(
         },
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        ScalingLazyColumn(
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+        AppLazyColumn(
+            state = scrollState,
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(6.dp)

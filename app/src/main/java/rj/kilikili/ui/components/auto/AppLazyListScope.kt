@@ -31,4 +31,11 @@ interface AppLazyListScope {
         contentType: ((T) -> Any?)? = null,
         itemContent: @Composable (T) -> Unit
     )
+
+    fun <T> itemsIndexed(
+        data: List<T>,
+        key: ((Int, T) -> Any)? = null,
+        contentType: ((Int, T) -> Any?)? = null,
+        itemContent: @Composable (Int, T) -> Unit
+    )
 }

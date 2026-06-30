@@ -12,10 +12,13 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.shouldLoadItem
+import rj.kilikili.utils.extensions.toHttpsUrl
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.SearchResultViewModel
@@ -151,10 +154,10 @@ fun SearchResultScreen(
                             items(pagingItems.itemCount) { index ->
                                 pagingItems[index]?.let { item ->
                                     when (selectedType) {
-                                        "video" -> SearchVideoCard(item, onVideoClick)
+                                        "video" -> SearchVideoCard(index, lazyListState, item, onVideoClick)
                                         "bili_user" -> UserResultItem(item, onUserClick)
                                         "article" -> SearchArticleCard(item, onOpusClick, viewModel)
-                                        else -> SearchVideoCard(item, onVideoClick)
+                                        else -> SearchVideoCard(index, lazyListState, item, onVideoClick)
                                     }
                                 }
                             }
@@ -257,15 +260,19 @@ private fun SearchTypeChip(
 
 @Composable
 private fun SearchVideoCard(
+    index: Int,
+    listState: AppLazyListState,
     item: SearchItem,
     onClick: (Long, String) -> Unit
 ) {
     SearchVideoCardContent(
+        index = index,
         title = item.title ?: "",
         cover = item.pic ?: "",
         author = item.author ?: "",
         play = item.play ?: 0,
-        onClick = { 
+        loadCover = listState.shouldLoadItem(index),
+        onClick = {
             val aid = item.aid ?: 0L
             val bvid = item.bvid ?: ""
             onClick(aid, bvid)
@@ -579,10 +586,12 @@ private fun SearchArticleCardContent(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun SearchVideoCardContent(
+    index: Int,
     title: String,
     cover: String,
     author: String,
     play: Long,
+    loadCover: Boolean = true,
     onClick: () -> Unit
 ) {
     Card(
@@ -609,19 +618,21 @@ private fun SearchVideoCardContent(
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 var isLoading by remember { mutableStateOf(true) }
-                
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(if (cover.startsWith("http")) cover else "http:$cover")
-                        .crossfade(200)
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.Crop,
-                    onSuccess = { isLoading = false },
-                    onError = { isLoading = false }
-                )
-                
+
+                if (loadCover) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(cover.toHttpsUrl())
+                            .crossfade(200)
+                            .build(),
+                        contentDescription = null,
+                        modifier = Modifier.matchParentSize(),
+                        contentScale = ContentScale.Crop,
+                        onSuccess = { isLoading = false },
+                        onError = { isLoading = false }
+                    )
+                }
+
                 if (isLoading) {
                     Box(
                         modifier = Modifier

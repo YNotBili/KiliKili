@@ -52,4 +52,18 @@ internal class WearLazyListScopeAdapter(
             itemContent(data[index])
         }
     }
+
+    override fun <T> itemsIndexed(
+        data: List<T>,
+        key: ((Int, T) -> Any)?,
+        contentType: ((Int, T) -> Any?)?,
+        itemContent: @Composable (Int, T) -> Unit
+    ) {
+        delegate.items(
+            count = data.size,
+            key = key?.let { k -> { index: Int -> k(index, data[index]) } }
+        ) { index ->
+            itemContent(index, data[index])
+        }
+    }
 }

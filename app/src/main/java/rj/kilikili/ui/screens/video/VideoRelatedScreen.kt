@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.data.repository.RecommendRepository
 import rj.kilikili.ui.components.VideoCard
@@ -111,14 +111,16 @@ fun VideoRelatedScreen(
         }
         
         is VideoRelatedUiState.Success -> {
-            ScalingLazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = (actualScrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                state = actualScrollState,
                 contentPadding = paddingValues
             ) {
                 items(state.videos.size) { index ->
                     val video = state.videos[index]
                     VideoCard(
+                        index = index,
+                        listState = actualScrollState,
                         videoInfo = video,
                         onClick = { onVideoClick(video) }
                     )

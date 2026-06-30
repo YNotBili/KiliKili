@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
@@ -144,8 +144,8 @@ private fun HistoryList(
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-    ScalingLazyColumn(
-        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+    AppLazyColumn(
+        state = scrollState,
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -153,6 +153,8 @@ private fun HistoryList(
         items(historyItems.itemCount) { index ->
             historyItems[index]?.let { item ->
                 HistoryCard(
+                    index = index,
+                    listState = scrollState,
                     item = item,
                     onClick = {
                         val videoInfo = item.toVideoInfo()
@@ -192,10 +194,14 @@ private fun HistoryList(
 
 @Composable
 private fun HistoryCard(
+    index: Int,
+    listState: AppLazyListState,
     item: HistoryItem,
     onClick: () -> Unit
 ) {
     VideoCard(
+        index = index,
+        listState = listState,
         videoInfo = item.toVideoInfo(),
         onClick = {
             onClick()

@@ -39,7 +39,7 @@ import rj.kilikili.ui.widget.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.screens.dynamic.DynamicCard
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -202,11 +202,11 @@ private fun DynamicsPage(
         },
         modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = PaddingValues()
         ) {
             item {
@@ -462,11 +462,11 @@ private fun VideosPage(
         },
         modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = PaddingValues()
         ) {
             if (seriesList.isNotEmpty()) {
@@ -529,6 +529,8 @@ private fun VideosPage(
             items(videos.itemCount) { index ->
                 videos[index]?.let { video ->
                     rj.kilikili.ui.screens.recommend.VideoCard(
+                        index = index,
+                        listState = scrollState,
                         videoInfo = video,
                         onClick = onVideoClick
                     )
@@ -580,11 +582,11 @@ private fun ArticlesPage(
         },
         modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = PaddingValues()
         ) {
             item {

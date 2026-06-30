@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
@@ -56,9 +56,9 @@ fun PlayerSettingsScreen(
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
-            ScalingLazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                state = scrollState,
                 contentPadding = paddingValues
             ) {
                 item {

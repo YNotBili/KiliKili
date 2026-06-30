@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.isRoundDevice
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
@@ -96,9 +96,9 @@ fun CommentScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (actualScrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = actualScrollState,
             contentPadding = paddingValues
         ) {
             // 发表评论按钮（仅登录且未禁用时显示）

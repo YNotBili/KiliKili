@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.BuildConfig
@@ -74,9 +75,9 @@ fun AboutScreen(navController: NavController) {
         ),
         topBarScrollBehavior = scrollBehavior
     ) {
-        androidx.wear.compose.foundation.lazy.ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = it
         ) {

@@ -40,7 +40,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
@@ -116,8 +116,8 @@ fun ConversationScreen(
                     )
                 }
                 else -> {
-                    ScalingLazyColumn(
-                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                    AppLazyColumn(
+                        state = scrollState,
                         contentPadding = PaddingValues(
                             top = paddingValues.calculateTopPadding(),
                             bottom = PaddingDefaults.verticalContentPadding() + 56.dp

@@ -64,7 +64,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.isRoundDevice
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.plus
@@ -154,9 +154,9 @@ fun CommentDetailScreen(
             },
             modifier = Modifier.fillMaxSize()
         ) {
-            ScalingLazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                state = scrollState,
                 contentPadding = paddingValues + PaddingValues(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

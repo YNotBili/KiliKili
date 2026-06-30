@@ -48,4 +48,19 @@ internal class PhoneLazyListScopeAdapter(
             itemContent(data[index])
         }
     }
+
+    override fun <T> itemsIndexed(
+        data: List<T>,
+        key: ((Int, T) -> Any)?,
+        contentType: ((Int, T) -> Any?)?,
+        itemContent: @Composable (Int, T) -> Unit
+    ) {
+        delegate.items(
+            count = data.size,
+            key = key?.let { k -> { index: Int -> k(index, data[index]) } },
+            contentType = contentType?.let { c -> { index: Int -> c(index, data[index]) } } ?: { null }
+        ) { index ->
+            itemContent(index, data[index])
+        }
+    }
 }

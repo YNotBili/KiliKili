@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
@@ -160,14 +160,16 @@ private fun ContentView(
         onRefresh = onRefresh,
         modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = paddingValues
         ) {
             items(videos.itemCount) { index ->
                 videos[index]?.let { video ->
                     VideoCard(
+                        index = index,
+                        listState = scrollState,
                         videoInfo = video,
                         onClick = { onVideoClick(video) }
                     )

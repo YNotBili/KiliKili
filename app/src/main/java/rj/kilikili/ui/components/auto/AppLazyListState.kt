@@ -10,12 +10,31 @@ import rj.kilikili.uiType
  * screens 拿到后只调 firstVisibleItemIndex + animateScrollToItem (这两是 wear/phone 共有方法)。
  */
 @Stable
+interface AppLazyListItemInfo {
+    val index: Int
+    val offset: Int
+    val size: Int
+}
+
+interface AppLazyListLayoutInfo {
+    val visibleItemsInfo: List<AppLazyListItemInfo>
+}
+
 interface AppLazyListState {
     val firstVisibleItemIndex: Int
     val firstVisibleItemScrollOffset: Int
     val isScrollInProgress: Boolean
+    val layoutInfo: AppLazyListLayoutInfo
     suspend fun scrollToItem(index: Int, scrollOffset: Int = 0)
     suspend fun animateScrollToItem(index: Int, scrollOffset: Int = 0)
+}
+
+fun AppLazyListState.shouldLoadItem(index: Int, prefetch: Int = 3): Boolean {
+    val visible = layoutInfo.visibleItemsInfo
+    if (visible.isEmpty()) return true
+    val minIndex = visible.minOf { it.index }
+    val maxIndex = visible.maxOf { it.index }
+    return index in minIndex..(maxIndex + prefetch)
 }
 
 /**

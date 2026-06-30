@@ -30,7 +30,7 @@ import rj.kilikili.data.download.DownloadStatus
 import rj.kilikili.data.download.SourceType
 import rj.kilikili.R
 import androidx.compose.ui.res.stringResource
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.plus
@@ -90,9 +90,9 @@ fun DownloadListScreen(
                     )
                 }
                 ContentState.CONTENT -> {
-                    ScalingLazyColumn(
+                    AppLazyColumn(
                         modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                        state = scrollState,
                         contentPadding = paddingValues.plus(
                             PaddingValues(horizontal = 16.dp)
                         )

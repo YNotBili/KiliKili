@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
@@ -81,8 +81,8 @@ fun LiveMedalWallScreen(
                 if (state.medals.isEmpty()) {
                     LoadingView(state = LoadingState.EMPTY, modifier = Modifier.fillMaxSize())
                 } else {
-                    ScalingLazyColumn(
-                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                    AppLazyColumn(
+                        state = scrollState,
                         contentPadding = paddingValues,
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(6.dp)

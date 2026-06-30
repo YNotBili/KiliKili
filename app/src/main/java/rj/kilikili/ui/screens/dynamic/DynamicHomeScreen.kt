@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
@@ -103,9 +103,9 @@ fun DynamicHomeScreen(
                         )
                     }
                     else -> {
-                        ScalingLazyColumn(
+                        AppLazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                            state = scrollState,
                             contentPadding = paddingValues
                         ) {
                             items(dynamics.itemCount) { index ->

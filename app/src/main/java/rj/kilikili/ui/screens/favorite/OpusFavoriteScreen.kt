@@ -38,7 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
@@ -147,8 +147,8 @@ private fun OpusList(
     paddingValues: PaddingValues,
     onOpusClick: (String) -> Unit
 ) {
-    ScalingLazyColumn(
-        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+    AppLazyColumn(
+        state = scrollState,
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)

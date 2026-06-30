@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
@@ -69,8 +69,8 @@ fun QualityChooserScreen(
         },
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        ScalingLazyColumn(
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+        AppLazyColumn(
+            state = scrollState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),

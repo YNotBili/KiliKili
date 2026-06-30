@@ -18,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
@@ -60,8 +60,8 @@ fun EditSignatureScreen(
         if (state.isLoading) {
             LoadingView(state = LoadingState.LOADING, modifier = Modifier.fillMaxSize())
         } else {
-            ScalingLazyColumn(
-                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            AppLazyColumn(
+                state = scrollState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),

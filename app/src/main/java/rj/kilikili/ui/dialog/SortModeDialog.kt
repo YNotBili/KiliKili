@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 
 import rj.kilikili.ui.components.auto.appTopBar
@@ -43,9 +43,9 @@ fun SortModeDialog(
                 onBackClick = onDismiss
             )
         ) { paddingValues ->
-            ScalingLazyColumn(
+            AppLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+                state = scrollState,
                 contentPadding = paddingValues,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

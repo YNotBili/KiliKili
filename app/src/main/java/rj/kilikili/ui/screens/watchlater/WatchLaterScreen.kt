@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
@@ -118,14 +118,16 @@ private fun WatchLaterList(
     paddingValues: PaddingValues,
     onVideoClick: (VideoInfo) -> Unit
 ) {
-    ScalingLazyColumn(
-        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+    AppLazyColumn(
+        state = scrollState,
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(items, key = { it.aid }) { item ->
+        itemsIndexed(items, key = { _, it -> it.aid }) { index, item ->
             VideoCard(
+                index = index,
+                listState = scrollState,
                 videoInfo = item.toVideoInfo(),
                 onClick = { onVideoClick(item.toVideoInfo()) }
             )

@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 
 import androidx.wear.compose.materialcore.toVerticalPadding
@@ -75,9 +75,9 @@ fun UiPreviewContent(
         ),
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = paddingValues

@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
@@ -155,9 +155,9 @@ private fun WelcomeStep(onNext: () -> Unit) {
             showBackIcon = false
         )
     ) { paddingValues ->
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = paddingValues
         ) {
             item {
@@ -198,9 +198,9 @@ private fun UiSetupStep(
             showBackIcon = false
         )
     ) { paddingValues ->
-        ScalingLazyColumn(
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
+            state = scrollState,
             contentPadding = paddingValues
         ) {
 

@@ -44,11 +44,16 @@ import com.huanli233.biliwebapi.bean.video.VideoInfo
 import rj.kilikili.data.setting.LocalData
 import com.valentinilk.shimmer.shimmer
 
+import rj.kilikili.ui.components.auto.AppLazyListState
+import rj.kilikili.ui.components.auto.shouldLoadItem
+import rj.kilikili.utils.extensions.toHttpsUrl
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun VideoCardContent(
     videoInfo: VideoInfo,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    loadCover: Boolean = true
 ) {
     FlowRow(
         modifier = modifier
@@ -65,17 +70,19 @@ fun VideoCardContent(
         ) {
             var isLoading by remember { mutableStateOf(true) }
 
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(videoInfo.pic)
-                    .crossfade(200)
-                    .build(),
-                contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                onSuccess = { isLoading = false },
-                onError = { isLoading = false }
-            )
+            if (loadCover) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(videoInfo.pic.toHttpsUrl())
+                        .crossfade(200)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    onSuccess = { isLoading = false },
+                    onError = { isLoading = false }
+                )
+            }
 
             if (isLoading) {
                 Box(
@@ -148,7 +155,7 @@ fun VideoCard(
 ) {
     val settings by LocalData.settingsStateFlow.collectAsState()
     val useBackgroundStyle = settings?.uiSettings?.videoCardBackgroundStyle ?: false
-    
+
     if (useBackgroundStyle) {
         VideoCardWithBackground(
             videoInfo = videoInfo,
@@ -173,13 +180,51 @@ fun VideoCard(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+fun VideoCard(
+    index: Int,
+    listState: AppLazyListState?,
+    videoInfo: VideoInfo,
+    onClick: (VideoInfo) -> Unit,
+    modifier: Modifier = Modifier,
+    prefetch: Int = 3
+) {
+    val loadCover = listState?.shouldLoadItem(index, prefetch) ?: true
+    val settings by LocalData.settingsStateFlow.collectAsState()
+    val useBackgroundStyle = settings?.uiSettings?.videoCardBackgroundStyle ?: false
+
+    if (useBackgroundStyle) {
+        VideoCardWithBackground(
+            videoInfo = videoInfo,
+            onClick = onClick,
+            modifier = modifier,
+            loadCover = loadCover
+        )
+    } else {
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            onClick = { onClick(videoInfo) }
+        ) {
+            VideoCardContent(videoInfo = videoInfo, loadCover = loadCover)
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
 fun VideoCardWithBackground(
     videoInfo: VideoInfo,
     onClick: (VideoInfo) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    loadCover: Boolean = true
 ) {
     var isLoading by remember { mutableStateOf(true) }
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -190,20 +235,22 @@ fun VideoCardWithBackground(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // 背景图片
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(videoInfo.pic)
-                    .crossfade(200)
-                    .build(),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop,
-                onSuccess = { isLoading = false },
-                onError = { isLoading = false }
-            )
-            
+            if (loadCover) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(videoInfo.pic.toHttpsUrl())
+                        .crossfade(200)
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop,
+                    onSuccess = { isLoading = false },
+                    onError = { isLoading = false }
+                )
+            }
+
             if (isLoading) {
                 Box(
                     modifier = Modifier
