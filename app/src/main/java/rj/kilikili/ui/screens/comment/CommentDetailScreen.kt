@@ -73,7 +73,6 @@ import coil3.compose.AsyncImage
 import com.huanli233.biliwebapi.bean.reply.Reply
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.EmoteText
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.RichText
@@ -131,19 +130,14 @@ fun CommentDetailScreen(
         viewModel.setReplyDetail(replyId, oid, type)
         viewModel.comments
     }.collectAsLazyPagingItems()
-    
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         modifier = modifier,
         topBar = appTopBar(
             title = "评论详情",
-            onBackClick = onBackClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onBackClick
+        )
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = comments.loadState.refresh is LoadState.Loading,

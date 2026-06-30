@@ -26,7 +26,6 @@ import androidx.wear.compose.materialcore.toVerticalPadding
 import rj.kilikili.R
 import rj.kilikili.ui.activity.base.BaseActivity
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.theme.BiliZepamTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,17 +62,13 @@ fun UiPreviewContent(
             delay(1000L)
         }
     }
-
-    val scrollBehavior = rememberAppScrollBehavior()
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = appTopBar(
             title = stringResource(R.string.view_preview),
             showBackIcon = true,
-            scrollBehavior = scrollBehavior,
             onBackClick = onFinish
-        ),
-        topBarScrollBehavior = scrollBehavior
+        )
     ) { paddingValues ->
         AppLazyColumn(
             modifier = Modifier.fillMaxSize(),

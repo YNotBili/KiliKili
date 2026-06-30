@@ -45,12 +45,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import com.tbuonomo.viewpagerdotsindicator.compose.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.viewmodel.HdQrCodeLoginViewModel
 import rj.kilikili.ui.viewmodel.HdQrStatus
@@ -82,23 +80,18 @@ fun HdQrCodeLoginHost(
         else -> importScrollState
     }
 
-    val scrollBehavior = rememberAppScrollBehavior()
-
     AppScreenScaffold(
         scrollState = currentScrollState,
         topBar = appTopBar(
             title = "登录",
             showBackIcon = true,
-            onBackClick = onSkip,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onSkip
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-            ) { page ->
+                modifier = Modifier.fillMaxSize()) { page ->
                 when (page) {
                     0 -> HdQrCodePage(
                         scrollState = qrCodeScrollState,
@@ -120,7 +113,7 @@ fun HdQrCodeLoginHost(
 
             DotsIndicator(
                 modifier = Modifier
-                    .padding(bottom = PaddingDefaults.verticalOptContentPadding())
+                    .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter),
                 dotCount = pagerState.pageCount,
                 dotSpacing = 8.dp,
@@ -129,11 +122,10 @@ fun HdQrCodeLoginHost(
                         16.dp,
                         borderWidth = 2.dp,
                         borderColor = MaterialTheme.colorScheme.primary,
-                        color = Color.Transparent,
-                    ),
+                        color = Color.Transparent),
                     wormDotGraphic = DotGraphic(
                         16.dp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 ),
                 pagerState = pagerState

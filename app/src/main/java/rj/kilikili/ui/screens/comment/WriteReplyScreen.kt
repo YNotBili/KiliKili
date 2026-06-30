@@ -19,11 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.isRoundDevice
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 
 @Composable
 fun WriteReplyScreen(
@@ -62,19 +60,14 @@ fun WriteReplyScreen(
             }
         }
     }
-
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
     
     AppScreenScaffold(
         scrollState = scrollState,
         modifier = modifier,
         topBar = appTopBar(
             title = "写评论",
-            onBackClick = onBackClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onBackClick
+        )
     ) { paddingValues ->
         Column(
             modifier = Modifier

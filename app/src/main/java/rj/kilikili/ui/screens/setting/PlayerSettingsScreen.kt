@@ -21,7 +21,6 @@ import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.data.setting.edit
 import rj.kilikili.ui.components.auto.AppSelectionDialog
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 
 @Composable
@@ -43,17 +42,14 @@ fun PlayerSettingsScreen(
     var showAreaBottomDialog by remember { mutableStateOf(false) }
 
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = appTopBar(
             title = stringResource(id = R.string.settings_player),
             showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             AppLazyColumn(

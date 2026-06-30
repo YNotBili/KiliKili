@@ -174,8 +174,7 @@ fun DynamicCard(
                                         pid = 0,
                                         name = "",
                                         image = "",
-                                        expire = 0,
-                                    ),
+                                        expire = 0),
                                     nameplate = com.huanli233.biliwebapi.bean.user.Nameplate(
                                         nid = 0,
                                         name = "",

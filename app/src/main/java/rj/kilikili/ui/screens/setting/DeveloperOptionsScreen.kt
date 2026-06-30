@@ -20,7 +20,6 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.dialog.AdaptDialog
 
@@ -32,17 +31,14 @@ fun DeveloperOptionsScreen(
     var showClearSettingsDialog by remember { mutableStateOf(false) }
 
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = appTopBar(
             title = stringResource(id = R.string.developer_options),
             showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             AppLazyColumn(

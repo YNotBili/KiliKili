@@ -30,14 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.huanli233.biliwebapi.bean.live.LiveRoom
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -52,7 +51,6 @@ fun LiveRoomScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(roomId) {
         viewModel.loadRoomInfo(roomId)
@@ -63,10 +61,8 @@ fun LiveRoomScreen(
         topBar = appTopBar(
             title = "直播",
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         when (val state = uiState) {
             is LiveRoomUiState.Loading -> {
@@ -98,7 +94,7 @@ private fun LiveRoomContent(
     room: LiveRoom,
     paddingValues: PaddingValues
 ) {
-    ScalingLazyColumn(
+    AppLazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = paddingValues,
         verticalArrangement = Arrangement.spacedBy(8.dp)

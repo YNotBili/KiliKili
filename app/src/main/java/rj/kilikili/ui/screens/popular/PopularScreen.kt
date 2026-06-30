@@ -25,13 +25,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.paging.compose.LazyPagingItems
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -52,8 +50,6 @@ fun PopularScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
-    val scrollBehavior = rememberAppScrollBehavior()
-    
     LaunchedEffect(videos.loadState.refresh) {
         if (videos.loadState.refresh is LoadState.NotLoading && isRefreshing) {
             isRefreshing = false
@@ -65,10 +61,8 @@ fun PopularScreen(
         topBar = appTopBar(
             title = "热门",
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         val currentLoadState = if (isRefreshing) LoadState.Loading else videos.loadState.refresh
         

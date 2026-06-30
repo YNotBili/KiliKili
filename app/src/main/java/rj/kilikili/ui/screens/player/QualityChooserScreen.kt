@@ -26,11 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.QualityChooserViewModel
 
 @Composable
@@ -42,7 +40,6 @@ fun QualityChooserScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(currentQn) {
         viewModel.selectQuality(currentQn)
@@ -60,14 +57,12 @@ fun QualityChooserScreen(
         topBar = {
             AppTopBar(
                 title = "画质选择",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         AppLazyColumn(
             state = scrollState,

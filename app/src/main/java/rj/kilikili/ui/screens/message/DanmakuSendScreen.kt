@@ -50,7 +50,6 @@ import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.DanmakuSendViewModel
 
 private val PRESET_COLORS = listOf(
@@ -84,7 +83,6 @@ fun DanmakuSendScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(uiState.result) {
         if (uiState.result == "发送成功喵~") {
@@ -97,14 +95,12 @@ fun DanmakuSendScreen(
         topBar = {
             AppTopBar(
                 title = "发送弹幕",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier

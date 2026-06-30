@@ -22,12 +22,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
-import androidx.wear.compose.material3.TimeText
-import androidx.wear.compose.material3.verticalContentPadding
 import rj.kilikili.R
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -52,8 +48,6 @@ fun DynamicHomeScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
-    val scrollBehavior = rememberAppScrollBehavior()
-    
     LaunchedEffect(dynamics.loadState.refresh) {
         if (dynamics.loadState.refresh is LoadState.NotLoading && isRefreshing) {
             isRefreshing = false
@@ -66,10 +60,8 @@ fun DynamicHomeScreen(
             title = stringResource(R.string.dynamic),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             PullToRefreshBox(
@@ -108,7 +100,7 @@ fun DynamicHomeScreen(
                             state = scrollState,
                             contentPadding = paddingValues
                         ) {
-                            items(dynamics.itemCount) { index ->
+                            items(count=dynamics.itemCount) { index ->
                                 dynamics[index]?.let { dynamic ->
                                     DynamicCard(
                                         dynamic = dynamic,

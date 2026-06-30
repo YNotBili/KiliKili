@@ -46,12 +46,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import rj.kilikili.R
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -73,7 +71,6 @@ fun MySpaceScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
@@ -81,10 +78,8 @@ fun MySpaceScreen(
             title = stringResource(R.string.my_space),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         when (val state = uiState) {
             is MySpaceUiState.Loading -> {

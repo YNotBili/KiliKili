@@ -36,12 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.MessageCenterUiState
@@ -60,20 +58,17 @@ fun MessageCenterScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.message_center),
-                scrollBehavior = scrollBehavior,
                 showBackIcon = false,
                 showMenuIcon = true,
                 onMenuClick = onMenuClick
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         when (val state = uiState) {
             is MessageCenterUiState.Loading -> {
@@ -128,7 +123,7 @@ private fun MessageCenterList(
         MessageMenuItem("点赞", Icons.Default.Favorite, unread.like, onLikeClick),
         MessageMenuItem("回复", Icons.Default.Forum, unread.reply, onReplyClick),
         MessageMenuItem("@我", Icons.Default.AlternateEmail, unread.at, onAtClick),
-        MessageMenuItem("系统通知", Icons.Default.Notifications, unread.system, onSystemClick),
+        MessageMenuItem("系统通知", Icons.Default.Notifications, unread.system, onSystemClick)
     )
 
     AppLazyColumn(

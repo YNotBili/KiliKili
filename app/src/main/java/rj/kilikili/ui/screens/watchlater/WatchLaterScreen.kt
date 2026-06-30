@@ -19,13 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppTopBar
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.WatchLaterUiState
@@ -47,22 +45,18 @@ fun WatchLaterScreen(
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
-    
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.watch_later),
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             state = swipeRefreshState,

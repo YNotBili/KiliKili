@@ -37,7 +37,6 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.BuildConfig
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.dialog.AdaptDialog
 
 const val ID_QQ_GROUP = "1082439478"
@@ -48,9 +47,6 @@ fun AboutScreen(navController: NavController) {
     val uriHandler = LocalUriHandler.current
     var showGroupIdDialog by remember { mutableStateOf(false) }
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
-    
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
 
     if (showGroupIdDialog) {
         AdaptDialog(
@@ -70,10 +66,8 @@ fun AboutScreen(navController: NavController) {
         topBar = appTopBar(
             title = stringResource(id = R.string.about),
             showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
+        )
     ) {
         AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -197,8 +191,7 @@ fun AboutScreen(navController: NavController) {
             }
             item {
                 FilledTonalButton(
-                    onClick = { showGroupIdDialog = true },
-                ) {
+                    onClick = { showGroupIdDialog = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.icon_group),
                         contentDescription = null,
@@ -226,7 +219,7 @@ fun AboutScreen(navController: NavController) {
                         Spacer(Modifier.height(8.dp))
                         Text(
                             text = stringResource(id = R.string.about_to_uncle),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }

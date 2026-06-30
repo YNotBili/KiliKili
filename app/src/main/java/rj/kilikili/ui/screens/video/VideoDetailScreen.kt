@@ -94,12 +94,11 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
-import androidx.wear.compose.material3.PaddingDefaults
+import rj.kilikili.ui.components.auto.appVerticalOptContentPadding
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.material3.TimeText
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.comment.CommentScreen
 import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
@@ -195,18 +194,13 @@ fun VideoDetailScreen(
     val commentScrollState = rememberAppLazyListState()
     val relatedScrollState = rememberAppLazyListState()
     
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
-    
     AppScreenScaffold(
         scrollState = commentScrollState,
         modifier = Modifier.fillMaxSize(),
         topBar = appTopBar(
             title = stringResource(R.string.video_detail),
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
         ),
-        topBarScrollBehavior = scrollBehavior,
         timeText = if (isRound) { { TimeText() } } else null
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
@@ -307,7 +301,7 @@ fun VideoDetailScreen(
                             rj.kilikili.ui.widget.DotsIndicator(
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
-                                    .padding(bottom = PaddingDefaults.verticalOptContentPadding()),
+                                    .padding(bottom = appVerticalOptContentPadding()),
                                 dotCount = pagerState.pageCount,
                                 dotSpacing = 8.dp,
                                 type = WormIndicatorType(
@@ -315,11 +309,10 @@ fun VideoDetailScreen(
                                         16.dp,
                                         borderWidth = 2.dp,
                                         borderColor = MaterialTheme.colorScheme.primary,
-                                        color = Color.Transparent,
-                                    ),
+                                        color = Color.Transparent),
                                     wormDotGraphic = DotGraphic(
                                         16.dp,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                 ),
                                 pagerState = pagerState

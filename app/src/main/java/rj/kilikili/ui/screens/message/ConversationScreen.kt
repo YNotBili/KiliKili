@@ -48,7 +48,6 @@ import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.data.account.AccountManager
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.ConversationViewModel
@@ -73,7 +72,6 @@ fun ConversationScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
     val currentUserUid = remember { AccountManager.currentAccount.accountId }
     var inputText by remember { mutableStateOf("") }
 
@@ -93,14 +91,12 @@ fun ConversationScreen(
         topBar = {
             AppTopBar(
                 title = talkerName,
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             when {

@@ -36,7 +36,6 @@ import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppSelectionDialog
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.navigation.Screen
 import splitties.activities.start
@@ -61,18 +60,13 @@ fun UiSettingsScreen(
     val context = LocalContext.current
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
 
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
-
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = appTopBar(
             title = stringResource(id = R.string.settings_ui),
             showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
+        )
     ) { paddingValues ->
         AppLazyColumn(
             modifier = Modifier.fillMaxSize(),

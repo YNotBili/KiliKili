@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.isRoundDevice
 import rj.kilikili.ui.components.auto.AppScreenScaffold
-import androidx.wear.compose.material3.TimeText
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.WearTopBar
 import coil3.compose.AsyncImage
@@ -57,8 +56,7 @@ fun ImageViewerScreen(
     val isRound = isRoundDevice() && LocalData.settings.uiSettings.roundMode
 
     AppScreenScaffold(
-        modifier = Modifier.fillMaxSize(),
-        timeText = if (isRound) { { TimeText() } } else null
+        modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
             HorizontalPager(

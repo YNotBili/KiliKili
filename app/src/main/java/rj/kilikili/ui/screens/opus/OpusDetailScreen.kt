@@ -17,7 +17,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -47,7 +46,6 @@ fun OpusDetailScreen(
     
     val opusDetailScrollState = rememberScrollState()
     val commentScrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(opusId) {
         viewModel.loadOpus(opusId)
@@ -86,10 +84,8 @@ fun OpusDetailScreen(
         topBar = appTopBar(
             title = stringResource(R.string.opus_detail),
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -142,7 +138,7 @@ fun OpusDetailScreen(
                                                 onCommentDetailClick(replyId, oid)
                                             },
                                             onWriteReplyClick = onWriteReplyClick,
-                                            onUserClick = onUserClick,
+                                            onUserClick = onUserClick
                                         )
                                     }
                                 }
@@ -157,11 +153,10 @@ fun OpusDetailScreen(
                                     16.dp,
                                     borderWidth = 2.dp,
                                     borderColor = MaterialTheme.colorScheme.primary,
-                                    color = Color.Transparent,
-                                ),
+                                    color = Color.Transparent),
                                 wormDotGraphic = DotGraphic(
                                     16.dp,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             ),
                             pagerState = pagerState.pagerState,

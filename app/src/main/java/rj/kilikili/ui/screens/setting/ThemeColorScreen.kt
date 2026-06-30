@@ -33,7 +33,6 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.theme.AppSeedColors
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -49,9 +48,6 @@ fun ThemeColorScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
-    
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
 
     fun formatThemeName(key: String): String {
         return key.split('_').joinToString(" ") { word ->
@@ -65,10 +61,8 @@ fun ThemeColorScreen(
         topBar = appTopBar(
             title = stringResource(id = R.string.theme_color),
             showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = { navController.popBackStack() }
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             AppLazyColumn(

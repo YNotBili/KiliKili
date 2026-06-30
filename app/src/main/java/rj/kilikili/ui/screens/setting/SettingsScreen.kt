@@ -24,7 +24,6 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.appTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.navigation.Screen
 
 @Composable
@@ -33,9 +32,6 @@ fun SettingsScreen(
     onMenuClick: () -> Unit = {}
 ) {
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
-    
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
@@ -43,10 +39,8 @@ fun SettingsScreen(
             title = stringResource(id = R.string.settings),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             AppLazyColumn(

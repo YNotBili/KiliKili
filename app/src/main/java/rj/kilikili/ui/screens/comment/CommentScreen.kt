@@ -22,7 +22,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.isRoundDevice
 import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import android.widget.Toast

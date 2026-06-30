@@ -47,19 +47,25 @@ import kotlin.math.roundToInt
  * A TopAppBarScrollBehavior defines how a top app bar should behave when the content under it is scrolled.
  * Based on Material3 design patterns.
  *
- * 其他字段 (isPinned, snapAnimationSpec, flingAnimationSpec, nestedScrollConnection) 从父接口 AppScrollBehavior 继承,
- * 只有 state 重写为更具体的 TopBarState 类型。
+ * wear 端 scroll behavior — 独立于 phone 端。
  */
 @Stable
-interface TopBarScrollBehavior : rj.kilikili.ui.components.auto.AppScrollBehavior {
-    override val state: TopBarState
+interface TopBarScrollBehavior {
+    val nestedScrollConnection: NestedScrollConnection
+    val state: TopBarState
+    val isPinned: Boolean
+    val snapAnimationSpec: AnimationSpec<Float>?
+    val flingAnimationSpec: DecayAnimationSpec<Float>?
 }
 
 /**
  * A state object that can be hoisted to control and observe the top app bar state.
  */
 @Stable
-interface TopBarState : rj.kilikili.ui.components.auto.AppTopBarState {
+interface TopBarState {
+    /** 0.0 = 完全展开, 1.0 = 完全折叠 */
+    val collapsedFraction: Float
+
     /**
      * The top app bar's height offset limit in pixels, which represents the limit that a top app bar
      * is allowed to collapse to.
@@ -70,7 +76,7 @@ interface TopBarState : rj.kilikili.ui.components.auto.AppTopBarState {
      * The top app bar's current height offset in pixels. This height offset is applied to the fixed
      * height of the app bar to control the displayed height when content is being scrolled.
      */
-    override var heightOffset: Float
+    var heightOffset: Float
 
     /**
      * The total offset of the content scrolled under the top app bar.

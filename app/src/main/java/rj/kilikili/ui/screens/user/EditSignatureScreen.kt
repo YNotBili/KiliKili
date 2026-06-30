@@ -22,7 +22,6 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.EditSignatureViewModel
@@ -35,7 +34,6 @@ fun EditSignatureScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(state.result) {
         if (state.result != null) {
@@ -48,14 +46,12 @@ fun EditSignatureScreen(
         topBar = {
             AppTopBar(
                 title = "编辑签名",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         if (state.isLoading) {
             LoadingView(state = LoadingState.LOADING, modifier = Modifier.fillMaxSize())

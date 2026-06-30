@@ -14,7 +14,6 @@ import rj.kilikili.ui.components.wear.ScrollAwareTopBar as wearScrollAwareTopBar
 fun AppTopBar(
     title: String,
     modifier: Modifier = Modifier,
-    scrollBehavior: AppScrollBehavior? = null,
     showBackIcon: Boolean = true,
     showMenuIcon: Boolean = false,
     onBackClick: (() -> Unit)? = null,
@@ -24,7 +23,6 @@ fun AppTopBar(
         UiType.WEAR -> wearScrollAwareTopBar(
             title = title,
             modifier = modifier,
-            scrollBehavior = scrollBehavior as? rj.kilikili.ui.components.wear.TopBarScrollBehavior,
             showBackIcon = showBackIcon,
             showMenuIcon = showMenuIcon,
             onBackClick = onBackClick,
@@ -33,7 +31,6 @@ fun AppTopBar(
         UiType.PHONE -> phoneScrollAwareTopBar(
             title = title,
             modifier = modifier,
-            scrollBehavior = scrollBehavior,
             showBackIcon = showBackIcon,
             showMenuIcon = showMenuIcon,
             onBackClick = onBackClick,
@@ -49,15 +46,14 @@ fun AppTopBar(
 fun appTopBar(
     title: String,
     modifier: Modifier = Modifier,
-    scrollBehavior: AppScrollBehavior? = null,
     showBackIcon: Boolean = true,
     showMenuIcon: Boolean = false,
     onBackClick: (() -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null
 ): @Composable () -> Unit {
     if (actualUiType == UiType.WEAR) {
-        return { AppTopBar(title, modifier, scrollBehavior, showBackIcon, showMenuIcon, onBackClick, onMenuClick) }
+        return { AppTopBar(title, modifier, showBackIcon = showBackIcon, showMenuIcon = showMenuIcon, onBackClick = onBackClick, onMenuClick = onMenuClick) }
     } else {
-        return { AppTopBar(title, modifier, scrollBehavior, showBackIcon, showMenuIcon, onBackClick, onMenuClick) }
+        return { AppTopBar(title, modifier, showBackIcon = showBackIcon, showMenuIcon = showMenuIcon, onBackClick = onBackClick, onMenuClick = onMenuClick) }
     }
 }

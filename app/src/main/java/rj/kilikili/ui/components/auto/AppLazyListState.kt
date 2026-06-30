@@ -45,6 +45,13 @@ fun AppLazyListState.asScalingLazyListState(): androidx.wear.compose.foundation.
     (this as? rj.kilikili.ui.components.wear.WearLazyListStateAdapter)?.delegate
 
 /**
+ * 通用 helper: 从 [AppLazyListState] 取出底层 TransformingLazyColumnState (wear) 或 null (phone)。
+ * 用法: `TransformingLazyColumn(state = listState.asTransformingLazyColumnState() ?: return@AppScreenScaffold) { ... }`
+ */
+fun AppLazyListState.asTransformingLazyColumnState(): androidx.wear.compose.foundation.lazy.TransformingLazyColumnState? =
+    (this as? rj.kilikili.ui.components.wear.WearTransformingLazyListStateAdapter)?.delegate
+
+/**
  * 通用 helper: 从 [AppLazyListState] 取出底层 phone LazyListState 或 null (wear)。
  * 用法: `LazyColumn(state = listState.asPhoneLazyListState() ?: return@AppScreenScaffold) { ... }`
  */
@@ -53,7 +60,7 @@ fun AppLazyListState.asPhoneLazyListState(): androidx.compose.foundation.lazy.La
 
 /**
  * 统一 remember — 返回 [AppLazyListState] 抽象，wear/phone 内部实现细节 screens 不可见。
- * @param initialFirstVisibleItemIndex wear ScalingLazyListState 居中索引，phone 忽略
+ * @param initialFirstVisibleItemIndex wear TransformingLazyColumnState 居中索引，phone 忽略
  * @param initialFirstVisibleItemScrollOffset wear 居中偏移，phone 忽略
  */
 @Composable
@@ -61,10 +68,10 @@ fun rememberAppLazyListState(
     initialFirstVisibleItemIndex: Int = 0,
     initialFirstVisibleItemScrollOffset: Int = 0
 ): AppLazyListState = when (actualUiType) {
-    UiType.WEAR -> rj.kilikili.ui.components.wear.WearLazyListStateAdapter(
-        androidx.wear.compose.foundation.lazy.rememberScalingLazyListState(
-            initialCenterItemIndex = initialFirstVisibleItemIndex,
-            initialCenterItemScrollOffset = initialFirstVisibleItemScrollOffset
+    UiType.WEAR -> rj.kilikili.ui.components.wear.WearTransformingLazyListStateAdapter(
+        androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState(
+            initialAnchorItemIndex = initialFirstVisibleItemIndex,
+            initialAnchorItemScrollOffset = initialFirstVisibleItemScrollOffset
         )
     )
     UiType.PHONE -> rj.kilikili.ui.components.phone.PhoneLazyListStateAdapter(

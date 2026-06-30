@@ -29,11 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.rememberPagerState
-import androidx.wear.compose.material3.PaddingDefaults
+import rj.kilikili.ui.components.auto.appVerticalOptContentPadding
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import com.huanli233.biliwebapi.bean.user.UserCardInfo
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.widget.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
@@ -91,7 +90,6 @@ fun UserProfileScreen(
     val isFollowing by viewModel.isFollowing.collectAsState()
     val followLoading by viewModel.followLoading.collectAsState()
     val pagerState = rememberPagerState(pageCount = { 5 })
-    val scrollBehavior = rememberAppScrollBehavior()
 
     val dynamicViewModel = hiltViewModel<DynamicViewModel>(key = "dynamic_$mid")
     
@@ -105,10 +103,8 @@ fun UserProfileScreen(
         topBar = appTopBar(
             title = userInfo?.card?.name ?: "",
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (userInfo == null) {
@@ -156,16 +152,15 @@ fun UserProfileScreen(
                         16.dp,
                         borderWidth = 2.dp,
                         borderColor = MaterialTheme.colorScheme.primary,
-                        color = Color.Transparent,
-                    ),
+                        color = Color.Transparent),
                     wormDotGraphic = DotGraphic(
                         16.dp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 ),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = PaddingDefaults.verticalOptContentPadding())
+                    .padding(bottom = appVerticalOptContentPadding())
             )
         }
     }

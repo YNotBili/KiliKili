@@ -23,11 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.FollowTagUiState
@@ -41,21 +39,18 @@ fun FollowTagScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = "关注分组",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         when (val state = uiState) {
             is FollowTagUiState.Loading -> {
@@ -79,7 +74,7 @@ fun FollowTagScreen(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        items(state.tags, key = { it.tagid }) { tag ->
+                        items(data=state.tags, key = { it.tagid }) { tag ->
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()

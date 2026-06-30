@@ -49,10 +49,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
-import androidx.wear.compose.material3.TimeText
-import androidx.wear.compose.material3.verticalContentPadding
 import rj.kilikili.R
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.appTopBar
@@ -60,8 +57,6 @@ import com.huanli233.biliwebapi.bean.video.VideoInfo
 import kotlinx.coroutines.launch
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import rj.kilikili.ui.components.auto.AppLazyListState
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,9 +74,6 @@ fun RecommendScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberAppScrollBehavior()
-    
     LaunchedEffect(videos.loadState.refresh) {
         if (videos.loadState.refresh is LoadState.NotLoading && isRefreshing) {
             isRefreshing = false
@@ -94,10 +86,8 @@ fun RecommendScreen(
             title = stringResource(R.string.recommend),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior // Pass the same ScrollBehavior to ScreenScaffold
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         val currentLoadState = if (isRefreshing) LoadState.Loading else videos.loadState.refresh
         

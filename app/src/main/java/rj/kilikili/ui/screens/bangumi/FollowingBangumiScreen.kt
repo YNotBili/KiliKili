@@ -35,14 +35,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.AppLazyColumn
-import androidx.wear.compose.foundation.lazy.items
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.FollowingBangumiUiState
@@ -61,21 +59,18 @@ fun FollowingBangumiScreen(
     val scope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = "追番列表",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             state = swipeRefreshState,
@@ -131,7 +126,7 @@ private fun BangumiList(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(items, key = { it.season_id }) { item ->
+        items(data=items, key = { it.season_id }) { item ->
             BangumiCard(item = item, onClick = { onBangumiClick(item) })
         }
     }

@@ -1,19 +1,19 @@
 package rj.kilikili.ui.components.auto
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold as phoneScaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import rj.kilikili.UiType
-import rj.kilikili.ui.components.phone.PhoneScrollBehaviorAdapter
-import rj.kilikili.ui.components.wear.TopBarScrollBehavior
+import rj.kilikili.uiType
 import rj.kilikili.ui.components.wear.WearLazyListStateAdapter
-import androidx.wear.compose.material3.ScreenScaffold as wearScreenScaffold
+import androidx.wear.compose.material3.ScreenScaffold
+
 /**
- * 统一 Scaffold 入口 — wear 端走 ScreenScaffold (content 是 BoxScope 扩展),
- * phone 端走 Material3 Scaffold。
+ * 统一 Scaffold 入口 — wear 端走 ScreenScaffold, phone 端走 Material3 Scaffold。
+ * topBar: phone 端直接传给 Scaffold(topBar=), wear 端放在 ScreenScaffold topBar 槽位。
+
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,18 +21,17 @@ fun AppScreenScaffold(
     modifier: Modifier = Modifier,
     scrollState: Any? = null,
     topBar: @Composable () -> Unit = {},
-    topBarScrollBehavior: AppScrollBehavior? = null,
     timeText: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    if (actualUiType == UiType.WEAR) {
-        val wearBehavior = topBarScrollBehavior as? TopBarScrollBehavior
-            ?: rj.kilikili.ui.components.wear.rememberEnterAlwaysScrollBehavior()
-        val wearScrollState = (scrollState as? WearLazyListStateAdapter)?.delegate
-            ?: (scrollState as? androidx.wear.compose.foundation.lazy.ScalingLazyListState)
-            ?: androidx.wear.compose.foundation.lazy.rememberScalingLazyListState()
-        Box(modifier = modifier) {
-            wearScreenScaffold(
+    when (actualUiType) {
+        UiType.WEAR -> {
+            val wearBehavior = rj.kilikili.ui.components.wear.rememberEnterAlwaysScrollBehavior()
+            val wearScrollState = (scrollState as? WearLazyListStateAdapter)?.delegate
+                ?: (scrollState as? androidx.wear.compose.foundation.lazy.ScalingLazyListState)
+                ?: androidx.wear.compose.foundation.lazy.rememberScalingLazyListState()
+            ScreenScaffold(
+                modifier = modifier,
                 scrollState = wearScrollState,
                 topBar = topBar,
                 topBarScrollBehavior = wearBehavior,
@@ -41,11 +40,12 @@ fun AppScreenScaffold(
                 content(padding)
             }
         }
-    } else {
-        phoneScaffold(
-            modifier = modifier,
-            topBar = topBar,
-            content = content
-        )
+        UiType.PHONE -> {
+            Scaffold(
+                modifier = modifier,
+                topBar = topBar,
+                content = content
+            )
+        }
     }
 }

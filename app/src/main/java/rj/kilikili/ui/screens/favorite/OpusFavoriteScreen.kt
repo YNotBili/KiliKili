@@ -46,7 +46,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.OpusFavoriteViewModel
@@ -65,22 +64,18 @@ fun OpusFavoriteScreen(
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
-    
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.opus_favorite),
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             state = swipeRefreshState,

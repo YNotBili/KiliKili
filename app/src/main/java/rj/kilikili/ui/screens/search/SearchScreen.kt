@@ -18,7 +18,6 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.SearchViewModel
 
 @Composable
@@ -32,17 +31,14 @@ fun SearchScreen(
     val suggestions by viewModel.suggestions.collectAsState()
     val searchHistory by viewModel.searchHistory.collectAsState()
     val listState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         topBar = appTopBar(
             title = stringResource(R.string.search),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         AppLazyColumn(
             modifier = Modifier.fillMaxSize(),

@@ -14,10 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.SendDynamicViewModel
 
 private const val MAX_CHARS = 2000
@@ -30,7 +28,6 @@ fun SendDynamicScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(state.result) {
         state.result?.let { dynamicId ->
@@ -44,25 +41,19 @@ fun SendDynamicScreen(
         topBar = {
             AppTopBar(
                 title = "发布动态",
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(
-                    start = PaddingDefaults.horizontalContentPadding(),
-                    end = PaddingDefaults.horizontalContentPadding(),
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = PaddingDefaults.verticalContentPadding()
-                ),
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Spacer(modifier = Modifier.height(4.dp))

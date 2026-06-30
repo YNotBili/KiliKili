@@ -27,7 +27,6 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.AppTopBar
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.FavoriteVideosViewModel
@@ -51,8 +50,6 @@ fun FavoriteVideosScreen(
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
-    
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(mid, fid) {
         viewModel.setFolder(mid, fid)
@@ -63,14 +60,12 @@ fun FavoriteVideosScreen(
         topBar = {
             AppTopBar(
                 title = folderName,
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             state = swipeRefreshState,

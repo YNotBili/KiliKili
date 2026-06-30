@@ -27,7 +27,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.AppLazyListState
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import com.huanli233.biliwebapi.bean.history.HistoryItem
@@ -38,7 +37,6 @@ import com.huanli233.biliwebapi.bean.video.VideoInfo
 import rj.kilikili.R
 import rj.kilikili.ui.components.VideoCard
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.HistoryViewModel
@@ -57,23 +55,18 @@ fun HistoryScreen(
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
-    
-    // Create ScrollBehavior manually
-    val scrollBehavior = rememberAppScrollBehavior()
 
     AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.history),
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         PullToRefreshBox(
             state = swipeRefreshState,
@@ -150,7 +143,7 @@ private fun HistoryList(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(historyItems.itemCount) { index ->
+        items(count=historyItems.itemCount) { index ->
             historyItems[index]?.let { item ->
                 HistoryCard(
                     index = index,

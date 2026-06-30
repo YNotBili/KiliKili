@@ -34,7 +34,6 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.plus
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -59,7 +58,6 @@ fun DownloadListScreen(
     var deleteFile by remember { mutableStateOf(false) }
 
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     val contentState = remember(displayItems) {
         if (displayItems.isEmpty()) ContentState.EMPTY else ContentState.CONTENT
@@ -71,10 +69,8 @@ fun DownloadListScreen(
             title = stringResource(id = R.string.download_manager),
             showBackIcon = false,
             showMenuIcon = true,
-            onMenuClick = onMenuClick,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onMenuClick = onMenuClick
+        )
     ) { paddingValues ->
         Crossfade(
             targetState = contentState,
@@ -282,7 +278,7 @@ private fun DownloadTaskItem(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp)),
+                                .clip(RoundedCornerShape(2.dp))
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }

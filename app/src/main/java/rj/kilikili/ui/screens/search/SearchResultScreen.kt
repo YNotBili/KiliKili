@@ -16,7 +16,6 @@ import rj.kilikili.ui.components.auto.AppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.shouldLoadItem
 import rj.kilikili.utils.extensions.toHttpsUrl
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -49,6 +48,8 @@ import androidx.compose.material3.Text
 import coil3.request.crossfade
 import rj.kilikili.ui.viewmodel.ArticleRedirectState
 import rj.kilikili.utils.MsgUtil
+import rj.kilikili.UiType
+import rj.kilikili.ui.components.auto.actualUiType
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -72,7 +73,6 @@ fun SearchResultScreen(
     val currentType by viewModel.currentType.collectAsState()
     var selectedType by remember { mutableStateOf("video") }
     val lazyListState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(query, selectedType) {
         // 只在还没有搜索结果或类型改变时才搜索
@@ -88,10 +88,8 @@ fun SearchResultScreen(
         topBar = appTopBar(
             title = query,
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         AppLazyColumn(
             state = lazyListState,
@@ -594,6 +592,11 @@ private fun SearchVideoCardContent(
     loadCover: Boolean = true,
     onClick: () -> Unit
 ) {
+    val isPhone = actualUiType == UiType.PHONE
+    val coverWidth = if (isPhone) 120.dp else 70.dp
+    val coverHeight = if (isPhone) 80.dp else 44.dp
+    val contentPadding = if (isPhone) 12.dp else 8.dp
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -607,14 +610,14 @@ private fun SearchVideoCardContent(
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(contentPadding),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .width(70.dp)
-                    .height(44.dp)
+                    .width(coverWidth)
+                    .height(coverHeight)
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 var isLoading by remember { mutableStateOf(true) }

@@ -27,12 +27,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppTopBar
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.VipUiState
@@ -50,7 +49,6 @@ fun VipScreen(
     val uiState by viewModel.uiState.collectAsState()
     val checkInResult by viewModel.checkInResult.collectAsState()
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(checkInResult) {
         // Show toast or snackbar via event
@@ -61,14 +59,12 @@ fun VipScreen(
         topBar = {
             AppTopBar(
                 title = stringResource(R.string.vip_center),
-                scrollBehavior = scrollBehavior,
                 showBackIcon = true,
                 showMenuIcon = false,
                 onBackClick = onNavigateBack,
                 onMenuClick = null
             )
-        },
-        topBarScrollBehavior = scrollBehavior
+        }
     ) { paddingValues ->
         when (val state = uiState) {
             is VipUiState.Loading -> {
@@ -113,7 +109,7 @@ private fun VipContent(
         else -> "普通用户"
     }
 
-    ScalingLazyColumn(
+    AppLazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -177,7 +173,7 @@ private fun VipContent(
                         Spacer(modifier = Modifier.height(4.dp))
                         LinearProgressIndicator(
                             progress = { progress },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

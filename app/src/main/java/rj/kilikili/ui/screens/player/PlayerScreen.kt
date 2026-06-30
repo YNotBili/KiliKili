@@ -43,8 +43,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import rj.kilikili.ui.components.auto.AppLazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -115,8 +114,8 @@ import androidx.wear.compose.foundation.hierarchicalFocusGroup
 import androidx.wear.compose.foundation.requestFocusOnHierarchyActive
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
-import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.appVerticalOptContentPadding
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.R
 import rj.kilikili.ui.components.auto.AppSelectionDialog
@@ -381,7 +380,7 @@ fun PlayerScreen(
     AppScreenScaffold {
         Surface(
             modifier = Modifier.fillMaxSize()
-                .padding(vertical = PaddingDefaults.verticalOptContentPadding())
+                .padding(vertical = appVerticalOptContentPadding())
                 .hierarchicalFocusGroup(true),
             color = MaterialTheme.colorScheme.surface
         ) {
@@ -870,7 +869,7 @@ fun PlayerScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(48.dp)
                         )
                     }
                 }
@@ -1445,7 +1444,7 @@ fun PlayerControls(
                             )
                         )
                         .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .padding(top = PaddingDefaults.verticalOptContentPadding()),
+                        .padding(top = appVerticalOptContentPadding()),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBackClick) {
@@ -1488,7 +1487,7 @@ fun PlayerControls(
                             )
                         )
                         .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .padding(bottom = PaddingDefaults.verticalOptContentPadding())
+                        .padding(bottom = appVerticalOptContentPadding())
                         .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { onDismissRequest() }
                 ) {
                     var sliderPosition by remember { mutableFloatStateOf(0f) }
@@ -1581,7 +1580,7 @@ fun PageSelectorDialog(
         confirmButton = { },
         title = { Text("选择分P") },
         text = {
-            LazyColumn(
+            AppLazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(400.dp),

@@ -30,7 +30,6 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import com.huanli233.biliwebapi.bean.video.VideoInfo
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -53,7 +52,6 @@ fun SeriesDetailScreen(
     val videosFlow by viewModel.videos.collectAsState()
     
     val scrollState = rememberAppLazyListState()
-    val scrollBehavior = rememberAppScrollBehavior()
     var isRefreshing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -67,10 +65,8 @@ fun SeriesDetailScreen(
         topBar = appTopBar(
             title = seriesName.ifEmpty { name },
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         videosFlow?.let { flow ->
             val videos = flow.collectAsLazyPagingItems()

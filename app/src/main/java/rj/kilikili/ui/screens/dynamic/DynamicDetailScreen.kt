@@ -24,7 +24,6 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.Button
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.viewmodel.DynamicDetailUiState
@@ -53,17 +52,13 @@ fun DynamicDetailScreen(
         viewModel.loadDynamic(dynamicId)
     }
 
-    val scrollBehavior = rememberAppScrollBehavior()
-
     AppScreenScaffold(
         scrollState = commentScrollState,
         topBar = appTopBar(
             title = stringResource(R.string.dynamic_detail),
             showBackIcon = true,
-            onBackClick = onNavigateBack,
-            scrollBehavior = scrollBehavior
-        ),
-        topBarScrollBehavior = scrollBehavior
+            onBackClick = onNavigateBack
+        )
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -122,7 +117,7 @@ fun DynamicDetailScreen(
                                         onUserClick = onUserClick,
                                         onOpusClick = { opusId ->
                                             navController.navigate("opus_detail/$opusId")
-                                        },
+                                        }
                                     )
                                 }
                             }
@@ -136,17 +131,16 @@ fun DynamicDetailScreen(
                                     16.dp,
                                     borderWidth = 2.dp,
                                     borderColor = MaterialTheme.colorScheme.primary,
-                                    color = Color.Transparent,
-                                ),
+                                    color = Color.Transparent),
                                 wormDotGraphic = DotGraphic(
                                     16.dp,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                             ),
                             pagerState = pagerState,
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .padding(bottom = 8.dp),
+                                .padding(bottom = 8.dp)
                         )
                     }
                 }
