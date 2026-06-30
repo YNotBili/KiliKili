@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.QualityChooserViewModel
 
 @Composable
@@ -41,8 +41,8 @@ fun QualityChooserScreen(
     viewModel: QualityChooserViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(currentQn) {
         viewModel.selectQuality(currentQn)
@@ -55,10 +55,10 @@ fun QualityChooserScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = "画质选择",
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -70,7 +70,7 @@ fun QualityChooserScreen(
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
         ScalingLazyColumn(
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),

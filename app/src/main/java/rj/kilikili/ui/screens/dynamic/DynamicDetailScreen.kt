@@ -20,12 +20,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.viewmodel.DynamicDetailUiState
 import rj.kilikili.ui.viewmodel.DynamicDetailViewModel
@@ -47,17 +47,17 @@ fun DynamicDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScrollState()
     val pagerState = rememberPagerState(pageCount = { 2 })
-    val commentScrollState = rememberScalingLazyListState()
+    val commentScrollState = rememberAppLazyListState()
 
     LaunchedEffect(dynamicId) {
         viewModel.loadDynamic(dynamicId)
     }
 
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = commentScrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.dynamic_detail),
             showBackIcon = true,
             onBackClick = onNavigateBack,

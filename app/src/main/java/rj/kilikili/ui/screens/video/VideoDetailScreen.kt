@@ -90,16 +90,16 @@ import androidx.core.graphics.toColorInt
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.isRoundDevice
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.material3.TimeText
 import rj.kilikili.data.setting.LocalData
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.comment.CommentScreen
 import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
@@ -192,16 +192,16 @@ fun VideoDetailScreen(
     
     // Create scroll states for each page
     val videoDetailScrollState = rememberScrollState()
-    val commentScrollState = rememberScalingLazyListState()
-    val relatedScrollState = rememberScalingLazyListState()
+    val commentScrollState = rememberAppLazyListState()
+    val relatedScrollState = rememberAppLazyListState()
     
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = commentScrollState,
         modifier = Modifier.fillMaxSize(),
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.video_detail),
             onBackClick = { navController.popBackStack() },
             scrollBehavior = scrollBehavior

@@ -35,7 +35,7 @@ import androidx.navigation.navArgument
 import rj.kilikili.R
 import rj.kilikili.data.account.AccountManager
 import rj.kilikili.data.menu.MenuConfigManager
-import rj.kilikili.ui.components.menu.MenuPanel
+import rj.kilikili.ui.components.auto.AppMenuPanel
 import rj.kilikili.ui.navigation.NavGraph
 import rj.kilikili.ui.navigation.Screen
 import rj.kilikili.ui.navigation.loginGraph
@@ -928,7 +928,10 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            settingsGraph(contentNavController)
+            settingsGraph(
+                contentNavController,
+                onMenuClick = { isMenuExpanded = !isMenuExpanded }
+            )
 
             loginGraph(
                 contentNavController,
@@ -975,7 +978,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     }
                 )
         ) {
-            MenuPanel(
+            AppMenuPanel(
                 modifier = Modifier.fillMaxSize(),
                 menuItems = menuConfig.menuItems,
                 onSelect = { route ->

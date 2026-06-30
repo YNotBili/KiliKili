@@ -65,17 +65,17 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.isRoundDevice
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.plus
 import androidx.wear.compose.material3.Text
 import coil3.compose.AsyncImage
 import com.huanli233.biliwebapi.bean.reply.Reply
 import rj.kilikili.data.setting.LocalData
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.components.EmoteText
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.components.RichText
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -100,7 +100,7 @@ fun CommentDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isRound = isRoundDevice() && LocalData.settings.uiSettings.roundMode
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(replyId, oid, type) {
@@ -133,12 +133,12 @@ fun CommentDetailScreen(
     }.collectAsLazyPagingItems()
     
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         modifier = modifier,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = "评论详情",
             onBackClick = onBackClick,
             scrollBehavior = scrollBehavior
@@ -156,7 +156,7 @@ fun CommentDetailScreen(
         ) {
             ScalingLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = scrollState,
+                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 contentPadding = paddingValues + PaddingValues(vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {

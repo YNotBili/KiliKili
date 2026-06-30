@@ -21,14 +21,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.material3.verticalContentPadding
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.DynamicViewModel
@@ -47,12 +47,12 @@ fun DynamicHomeScreen(
 ) {
     val dynamics = viewModel.dynamicFlow.collectAsLazyPagingItems()
     val scope = rememberCoroutineScope()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     var isRefreshing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
     LaunchedEffect(dynamics.loadState.refresh) {
         if (dynamics.loadState.refresh is LoadState.NotLoading && isRefreshing) {
@@ -60,9 +60,9 @@ fun DynamicHomeScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.dynamic),
             showBackIcon = false,
             showMenuIcon = true,
@@ -105,7 +105,7 @@ fun DynamicHomeScreen(
                     else -> {
                         ScalingLazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            state = scrollState,
+                            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                             contentPadding = paddingValues
                         ) {
                             items(dynamics.itemCount) { index ->

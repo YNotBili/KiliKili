@@ -21,9 +21,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.isRoundDevice
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import android.widget.Toast
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.dialog.SortModeDialog
@@ -41,7 +42,7 @@ fun CommentScreen(
     type: Int = 1,
     modifier: Modifier = Modifier,
     viewModel: CommentViewModel = hiltViewModel(),
-    scrollState: ScalingLazyListState? = null,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState? = null,
     onLoginClick: () -> Unit = {},
     onCommentDetailClick: (Long) -> Unit = {},
     onWriteReplyClick: (Long, Long, Long, String?) -> Unit = { _, _, _, _ -> },
@@ -52,7 +53,7 @@ fun CommentScreen(
     val uiState by viewModel.uiState.collectAsState()
     val activeAccount by viewModel.accountRepository.activeAccount.collectAsState()
     val context = LocalContext.current
-    val internalScrollState = rememberScalingLazyListState()
+    val internalScrollState = rememberAppLazyListState()
     val actualScrollState = scrollState ?: internalScrollState
     val scope = rememberCoroutineScope()
     val isRound = isRoundDevice() && LocalData.settings.uiSettings.roundMode
@@ -97,7 +98,7 @@ fun CommentScreen(
     ) {
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = actualScrollState,
+            state = (actualScrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues
         ) {
             // 发表评论按钮（仅登录且未禁用时显示）

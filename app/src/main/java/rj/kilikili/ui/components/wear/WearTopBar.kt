@@ -1,4 +1,4 @@
-package rj.kilikili.ui.components
+package rj.kilikili.ui.components.wear
 
 import android.util.Log
 import androidx.compose.foundation.background

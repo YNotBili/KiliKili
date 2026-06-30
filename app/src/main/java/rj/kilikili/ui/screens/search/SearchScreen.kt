@@ -2,9 +2,6 @@ package rj.kilikili.ui.screens.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,10 +9,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.material3.*
+import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.Card
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.Text
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.AppLazyColumn
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.SearchViewModel
 
 @Composable
@@ -28,12 +31,11 @@ fun SearchScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val searchHistory by viewModel.searchHistory.collectAsState()
-    val listState = rememberLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val listState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
-        scrollState = listState,
-        topBar = scrollAwareTopBar(
+    AppScreenScaffold(
+        topBar = appTopBar(
             title = stringResource(R.string.search),
             showBackIcon = false,
             showMenuIcon = true,
@@ -42,9 +44,9 @@ fun SearchScreen(
         ),
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        LazyColumn(
-            state = listState,
+        AppLazyColumn(
             modifier = Modifier.fillMaxSize(),
+            state = listState,
             contentPadding = paddingValues,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

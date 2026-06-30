@@ -41,6 +41,17 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * 切换界面模式 (WEAR / PHONE)。设置后 [rj.kilikili.uiType] 通过 settingsStateFlow 同步生效。
+     */
+    fun updateUiType(value: rj.kilikili.UiType) {
+        viewModelScope.launch {
+            LocalData.edit {
+                uiType = value.ordinal
+            }
+        }
+    }
+
     fun updateFollowSystemAccent(enabled: Boolean) {
         viewModelScope.launch {
             LocalData.edit {

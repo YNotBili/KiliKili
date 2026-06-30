@@ -20,27 +20,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.toVerticalPadding
 import rj.kilikili.R
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.navigation.Screen
 
 @Composable
-fun SettingsScreen(navController: NavController) {
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+fun SettingsScreen(
+    navController: NavController,
+    onMenuClick: () -> Unit = {}
+) {
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(id = R.string.settings),
-            showBackIcon = true,
-            onBackClick = { navController.popBackStack() },
+            showBackIcon = false,
+            showMenuIcon = true,
+            onMenuClick = onMenuClick,
             scrollBehavior = scrollBehavior
         ),
         topBarScrollBehavior = scrollBehavior
@@ -48,7 +52,7 @@ fun SettingsScreen(navController: NavController) {
         Box(modifier = Modifier.fillMaxSize()) {
             ScalingLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = scrollState,
+                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 contentPadding = paddingValues
             ) {
             item {

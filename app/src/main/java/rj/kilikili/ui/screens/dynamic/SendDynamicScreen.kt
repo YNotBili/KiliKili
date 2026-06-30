@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.SendDynamicViewModel
 
 private const val MAX_CHARS = 2000
@@ -29,8 +29,8 @@ fun SendDynamicScreen(
     viewModel: SendDynamicViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(state.result) {
         state.result?.let { dynamicId ->
@@ -39,10 +39,10 @@ fun SendDynamicScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = "发布动态",
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,

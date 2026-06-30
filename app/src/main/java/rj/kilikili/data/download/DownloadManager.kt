@@ -87,7 +87,12 @@ class DownloadManager @Inject constructor(
             .build()
 
         val workId = work.id.toString()
-        downloadDao.update(downloadDao.getById(downloadId)!!.copy(workId = workId, updatedAt = System.currentTimeMillis()))
+        val currentEntity = downloadDao.getById(downloadId)
+        if (currentEntity == null) {
+            android.util.Log.w(TAG, "download row vanished before work enqueue: id=$downloadId")
+            return Result.failure(IllegalStateException("download not found after upsert"))
+        }
+        downloadDao.update(currentEntity.copy(workId = workId, updatedAt = System.currentTimeMillis()))
 
         WorkManager.getInstance(context).enqueueUniqueWork(
             request.key,
@@ -136,5 +141,9 @@ class DownloadManager @Inject constructor(
         }
 
         downloadDao.deleteById(downloadId)
+    }
+
+    companion object {
+        private const val TAG = "DownloadManager"
     }
 }

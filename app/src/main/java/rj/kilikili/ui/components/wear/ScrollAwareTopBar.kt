@@ -1,4 +1,4 @@
-package rj.kilikili.ui.components
+package rj.kilikili.ui.components.wear
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationSpec
@@ -46,43 +46,20 @@ import kotlin.math.roundToInt
 /**
  * A TopAppBarScrollBehavior defines how a top app bar should behave when the content under it is scrolled.
  * Based on Material3 design patterns.
+ *
+ * 其他字段 (isPinned, snapAnimationSpec, flingAnimationSpec, nestedScrollConnection) 从父接口 AppScrollBehavior 继承,
+ * 只有 state 重写为更具体的 TopBarState 类型。
  */
 @Stable
-interface TopBarScrollBehavior {
-    /**
-     * A [TopBarState] that is attached to this behavior and is read and updated when scrolling happens.
-     */
-    val state: TopBarState
-
-    /**
-     * Indicates whether the top app bar is pinned.
-     */
-    val isPinned: Boolean
-
-    /**
-     * An optional [AnimationSpec] that defines how the top app bar snaps to either fully
-     * collapsed or fully extended state when a fling or a drag scrolled it into an intermediate position.
-     */
-    val snapAnimationSpec: AnimationSpec<Float>?
-
-    /**
-     * An optional [DecayAnimationSpec] that defined how to fling the top app bar when the user
-     * flings the app bar itself, or the content below it.
-     */
-    val flingAnimationSpec: DecayAnimationSpec<Float>?
-
-    /**
-     * A [NestedScrollConnection] that should be attached to a [Modifier.nestedScroll] in order to
-     * keep track of the scroll events.
-     */
-    val nestedScrollConnection: NestedScrollConnection
+interface TopBarScrollBehavior : rj.kilikili.ui.components.auto.AppScrollBehavior {
+    override val state: TopBarState
 }
 
 /**
  * A state object that can be hoisted to control and observe the top app bar state.
  */
 @Stable
-interface TopBarState {
+interface TopBarState : rj.kilikili.ui.components.auto.AppTopBarState {
     /**
      * The top app bar's height offset limit in pixels, which represents the limit that a top app bar
      * is allowed to collapse to.
@@ -93,18 +70,12 @@ interface TopBarState {
      * The top app bar's current height offset in pixels. This height offset is applied to the fixed
      * height of the app bar to control the displayed height when content is being scrolled.
      */
-    var heightOffset: Float
+    override var heightOffset: Float
 
     /**
      * The total offset of the content scrolled under the top app bar.
      */
     var contentOffset: Float
-
-    /**
-     * A value that represents the collapsed height percentage of the app bar.
-     * A `0.0` represents a fully expanded bar, and `1.0` represents a fully collapsed bar.
-     */
-    val collapsedFraction: Float
 
     companion object {
         /** The default [Saver] implementation for [TopBarState]. */

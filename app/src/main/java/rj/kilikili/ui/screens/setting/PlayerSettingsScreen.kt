@@ -16,13 +16,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.data.setting.edit
-import rj.kilikili.ui.components.SelectionDialog
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.AppSelectionDialog
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 
 @Composable
 fun PlayerSettingsScreen(
@@ -42,12 +42,12 @@ fun PlayerSettingsScreen(
     var showAreaTopDialog by remember { mutableStateOf(false) }
     var showAreaBottomDialog by remember { mutableStateOf(false) }
 
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(id = R.string.settings_player),
             showBackIcon = true,
             onBackClick = { navController.popBackStack() },
@@ -58,7 +58,7 @@ fun PlayerSettingsScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             ScalingLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = scrollState,
+                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 contentPadding = paddingValues
             ) {
                 item {
@@ -354,7 +354,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showQualityDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.default_quality),
             options = listOf(
                 0 to "自动",
@@ -377,7 +377,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showSpeedDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.default_speed),
             options = listOf(
                 0.5f to "0.5x",
@@ -402,7 +402,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showFontSizeDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_font_size),
             options = listOf(
                 10f to "10sp",
@@ -428,7 +428,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showMaxCountDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_max_count),
             options = listOf(
                 10 to "10",
@@ -454,7 +454,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showTransparencyDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_transparency),
             options = listOf(
                 0.0f to "0%",
@@ -479,7 +479,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showScrollSpeedDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_scroll_speed),
             options = listOf(
                 0.5f to "0.5x",
@@ -504,7 +504,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showStrokeWidthDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_stroke_width),
             options = listOf(
                 0f to "0",
@@ -528,7 +528,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showAreaTopDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_area_top),
             options = listOf(
                 0.0f to "0%",
@@ -552,7 +552,7 @@ fun PlayerSettingsScreen(
     }
 
     if (showAreaBottomDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.danmaku_area_bottom),
             options = listOf(
                 0.0f to "0%",

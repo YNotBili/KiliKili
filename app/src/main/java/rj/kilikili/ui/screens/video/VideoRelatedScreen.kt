@@ -10,7 +10,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.data.repository.RecommendRepository
 import rj.kilikili.ui.components.VideoCard
 import rj.kilikili.ui.screens.recommend.LoadingState
@@ -66,13 +66,13 @@ sealed class VideoRelatedUiState {
 fun VideoRelatedScreen(
     aid: Long,
     bvid: String = "",
-    scrollState: androidx.wear.compose.foundation.lazy.ScalingLazyListState? = null,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState? = null,
     onVideoClick: (VideoInfo) -> Unit,
     paddingValues: PaddingValues = PaddingValues(),
     viewModel: VideoRelatedViewModel = hiltViewModel(key = "video_related_$aid")
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val actualScrollState = scrollState ?: rememberScalingLazyListState()
+    val actualScrollState = scrollState ?: rememberAppLazyListState()
     
     LaunchedEffect(aid) {
         if (uiState is VideoRelatedUiState.Loading) {
@@ -113,7 +113,7 @@ fun VideoRelatedScreen(
         is VideoRelatedUiState.Success -> {
             ScalingLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = actualScrollState,
+                state = (actualScrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 contentPadding = paddingValues
             ) {
                 items(state.videos.size) { index ->

@@ -26,9 +26,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import com.huanli233.biliwebapi.bean.history.HistoryItem
 import com.huanli233.biliwebapi.bean.user.UserInfo
 import com.huanli233.biliwebapi.bean.video.Page
@@ -36,8 +37,8 @@ import com.huanli233.biliwebapi.bean.video.Stat
 import com.huanli233.biliwebapi.bean.video.VideoInfo
 import rj.kilikili.R
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.HistoryViewModel
@@ -51,19 +52,19 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel()
 ) {
     val historyItems = viewModel.historyFlow.collectAsLazyPagingItems()
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     val scope = rememberCoroutineScope()
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
     
     // Create ScrollBehavior manually
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = stringResource(R.string.history),
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -137,14 +138,14 @@ fun HistoryScreen(
 @Composable
 private fun HistoryList(
     historyItems: LazyPagingItems<HistoryItem>,
-    scrollState: ScalingLazyListState,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState,
     paddingValues: PaddingValues,
     onVideoClick: (VideoInfo) -> Unit
 ) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     ScalingLazyColumn(
-        state = scrollState,
+        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)

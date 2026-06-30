@@ -20,10 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.viewmodel.MessageSettingsViewModel
 
 @Composable
@@ -32,13 +32,13 @@ fun MessageSettingsScreen(
     viewModel: MessageSettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = "消息设置",
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -50,7 +50,7 @@ fun MessageSettingsScreen(
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
         ScalingLazyColumn(
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(6.dp)

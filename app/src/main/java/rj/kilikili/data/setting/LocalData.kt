@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.runBlocking
 import java.io.IOException
 
 private const val APP_SETTINGS_FILE_NAME = "app_settings.pb"
@@ -54,7 +52,7 @@ object LocalData {
         )
 
     val settings: AppSettings
-        get() = settingsStateFlow.value ?: runBlocking { settingsFlow.first() }
+        get() = settingsStateFlow.value ?: AppSettingsSerializer.defaultValue
 
     suspend fun updateData(transform: suspend (settings: AppSettings) -> AppSettings): AppSettings {
         return dataStore.updateData { transform(it) }

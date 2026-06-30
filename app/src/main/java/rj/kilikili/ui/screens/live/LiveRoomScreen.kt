@@ -31,14 +31,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.huanli233.biliwebapi.bean.live.LiveRoom
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.LiveRoomUiState
@@ -51,16 +51,16 @@ fun LiveRoomScreen(
     viewModel: LiveRoomViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(roomId) {
         viewModel.loadRoomInfo(roomId)
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = "直播",
             showBackIcon = true,
             onBackClick = onNavigateBack,

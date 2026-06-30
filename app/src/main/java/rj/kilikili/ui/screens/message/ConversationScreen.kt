@@ -42,13 +42,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
 import rj.kilikili.data.account.AccountManager
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.ConversationViewModel
@@ -72,8 +72,8 @@ fun ConversationScreen(
     viewModel: ConversationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
     val currentUserUid = remember { AccountManager.currentAccount.accountId }
     var inputText by remember { mutableStateOf("") }
 
@@ -88,10 +88,10 @@ fun ConversationScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = talkerName,
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -117,7 +117,7 @@ fun ConversationScreen(
                 }
                 else -> {
                     ScalingLazyColumn(
-                        state = scrollState,
+                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                         contentPadding = PaddingValues(
                             top = paddingValues.calculateTopPadding(),
                             bottom = PaddingDefaults.verticalContentPadding() + 56.dp

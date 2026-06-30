@@ -27,6 +27,8 @@ import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import java.net.URL
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 
 private const val BILIBILI_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
@@ -43,6 +45,9 @@ class PlayerViewModel @Inject constructor(
     
     private var progressReportJob: Job? = null
     private var lastReportedProgress: Long = 0
+
+    private val currentPlayTag = AtomicInteger(0)
+    private val preparationCancelled = AtomicBoolean(false)
 
     val ijkPlayer: IjkMediaPlayer = IjkMediaPlayer().apply {
         Log.d("PlayerViewModel", "Initializing IjkMediaPlayer")
@@ -97,11 +102,20 @@ class PlayerViewModel @Inject constructor(
         // 设置监听器
         setOnPreparedListener { player ->
             Log.d("PlayerViewModel", "Player prepared")
+            val tagAtFire = currentPlayTag.get()
+            if (preparationCancelled.get() || tagAtFire != currentPlayTag.get()) {
+                Log.d("PlayerViewModel", "Stale onPrepared callback (tag $tagAtFire), ignoring")
+                runCatching { player.stop() }
+                return@setOnPreparedListener
+            }
             val autoPlay = LocalData.settingsStateFlow.value?.playerSettings?.autoPlay ?: false
             if (autoPlay) {
                 // 延迟一点时间确保 Surface 已经设置
                 viewModelScope.launch {
                     delay(200)
+                    if (preparationCancelled.get() || tagAtFire != currentPlayTag.get()) {
+                        return@launch
+                    }
                     if (player.isPlayable) {
                         Log.d("PlayerViewModel", "Auto-starting playback")
                         player.start()
@@ -120,6 +134,7 @@ class PlayerViewModel @Inject constructor(
         
         setOnErrorListener { _, what, extra ->
             Log.e("PlayerViewModel", "Player error: what=$what, extra=$extra")
+            if (preparationCancelled.get()) return@setOnErrorListener true
             false
         }
         
@@ -174,9 +189,14 @@ class PlayerViewModel @Inject constructor(
     fun playVideo(videoUrl: String) {
         if (videoUrl.isEmpty()) return
 
+        val tag = currentPlayTag.incrementAndGet()
+        preparationCancelled.set(false)
+
         viewModelScope.launch {
             try {
-                Log.d("PlayerViewModel", "Playing video: $videoUrl")
+                Log.d("PlayerViewModel", "Playing video: $videoUrl (tag=$tag)")
+
+                if (tag != currentPlayTag.get()) return@launch
 
                 // 停止当前播放
                 if (ijkPlayer.isPlaying) {
@@ -201,9 +221,14 @@ class PlayerViewModel @Inject constructor(
     fun playLocalFile(path: String, title: String) {
         if (path.isEmpty()) return
 
+        val tag = currentPlayTag.incrementAndGet()
+        preparationCancelled.set(false)
+
         viewModelScope.launch {
             try {
-                Log.d("PlayerViewModel", "Playing local file: $path")
+                Log.d("PlayerViewModel", "Playing local file: $path (tag=$tag)")
+
+                if (tag != currentPlayTag.get()) return@launch
 
                 _uiState.value = PlayerUiState(
                     isLocalMode = true,
@@ -227,6 +252,12 @@ class PlayerViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun cancelPreparation() {
+        preparationCancelled.set(true)
+        runCatching { ijkPlayer.stop() }
+        Log.d("PlayerViewModel", "Preparation cancelled by UI")
     }
     
     fun loadVideoInfo(aid: Long) {
@@ -258,6 +289,9 @@ class PlayerViewModel @Inject constructor(
     }
     
     fun loadVideo(aid: Long, cid: Long) {
+        currentPlayTag.incrementAndGet()
+        preparationCancelled.set(false)
+
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
@@ -517,6 +551,8 @@ class PlayerViewModel @Inject constructor(
     
     override fun onCleared() {
         super.onCleared()
+        currentPlayTag.incrementAndGet()
+        preparationCancelled.set(true)
         stopProgressReporting()
         ijkPlayer.release()
         Log.d("PlayerViewModel", "IjkMediaPlayer released")

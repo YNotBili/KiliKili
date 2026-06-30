@@ -24,14 +24,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.paging.compose.LazyPagingItems
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.PreciousViewModel
@@ -46,12 +47,12 @@ fun PreciousScreen(
     onNavigateBack: () -> Unit = {}
 ) {
     val videos = viewModel.videos.collectAsLazyPagingItems()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     var isRefreshing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
     LaunchedEffect(videos.loadState.refresh) {
         if (videos.loadState.refresh is LoadState.NotLoading && isRefreshing) {
@@ -59,9 +60,9 @@ fun PreciousScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = "入站必刷",
             showBackIcon = true,
             onBackClick = onNavigateBack,
@@ -148,7 +149,7 @@ fun PreciousScreen(
 @Composable
 private fun ContentView(
     videos: LazyPagingItems<VideoInfo>,
-    scrollState: ScalingLazyListState,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState,
     paddingValues: PaddingValues,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -161,7 +162,7 @@ private fun ContentView(
     ) {
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues
         ) {
             items(videos.itemCount) { index ->

@@ -75,15 +75,6 @@ wearCompose = "1.5.3"
 # noinspection GradleDependency
 material = "1.12.0-alpha01"
 
-# BetterAndroid
-hikageCore = "1.0.5"
-hikageRecyclerView = "1.0.1"
-hikageExtension = "1.0.3-alpha01"
-hikageExtensionBetterAndroid = "1.0.2"
-hikageCompiler = "1.0.1"
-hikageWidgetAndroidX = "1.0.1"
-hikageWidgetMaterial = "1.0.1"
-
 # ZXing
 # noinspection GradleDependency
 orgEclipseJgit = "7.2.0.202503040940-r"
@@ -107,10 +98,8 @@ okhttp3CompatOkhttp = "5.0.0-p2"
 retrofit2Compat = "2.12.0-p2"
 # noinspection GradleDependency
 googleGson = "2.9.1"
-glide = "4.16.0"
 
 # Third Party - Other
-eventbus = "3.3.1"
 geetestSensebot = "4.4.4"
 brotliDec = "0.1.2"
 brotli4j = "1.18.0"
@@ -193,15 +182,6 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 # Use forked materialcompat library
 material = { group = "com.huanli233.materialcompat", name = "material", version.ref = "material" }
 
-# BetterAndroid
-hikage-core = { group = "com.huanli233.hikage.compat", name = "hikage-core", version.ref = "hikageCore" }
-hikage-recyclerview = { group = "com.huanli233.hikage.compat", name = "hikage-recyclerview", version.ref = "hikageRecyclerView" }
-hikage-extension = { group = "com.huanli233.hikage.compat", name = "hikage-extension", version.ref = "hikageExtension" }
-hikage-extension-betterandroid = { group = "com.huanli233.hikage.compat", name = "hikage-extension-betterandroid", version.ref = "hikageExtensionBetterAndroid" }
-hikage-compiler = { group = "com.huanli233.hikage.compat", name = "hikage-compiler", version.ref = "hikageCompiler" }
-hikage-widget-androidx = { group = "com.huanli233.hikage.compat", name = "hikage-widget-androidx", version.ref = "hikageWidgetAndroidX" }
-hikage-widget-material = { group = "com.huanli233.hikage.compat", name = "hikage-widget-material", version.ref = "hikageWidgetMaterial" }
-
 # ZXing
 org-eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "orgEclipseJgit" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobufJavalite" }
@@ -223,11 +203,8 @@ okhttp3-compat-okhttp = { group = "com.huanli233.okhttp3-compat", name = "okhttp
 retrofit2-compat-retrofit = { group = "com.huanli233.retrofit2-compat", name = "retrofit", version.ref = "retrofit2Compat" }
 retrofit2-compat-converter-gson = { group = "com.huanli233.retrofit2-compat", name = "converter-gson", version.ref = "retrofit2Compat" }
 google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "googleGson" }
-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
-glide-compiler = { group = "com.github.bumptech.glide", name = "ksp", version.ref = "glide" }
 
 # Third Party - Other
-eventbus = { group = "org.greenrobot", name = "eventbus", version.ref = "eventbus" }
 geetest-sensebot = { group = "com.geetest.sensebot", name = "sensebot", version.ref = "geetestSensebot" }
 brotli-dec = { group = "org.brotli", name = "dec", version.ref = "brotliDec" }
 brotli4j = { group = "com.aayushatharva.brotli4j", name = "brotli4j", version.ref = "brotli4j" }

@@ -20,13 +20,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+
 import androidx.wear.compose.materialcore.toVerticalPadding
 import rj.kilikili.R
 import rj.kilikili.ui.activity.base.BaseActivity
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.theme.BiliZepamTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -53,7 +54,7 @@ fun UiPreviewContent(
     onFinish: () -> Unit
 ) {
     var currentTime by remember { mutableStateOf("") }
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
 
     LaunchedEffect(Unit) {
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -63,10 +64,10 @@ fun UiPreviewContent(
         }
     }
 
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
-    ScreenScaffold(
+    val scrollBehavior = rememberAppScrollBehavior()
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.view_preview),
             showBackIcon = true,
             scrollBehavior = scrollBehavior,
@@ -76,7 +77,7 @@ fun UiPreviewContent(
     ) { paddingValues ->
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = paddingValues

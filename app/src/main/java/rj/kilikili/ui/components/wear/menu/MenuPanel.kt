@@ -1,4 +1,4 @@
-package rj.kilikili.ui.components.menu
+package rj.kilikili.ui.components.wear.menu
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -28,7 +28,8 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.wear.WearLazyListStateAdapter
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -64,7 +65,7 @@ fun MenuPanel(
     onDismiss: () -> Unit = {}
 ) {
     val loggedIn = remember { AccountManager.loggedIn() }
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState().let { (it as WearLazyListStateAdapter).delegate }
     
     val filteredItems = remember(menuItems, loggedIn) {
         menuItems.filter { item ->

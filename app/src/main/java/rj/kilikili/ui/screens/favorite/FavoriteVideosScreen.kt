@@ -23,11 +23,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.ScrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppTopBar
 import rj.kilikili.ui.components.VideoCard
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.FavoriteVideosViewModel
@@ -46,22 +46,22 @@ fun FavoriteVideosScreen(
     viewModel: FavoriteVideosViewModel = hiltViewModel()
 ) {
     val videos = viewModel.videosFlow.collectAsLazyPagingItems()
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     val scope = rememberCoroutineScope()
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
     
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(mid, fid) {
         viewModel.setFolder(mid, fid)
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = folderName,
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -133,12 +133,12 @@ fun FavoriteVideosScreen(
 @Composable
 private fun FavoriteVideosList(
     videos: LazyPagingItems<FavoriteVideo>,
-    scrollState: androidx.wear.compose.foundation.lazy.ScalingLazyListState,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState,
     paddingValues: PaddingValues,
     onVideoClick: (VideoInfo) -> Unit
 ) {
     ScalingLazyColumn(
-        state = scrollState,
+        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
         contentPadding = paddingValues,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp)

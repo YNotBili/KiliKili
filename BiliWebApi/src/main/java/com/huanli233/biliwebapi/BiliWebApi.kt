@@ -86,7 +86,7 @@ open class BiliWebApi(
 }
 
 object ApiDebugSettings {
-    val ENABLE_API_DEBUG = true
+    val ENABLE_API_DEBUG = BuildConfig.DEBUG
     const val ENABLE_REQUEST_LOGGING = true
     const val ENABLE_RESPONSE_LOGGING = true
     const val ENABLE_COOKIE_LOGGING = true
@@ -229,8 +229,8 @@ object ApiDebugLogger {
             val bodyString = responseBody.string()
             
             Log.d(TAG, "Response Body:")
-            if (bodyString.length > 2000) {
-                Log.d(TAG, "  ${bodyString.take(2000)}... (truncated)")
+            if (bodyString.length > 512) {
+                Log.d(TAG, "  ${bodyString.take(512)}... (truncated)")
             } else {
                 Log.d(TAG, "  $bodyString")
             }

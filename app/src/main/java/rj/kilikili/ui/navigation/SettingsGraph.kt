@@ -13,9 +13,12 @@ import rj.kilikili.ui.screens.setting.SettingsScreen
 import rj.kilikili.ui.screens.setting.ThemeColorScreen
 import rj.kilikili.ui.screens.setting.UiSettingsScreen
 
-fun NavGraphBuilder.settingsGraph(navController: NavController) {
+fun NavGraphBuilder.settingsGraph(navController: NavController, onMenuClick: () -> Unit = {}) {
     composable(Screen.Settings.route) {
-        SettingsScreen(navController = navController)
+        SettingsScreen(
+            navController = navController,
+            onMenuClick = onMenuClick
+        )
     }
     composable(Screen.UiSettings.route) {
         UiSettingsScreen(navController = navController)

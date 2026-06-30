@@ -18,12 +18,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.isRoundDevice
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.data.setting.LocalData
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 
 @Composable
 fun WriteReplyScreen(
@@ -38,7 +38,7 @@ fun WriteReplyScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isRound = isRoundDevice() && LocalData.settings.uiSettings.roundMode
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var replyText by remember { mutableStateOf("") }
@@ -64,12 +64,12 @@ fun WriteReplyScreen(
     }
 
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         modifier = modifier,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = "写评论",
             onBackClick = onBackClick,
             scrollBehavior = scrollBehavior

@@ -8,8 +8,6 @@ import rj.kilikili.data.account.AccountManager.currentAccount
 import rj.kilikili.utils.MsgUtil
 import rj.kilikili.utils.runOnUi
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 object AccountManager {
 
@@ -22,7 +20,7 @@ object AccountManager {
     }
 
     val currentAccount: AccountEntity
-        get() = repository.activeAccount.value ?: runBlocking { repository.activeAccount.first { it != null } } ?: emptyAccount
+        get() = repository.activeAccount.value ?: emptyAccount
 
     fun loggedIn() = currentAccount.accountId != 0L
 

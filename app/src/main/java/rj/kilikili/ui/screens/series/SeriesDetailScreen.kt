@@ -27,11 +27,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import com.huanli233.biliwebapi.bean.video.VideoInfo
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.screens.recommend.VideoCard
@@ -52,8 +52,8 @@ fun SeriesDetailScreen(
     val seriesName by viewModel.seriesName.collectAsState()
     val videosFlow by viewModel.videos.collectAsState()
     
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
     var isRefreshing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -62,9 +62,9 @@ fun SeriesDetailScreen(
         viewModel.loadSeries(type, mid, id, name)
     }
     
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = seriesName.ifEmpty { name },
             showBackIcon = true,
             onBackClick = onNavigateBack,
@@ -92,7 +92,7 @@ fun SeriesDetailScreen(
                 ) {
                     ScalingLazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        state = scrollState,
+                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                         contentPadding = paddingValues
                     ) {
                         item {

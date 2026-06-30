@@ -347,7 +347,10 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
                 .setOnVideoSizeChangedListener(mInternalListenerAdapter);
         mInternalMediaPlayer.setOnErrorListener(mInternalListenerAdapter);
         mInternalMediaPlayer.setOnInfoListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnTimedTextListener(mInternalListenerAdapter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            mInternalMediaPlayer.setOnTimedTextListener(
+                    new TimedTextListener(this));
+        }
     }
 
     @SuppressLint("NewApi")
@@ -356,8 +359,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
             MediaPlayer.OnBufferingUpdateListener,
             MediaPlayer.OnSeekCompleteListener,
             MediaPlayer.OnVideoSizeChangedListener,
-            MediaPlayer.OnErrorListener, MediaPlayer.OnInfoListener,
-            MediaPlayer.OnTimedTextListener {
+            MediaPlayer.OnErrorListener, MediaPlayer.OnInfoListener {
         public final WeakReference<AndroidMediaPlayer> mWeakMediaPlayer;
 
         public AndroidMediaPlayerListenerHolder(AndroidMediaPlayer mp) {
@@ -422,6 +424,16 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
 
             notifyOnPrepared();
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private static class TimedTextListener implements
+            MediaPlayer.OnTimedTextListener {
+        private final WeakReference<AndroidMediaPlayer> mWeakMediaPlayer;
+
+        TimedTextListener(AndroidMediaPlayer mp) {
+            mWeakMediaPlayer = new WeakReference<>(mp);
+        }
 
         @Override
         public void onTimedText(MediaPlayer mp, TimedText text) {
@@ -430,12 +442,10 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
                 return;
 
             IjkTimedText ijkText = null;
-
             if (text != null) {
                 ijkText = new IjkTimedText(text.getBounds(), text.getText());
             }
-
-            notifyOnTimedText(ijkText);
+            self.notifyOnTimedText(ijkText);
         }
     }
 }

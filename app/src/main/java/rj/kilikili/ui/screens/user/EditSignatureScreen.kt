@@ -19,10 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.ScrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.EditSignatureViewModel
@@ -34,8 +34,8 @@ fun EditSignatureScreen(
     viewModel: EditSignatureViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(state.result) {
         if (state.result != null) {
@@ -43,10 +43,10 @@ fun EditSignatureScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
         topBar = {
-            ScrollAwareTopBar(
+            AppTopBar(
                 title = "编辑签名",
                 scrollBehavior = scrollBehavior,
                 showBackIcon = true,
@@ -61,7 +61,7 @@ fun EditSignatureScreen(
             LoadingView(state = LoadingState.LOADING, modifier = Modifier.fillMaxSize())
         } else {
             ScalingLazyColumn(
-                state = scrollState,
+                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),

@@ -31,11 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.BuildConfig
 import rj.kilikili.R
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.dialog.AdaptDialog
 
 const val ID_QQ_GROUP = "1082439478"
@@ -45,10 +46,10 @@ const val ID_QQ_GROUP = "1082439478"
 fun AboutScreen(navController: NavController) {
     val uriHandler = LocalUriHandler.current
     var showGroupIdDialog by remember { mutableStateOf(false) }
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     if (showGroupIdDialog) {
         AdaptDialog(
@@ -63,9 +64,9 @@ fun AboutScreen(navController: NavController) {
         )
     }
 
-    androidx.wear.compose.material3.ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(id = R.string.about),
             showBackIcon = true,
             onBackClick = { navController.popBackStack() },
@@ -75,7 +76,7 @@ fun AboutScreen(navController: NavController) {
     ) {
         androidx.wear.compose.foundation.lazy.ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = it
         ) {

@@ -16,9 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.ui.screens.comment.CommentSortMode
 
 @Composable
@@ -27,16 +28,16 @@ fun SortModeDialog(
     onModeSelected: (CommentSortMode) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        ScreenScaffold(
+        AppScreenScaffold(
             scrollState = scrollState,
-            topBar = scrollAwareTopBar(
+            topBar = appTopBar(
                 title = "排序方式",
                 showBackIcon = true,
                 onBackClick = onDismiss
@@ -44,7 +45,7 @@ fun SortModeDialog(
         ) { paddingValues ->
             ScalingLazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                state = scrollState,
+                state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                 contentPadding = paddingValues,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

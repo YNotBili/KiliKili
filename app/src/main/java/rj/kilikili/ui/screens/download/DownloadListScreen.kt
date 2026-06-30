@@ -31,11 +31,11 @@ import rj.kilikili.data.download.SourceType
 import rj.kilikili.R
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.materialcore.plus
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -58,16 +58,16 @@ fun DownloadListScreen(
     var deleteTarget by remember { mutableStateOf<DownloadDisplayItem?>(null) }
     var deleteFile by remember { mutableStateOf(false) }
 
-    val scrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     val contentState = remember(displayItems) {
         if (displayItems.isEmpty()) ContentState.EMPTY else ContentState.CONTENT
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(id = R.string.download_manager),
             showBackIcon = false,
             showMenuIcon = true,
@@ -92,7 +92,7 @@ fun DownloadListScreen(
                 ContentState.CONTENT -> {
                     ScalingLazyColumn(
                         modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                        state = scrollState,
+                        state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                         contentPadding = paddingValues.plus(
                             PaddingValues(horizontal = 16.dp)
                         )

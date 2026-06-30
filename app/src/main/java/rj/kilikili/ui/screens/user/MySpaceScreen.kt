@@ -47,12 +47,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 
@@ -72,12 +72,12 @@ fun MySpaceScreen(
     viewModel: MySpaceViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
+    val scrollBehavior = rememberAppScrollBehavior()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.my_space),
             showBackIcon = false,
             showMenuIcon = true,
@@ -144,7 +144,7 @@ fun MySpaceScreen(
                 
                 ScalingLazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    state = scrollState,
+                    state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
                     contentPadding = paddingValues,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {

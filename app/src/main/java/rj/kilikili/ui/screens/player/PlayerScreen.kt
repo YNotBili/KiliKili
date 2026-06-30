@@ -116,10 +116,10 @@ import androidx.wear.compose.foundation.requestFocusOnHierarchyActive
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.R
-import rj.kilikili.ui.components.SelectionDialog
+import rj.kilikili.ui.components.auto.AppSelectionDialog
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.utils.MsgUtil
 import kotlinx.coroutines.delay
@@ -292,13 +292,19 @@ fun PlayerScreen(
 
     LaunchedEffect(viewModel.ijkPlayer, uiState.historyProgress) {
         if (!hasAppliedHistoryProgress && uiState.historyProgress > 5000) {
-            while (!viewModel.ijkPlayer.isPlaying && viewModel.ijkPlayer.duration <= 0) {
-                delay(100)
+            val prepared = withTimeoutOrNull(30_000L) {
+                while (!viewModel.ijkPlayer.isPlaying && viewModel.ijkPlayer.duration <= 0) {
+                    delay(100)
+                }
+                true
             }
-            if (viewModel.ijkPlayer.duration > 0) {
+            if (prepared != null && viewModel.ijkPlayer.duration > 0) {
                 viewModel.ijkPlayer.seekTo(uiState.historyProgress)
                 hasAppliedHistoryProgress = true
                 Log.d("PlayerScreen", "Seeked to history progress: ${uiState.historyProgress}ms")
+            } else {
+                Log.w("PlayerScreen", "Player preparation timed out, aborting history seek")
+                viewModel.cancelPreparation()
             }
         }
     }
@@ -372,7 +378,7 @@ fun PlayerScreen(
         }
     }
 
-    ScreenScaffold {
+    AppScreenScaffold {
         Surface(
             modifier = Modifier.fillMaxSize()
                 .padding(vertical = PaddingDefaults.verticalOptContentPadding())
@@ -1216,7 +1222,7 @@ fun PlayerScreen(
     }
 
     if (showQualitySelector) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = "选择清晰度",
             options = uiState.availableQualities.map { quality ->
                 quality.qn to quality.description
@@ -1231,7 +1237,7 @@ fun PlayerScreen(
     }
 
     if (showSpeedSelector) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = "播放速度",
             options = listOf(
                 0.5f to "0.5x",

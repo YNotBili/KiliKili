@@ -17,13 +17,20 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import com.huanli233.biliwebapi.api.util.BiliTicketUtil
+import com.huanli233.biliwebapi.api.util.RequestParamUtil
+import com.huanli233.biliwebapi.bean.requestParam.Buvids
+import okhttp3.Cookie
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import rj.kilikili.api.bilibiliApi
 import rj.kilikili.data.proto.AppSettings
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.activity.base.material.ThemedAppCompatActivity
 import rj.kilikili.ui.animations.playAnimation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
+import kotlinx.coroutines.withContext
 
 open class BaseActivity : ThemedAppCompatActivity() {
 
@@ -72,6 +79,7 @@ open class BaseActivity : ThemedAppCompatActivity() {
 
         // Add a listener for settings changes
         observeSettingsChanges()
+        initData()
     }
 
     var lastSettings = LocalData.settingsStateFlow.value
@@ -108,6 +116,86 @@ open class BaseActivity : ThemedAppCompatActivity() {
 
         if (paddingChanged) {
             uiPaddingManager.applyRootViewPadding(window.decorView.rootView)
+        }
+    }
+
+    private fun initData() {
+        if (!preheatStarted) {
+            preheatStarted = true
+            preheatCookies()
+        }
+    }
+
+    companion object {
+        @Volatile
+        private var preheatStarted: Boolean = false
+    }
+
+    private fun preheatCookies() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val httpUrl = "https://www.bilibili.com".toHttpUrl()
+            val cookies = bilibiliApi.cookieManager.loadForRequest(httpUrl)
+            val nameSet = cookies.map { it.name }.toSet()
+
+            if ("bili_ticket" !in nameSet) {
+                val resp = withContext(Dispatchers.IO) {
+                    BiliTicketUtil.genBiliTicketSync(bilibiliApi)
+                }
+                resp.data?.let { ticket ->
+                    bilibiliApi.cookieManager.saveFromResponse(
+                        url = httpUrl,
+                        cookies = listOf(
+                            Cookie.Builder().name("bili_ticket").value(ticket.ticket).domain("bilibili.com").build(),
+                            Cookie.Builder().name("bili_ticket_expires")
+                                .value((ticket.createTime + 3 * 24 * 60 * 60).toString())
+                                .domain("bilibili.com").build()
+                        )
+                    )
+                }
+            }
+
+            if ("_uuid" !in nameSet) {
+                bilibiliApi.cookieManager.saveFromResponse(
+                    url = httpUrl,
+                    cookies = listOf(
+                        Cookie.Builder().name("_uuid").value(RequestParamUtil.genUuidInfoc())
+                            .domain("bilibili.com").build()
+                    )
+                )
+            }
+
+            if ("b_lsid" !in nameSet) {
+                bilibiliApi.cookieManager.saveFromResponse(
+                    url = httpUrl,
+                    cookies = listOf(
+                        Cookie.Builder().name("b_lsid").value(RequestParamUtil.genBlsid())
+                            .domain("bilibili.com").build()
+                    )
+                )
+            }
+
+            if ("buvid3" !in nameSet || "buvid4" !in nameSet) {
+                val buvids = withContext(Dispatchers.IO) { Buvids.generate(bilibiliApi) }
+                buvids.data?.let { data ->
+                    bilibiliApi.cookieManager.saveFromResponse(
+                        url = httpUrl,
+                        cookies = listOf(
+                            Cookie.Builder().name("buvid3").value(data.buvid3).domain("bilibili.com").build(),
+                            Cookie.Builder().name("buvid4").value(data.buvid4).domain("bilibili.com").build()
+                        )
+                    )
+                }
+            }
+
+            if ("b_nut" !in nameSet) {
+                bilibiliApi.cookieManager.saveFromResponse(
+                    url = httpUrl,
+                    cookies = listOf(
+                        Cookie.Builder().name("b_nut").value(RequestParamUtil.genBnut())
+                            .domain("bilibili.com").build()
+                    )
+                )
+            }
         }
     }
 
@@ -152,28 +240,6 @@ open class BaseActivity : ThemedAppCompatActivity() {
         if (!LocalData.settings.preferences.backDisabled && Build.VERSION.SDK_INT < 33) {
             super.onBackPressed()
         }
-    }
-
-    private var eventBusInit: Boolean = false
-
-    override fun onStart() {
-        super.onStart()
-        if (eventBusEnabled() && !eventBusInit) {
-            EventBus.getDefault().register(this)
-            eventBusInit = true
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (eventBusInit) {
-            EventBus.getDefault().unregister(this)
-            eventBusInit = false
-        }
-    }
-
-    protected open fun eventBusEnabled(): Boolean {
-        return false
     }
 
     override fun isDestroyed(): Boolean {

@@ -30,17 +30,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.rememberPagerState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import com.huanli233.biliwebapi.bean.user.UserCardInfo
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.widget.DotsIndicator
 import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.screens.dynamic.DynamicCard
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -91,7 +91,7 @@ fun UserProfileScreen(
     val isFollowing by viewModel.isFollowing.collectAsState()
     val followLoading by viewModel.followLoading.collectAsState()
     val pagerState = rememberPagerState(pageCount = { 5 })
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     val dynamicViewModel = hiltViewModel<DynamicViewModel>(key = "dynamic_$mid")
     
@@ -101,8 +101,8 @@ fun UserProfileScreen(
         viewModel.loadUser(mid)
     }
 
-    ScreenScaffold(
-        topBar = scrollAwareTopBar(
+    AppScreenScaffold(
+        topBar = appTopBar(
             title = userInfo?.card?.name ?: "",
             showBackIcon = true,
             onBackClick = onNavigateBack,
@@ -185,7 +185,7 @@ private fun DynamicsPage(
     }
     
     val dynamics = viewModel.dynamicFlow.collectAsLazyPagingItems()
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(dynamics.loadState.refresh) {
@@ -206,7 +206,7 @@ private fun DynamicsPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = PaddingValues()
         ) {
             item {
@@ -444,7 +444,7 @@ private fun VideosPage(
 ) {
     val videos = viewModel.videosFlow.collectAsLazyPagingItems()
     val seriesList by viewModel.seriesList.collectAsState()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     var isRefreshing by remember { mutableStateOf(false) }
     var isSeriesExpanded by remember { mutableStateOf(false) }
 
@@ -466,7 +466,7 @@ private fun VideosPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = PaddingValues()
         ) {
             if (seriesList.isNotEmpty()) {
@@ -561,7 +561,7 @@ private fun ArticlesPage(
     onOpusClick: (Long) -> Unit = {}
 ) {
     val articles = viewModel.articlesFlow.collectAsLazyPagingItems()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     var isRefreshing by remember { mutableStateOf(false) }
     var loadingArticles by remember { mutableStateOf<Set<Long>>(emptySet()) }
     val coroutineScope = rememberCoroutineScope()
@@ -584,7 +584,7 @@ private fun ArticlesPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = PaddingValues()
         ) {
             item {

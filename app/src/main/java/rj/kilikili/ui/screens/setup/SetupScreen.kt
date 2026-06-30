@@ -37,10 +37,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.data.proto.NightMode
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.data.setting.edit
@@ -146,18 +146,18 @@ fun SetupScreen(
 
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.welcome),
             showBackIcon = false
         )
     ) { paddingValues ->
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues
         ) {
             item {
@@ -187,20 +187,20 @@ private fun UiSetupStep(
     viewModel: UiSetupViewModel,
     onNext: () -> Unit
 ) {
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     val context = LocalContext.current
     val darkThemeModes = remember { context.resources.getStringArray(R.array.dark_theme_modes) }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.initialize_setting),
             showBackIcon = false
         )
     ) { paddingValues ->
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues
         ) {
 

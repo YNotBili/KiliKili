@@ -281,13 +281,6 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
 //    implementation(libs.androidx.wear)
 
-    implementation(libs.hikage.core)
-    implementation(libs.hikage.recyclerview)
-    implementation(libs.hikage.extension.betterandroid)
-    ksp(libs.hikage.compiler)
-    implementation(libs.hikage.widget.androidx)
-    implementation(libs.hikage.widget.material)
-
     implementation(libs.flexbox)
 
     implementation(libs.protobuf.javalite)
@@ -311,10 +304,7 @@ dependencies {
         exclude("com.google.code.gson", "gson")
     }
     implementation(libs.google.gson)
-    implementation(libs.glide)
-    ksp(libs.glide.compiler)
 
-    implementation(libs.eventbus)
     implementation(libs.geetest.sensebot) {
         exclude(group = "com.squareup.okhttp3")
     }
@@ -351,11 +341,6 @@ dependencies {
     implementation(libs.material.kolor)
     implementation(libs.dotsindicator)
     implementation(libs.compose.shimmer)
-
-    // Media3 for video playback
-    implementation("androidx.media3:media3-exoplayer:1.5.0")
-    implementation("androidx.media3:media3-ui:1.5.0")
-    implementation("androidx.media3:media3-common:1.5.0")
 
     // Image zoom and processing
     implementation("net.engawapg.lib:zoomable:1.6.2")

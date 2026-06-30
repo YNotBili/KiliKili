@@ -92,4 +92,7 @@ message AppSettings {
 
   // 内部设置：是否使用 HD 登录协议（android_hd 客户端）
   int32 is_hd = 11;
+
+  // 界面模式: 0=WEAR (手表单板), 1=PHONE (手机 Material3)
+  int32 ui_type = 12;
 }

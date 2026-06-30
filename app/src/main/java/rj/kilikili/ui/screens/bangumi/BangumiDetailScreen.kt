@@ -18,16 +18,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.huanli233.biliwebapi.bean.bangumi.BangumiSections
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -52,17 +52,17 @@ fun BangumiDetailScreen(
     val selectedEpisode by viewModel.selectedEpisode.collectAsState()
     
     val pagerState = rememberPagerState(pageCount = { 2 })
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
     val bangumiScrollState = rememberScrollState()
-    val commentScrollState = rememberScalingLazyListState()
+    val commentScrollState = rememberAppLazyListState()
     
     LaunchedEffect(mediaId) {
         viewModel.loadBangumi(mediaId)
     }
     
-    ScreenScaffold(
-        topBar = scrollAwareTopBar(
+    AppScreenScaffold(
+        topBar = appTopBar(
             title = bangumiInfo?.media?.title ?: "番剧详情",
             showBackIcon = true,
             onBackClick = onNavigateBack,

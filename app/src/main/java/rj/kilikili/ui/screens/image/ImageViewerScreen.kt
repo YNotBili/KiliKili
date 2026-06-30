@@ -24,10 +24,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.isRoundDevice
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.material3.TimeText
 import rj.kilikili.data.setting.LocalData
-import rj.kilikili.ui.components.WearTopBar
+import rj.kilikili.ui.components.auto.WearTopBar
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -56,7 +56,7 @@ fun ImageViewerScreen(
     var isSaving by remember { mutableStateOf(false) }
     val isRound = isRoundDevice() && LocalData.settings.uiSettings.roundMode
 
-    ScreenScaffold(
+    AppScreenScaffold(
         modifier = Modifier.fillMaxSize(),
         timeText = if (isRound) { { TimeText() } } else null
     ) { paddingValues ->
@@ -178,7 +178,9 @@ private suspend fun saveImage(context: Context, imageUrl: String) {
             
             val file = File(appDir, fileName)
             val url = URL(imageUrl)
-            val connection = url.openConnection()
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 15_000
+            connection.readTimeout = 30_000
             connection.connect()
             
             connection.getInputStream().use { input ->

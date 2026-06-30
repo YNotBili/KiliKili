@@ -10,6 +10,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -19,6 +20,7 @@ import com.google.gson.reflect.TypeToken
 import rj.kilikili.KiliKili
 import rj.kilikili.data.di.AppDependenciesEntryPoint
 import rj.kilikili.data.download.DownloadDao
+import rj.kilikili.data.download.DownloadEntity
 import rj.kilikili.data.download.DownloadStatus
 import dagger.hilt.EntryPoints
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,14 @@ class DownloadWorker(
     )
 
     private val downloadDao: DownloadDao = entryPoint.downloadDao()
+
+    private suspend fun getOrFail(downloadId: Long, errorMsg: String): DownloadEntity? {
+        val entity = downloadDao.getById(downloadId)
+        if (entity == null) {
+            android.util.Log.w(TAG, "download row missing: id=$downloadId, reason=$errorMsg")
+        }
+        return entity
+    }
 
     override suspend fun doWork(): Result {
         val downloadId = inputData.getLong(KEY_DOWNLOAD_ID, -1L)
@@ -62,22 +72,26 @@ class DownloadWorker(
 
                 if (!response.isSuccessful) {
                     val msg = "HTTP ${response.code}"
-                    downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                        status = DownloadStatus.FAILED,
-                        errorMessage = msg,
-                        updatedAt = System.currentTimeMillis(),
-                        finishedAt = System.currentTimeMillis()
-                    ))
+                    getOrFail(downloadId, msg)?.let { e ->
+                        downloadDao.update(e.copy(
+                            status = DownloadStatus.FAILED,
+                            errorMessage = msg,
+                            updatedAt = System.currentTimeMillis(),
+                            finishedAt = System.currentTimeMillis()
+                        ))
+                    }
                     return@withContext Result.failure()
                 }
 
                 val body = response.body ?: run {
-                    downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                        status = DownloadStatus.FAILED,
-                        errorMessage = "empty body",
-                        updatedAt = System.currentTimeMillis(),
-                        finishedAt = System.currentTimeMillis()
-                    ))
+                    getOrFail(downloadId, "empty body")?.let { e ->
+                        downloadDao.update(e.copy(
+                            status = DownloadStatus.FAILED,
+                            errorMessage = "empty body",
+                            updatedAt = System.currentTimeMillis(),
+                            finishedAt = System.currentTimeMillis()
+                        ))
+                    }
                     return@withContext Result.failure()
                 }
 
@@ -86,12 +100,14 @@ class DownloadWorker(
 
                 val uri = createDownloadItem(entity.fileName, mime)
                 if (uri == null) {
-                    downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                        status = DownloadStatus.FAILED,
-                        errorMessage = "failed to create MediaStore item",
-                        updatedAt = System.currentTimeMillis(),
-                        finishedAt = System.currentTimeMillis()
-                    ))
+                    getOrFail(downloadId, "media store insert failed")?.let { e ->
+                        downloadDao.update(e.copy(
+                            status = DownloadStatus.FAILED,
+                            errorMessage = "failed to create MediaStore item",
+                            updatedAt = System.currentTimeMillis(),
+                            finishedAt = System.currentTimeMillis()
+                        ))
+                    }
                     return@withContext Result.failure()
                 }
 
@@ -104,11 +120,13 @@ class DownloadWorker(
 
                         while (true) {
                             if (isStopped) {
-                                downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                                    status = DownloadStatus.CANCELED,
-                                    updatedAt = System.currentTimeMillis(),
-                                    finishedAt = System.currentTimeMillis()
-                                ))
+                                getOrFail(downloadId, "stopped")?.let { e ->
+                                    downloadDao.update(e.copy(
+                                        status = DownloadStatus.CANCELED,
+                                        updatedAt = System.currentTimeMillis(),
+                                        finishedAt = System.currentTimeMillis()
+                                    ))
+                                }
                                 return@withContext Result.success()
                             }
 
@@ -124,14 +142,16 @@ class DownloadWorker(
                                 } else 0
 
                                 lastUpdateTs = nowTs
-                                downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                                    downloadedBytes = downloaded,
-                                    totalBytes = totalBytes,
-                                    progress = progress,
-                                    updatedAt = nowTs,
-                                    contentUri = uri.toString(),
-                                    status = DownloadStatus.RUNNING
-                                ))
+                                getOrFail(downloadId, "progress update")?.let { e ->
+                                    downloadDao.update(e.copy(
+                                        downloadedBytes = downloaded,
+                                        totalBytes = totalBytes,
+                                        progress = progress,
+                                        updatedAt = nowTs,
+                                        contentUri = uri.toString(),
+                                        status = DownloadStatus.RUNNING
+                                    ))
+                                }
                                 setForeground(createForegroundInfo(notificationId, entity.fileName, progress))
                             }
                         }
@@ -139,51 +159,61 @@ class DownloadWorker(
 
                         finalizePending(uri)
 
-                        downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                            downloadedBytes = downloaded,
-                            totalBytes = totalBytes,
-                            progress = 100,
-                            status = DownloadStatus.SUCCEEDED,
-                            updatedAt = System.currentTimeMillis(),
-                            finishedAt = System.currentTimeMillis(),
-                            contentUri = uri.toString()
-                        ))
+                        getOrFail(downloadId, "finalize")?.let { e ->
+                            downloadDao.update(e.copy(
+                                downloadedBytes = downloaded,
+                                totalBytes = totalBytes,
+                                progress = 100,
+                                status = DownloadStatus.SUCCEEDED,
+                                updatedAt = System.currentTimeMillis(),
+                                finishedAt = System.currentTimeMillis(),
+                                contentUri = uri.toString()
+                            ))
+                        }
                         setForeground(createForegroundInfo(notificationId, entity.fileName, 100))
                     }
                 } ?: run {
-                    downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                        status = DownloadStatus.FAILED,
-                        errorMessage = "failed to open output stream",
-                        updatedAt = System.currentTimeMillis(),
-                        finishedAt = System.currentTimeMillis()
-                    ))
+                    getOrFail(downloadId, "open output stream failed")?.let { e ->
+                        downloadDao.update(e.copy(
+                            status = DownloadStatus.FAILED,
+                            errorMessage = "failed to open output stream",
+                            updatedAt = System.currentTimeMillis(),
+                            finishedAt = System.currentTimeMillis()
+                        ))
+                    }
                     return@withContext Result.failure()
                 }
 
                 Result.success()
             } catch (e: SecurityException) {
-                downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                    status = DownloadStatus.FAILED,
-                    errorMessage = e.message ?: "permission denied",
-                    updatedAt = System.currentTimeMillis(),
-                    finishedAt = System.currentTimeMillis()
-                ))
+                getOrFail(downloadId, "security: ${e.message}")?.let { row ->
+                    downloadDao.update(row.copy(
+                        status = DownloadStatus.FAILED,
+                        errorMessage = e.message ?: "permission denied",
+                        updatedAt = System.currentTimeMillis(),
+                        finishedAt = System.currentTimeMillis()
+                    ))
+                }
                 Result.failure()
             } catch (e: IOException) {
-                downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                    status = DownloadStatus.FAILED,
-                    errorMessage = e.message ?: "io error",
-                    updatedAt = System.currentTimeMillis(),
-                    finishedAt = System.currentTimeMillis()
-                ))
+                getOrFail(downloadId, "io: ${e.message}")?.let { row ->
+                    downloadDao.update(row.copy(
+                        status = DownloadStatus.FAILED,
+                        errorMessage = e.message ?: "io error",
+                        updatedAt = System.currentTimeMillis(),
+                        finishedAt = System.currentTimeMillis()
+                    ))
+                }
                 Result.retry()
             } catch (e: Exception) {
-                downloadDao.update(downloadDao.getById(downloadId)!!.copy(
-                    status = DownloadStatus.FAILED,
-                    errorMessage = e.message ?: "unknown error",
-                    updatedAt = System.currentTimeMillis(),
-                    finishedAt = System.currentTimeMillis()
-                ))
+                getOrFail(downloadId, "exception: ${e.message}")?.let { row ->
+                    downloadDao.update(row.copy(
+                        status = DownloadStatus.FAILED,
+                        errorMessage = e.message ?: "unknown error",
+                        updatedAt = System.currentTimeMillis(),
+                        finishedAt = System.currentTimeMillis()
+                    ))
+                }
                 Result.failure()
             }
         }
@@ -263,5 +293,6 @@ class DownloadWorker(
         const val TAG_DOWNLOAD = "download"
         const val KEY_DOWNLOAD_ID = "download_id"
         private const val CHANNEL_ID = "downloads"
+        private const val TAG = "DownloadWorker"
     }
 }

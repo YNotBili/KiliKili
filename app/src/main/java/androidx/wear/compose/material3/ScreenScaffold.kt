@@ -74,8 +74,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import rj.kilikili.ui.components.TopBarScrollBehavior
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.wear.TopBarScrollBehavior
+import rj.kilikili.ui.components.wear.rememberEnterAlwaysScrollBehavior
 import androidx.wear.compose.foundation.LocalScreenIsActive
 import androidx.wear.compose.foundation.ScrollInfoProvider
 import androidx.wear.compose.foundation.isRoundDevice

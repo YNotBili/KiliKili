@@ -1,8 +1,7 @@
 package rj.kilikili.ui.screens.setting
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,16 +28,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
-import androidx.wear.compose.materialcore.toVerticalPadding
 import rj.kilikili.R
 import rj.kilikili.data.proto.NightMode
 import rj.kilikili.ui.activity.setup.UiPreviewActivity
-import rj.kilikili.ui.components.SelectionDialog
-import rj.kilikili.ui.components.scrollAwareTopBar
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.AppLazyColumn
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.AppSelectionDialog
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.navigation.Screen
 import splitties.activities.start
@@ -56,18 +54,19 @@ fun UiSettingsScreen(
     var showDensityDialog by remember { mutableStateOf(false) }
     var showNightModeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showUiTypeDialog by remember { mutableStateOf(false) }
 
     val currentSettings = settings ?: return
 
     val context = LocalContext.current
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 0)
-    
-    // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
 
-    ScreenScaffold(
+    // Create ScrollBehavior for TopBar
+    val scrollBehavior = rememberAppScrollBehavior()
+
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(id = R.string.settings_ui),
             showBackIcon = true,
             onBackClick = { navController.popBackStack() },
@@ -75,12 +74,11 @@ fun UiSettingsScreen(
         ),
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            ScalingLazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = scrollState,
-                contentPadding = paddingValues
-            ) {
+        AppLazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = scrollState,
+            contentPadding = paddingValues
+        ) {
 
                 item {
                     SettingsItem(
@@ -134,6 +132,18 @@ fun UiSettingsScreen(
                         title = stringResource(id = R.string.dark_theme),
                         summary = nightModeSummary,
                         onClick = { showNightModeDialog = true }
+                    )
+                }
+
+                item {
+                    SettingsItem(
+                        title = stringResource(id = R.string.ui_type),
+                        summary = if (rj.kilikili.uiType == rj.kilikili.UiType.PHONE) {
+                            stringResource(R.string.ui_type_phone)
+                        } else {
+                            stringResource(R.string.ui_type_wear)
+                        },
+                        onClick = { showUiTypeDialog = true }
                     )
                 }
 
@@ -200,7 +210,6 @@ fun UiSettingsScreen(
                     )
                 }
             }
-        }
     }
 
     if (showUiScaleDialog) {
@@ -227,7 +236,7 @@ fun UiSettingsScreen(
 
     if (showNightModeDialog) {
         val nightModeEntries = stringArrayResource(R.array.dark_theme_modes)
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.dark_theme),
             options = listOf(
                 NightMode.NIGHT_MODE_AUTO to nightModeEntries[0],
@@ -244,7 +253,7 @@ fun UiSettingsScreen(
     }
 
     if (showLanguageDialog) {
-        SelectionDialog(
+        AppSelectionDialog(
             title = stringResource(id = R.string.settings_language),
             options = listOf(
                 "" to stringResource(R.string.language_system),
@@ -258,6 +267,22 @@ fun UiSettingsScreen(
             onConfirm = { languageTag ->
                 viewModel.updateLanguage(languageTag)
                 showLanguageDialog = false
+            }
+        )
+    }
+
+    if (showUiTypeDialog) {
+        AppSelectionDialog(
+            title = stringResource(id = R.string.ui_type),
+            options = listOf(
+                rj.kilikili.UiType.WEAR to stringResource(R.string.ui_type_wear),
+                rj.kilikili.UiType.PHONE to stringResource(R.string.ui_type_phone)
+            ),
+            currentValue = rj.kilikili.uiType,
+            onDismiss = { showUiTypeDialog = false },
+            onConfirm = { type ->
+                viewModel.updateUiType(type)
+                showUiTypeDialog = false
             }
         )
     }

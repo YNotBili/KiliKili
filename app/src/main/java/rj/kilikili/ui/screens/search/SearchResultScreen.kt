@@ -1,8 +1,6 @@
 package rj.kilikili.ui.screens.search
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,10 +10,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.wear.compose.material3.*
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.AppLazyColumn
+import rj.kilikili.ui.components.auto.AppScreenScaffold
+import rj.kilikili.ui.components.auto.appTopBar
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.SearchResultViewModel
@@ -37,7 +37,12 @@ import coil3.request.ImageRequest
 import com.valentinilk.shimmer.shimmer
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import coil3.request.crossfade
 import rj.kilikili.ui.viewmodel.ArticleRedirectState
 import rj.kilikili.utils.MsgUtil
@@ -63,8 +68,8 @@ fun SearchResultScreen(
     val searchResults by viewModel.searchResults.collectAsState()
     val currentType by viewModel.currentType.collectAsState()
     var selectedType by remember { mutableStateOf("video") }
-    val lazyListState = rememberLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val lazyListState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(query, selectedType) {
         // 只在还没有搜索结果或类型改变时才搜索
@@ -75,9 +80,9 @@ fun SearchResultScreen(
     
     val pagingItems = searchResults?.collectAsLazyPagingItems()
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = lazyListState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = query,
             showBackIcon = true,
             onBackClick = onNavigateBack,
@@ -85,7 +90,7 @@ fun SearchResultScreen(
         ),
         topBarScrollBehavior = scrollBehavior
     ) { paddingValues ->
-        LazyColumn(
+        AppLazyColumn(
             state = lazyListState,
             modifier = Modifier.fillMaxSize(),
             contentPadding = paddingValues,

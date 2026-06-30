@@ -22,6 +22,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+/** 当前 UI 目标平台。WEAR=强制手表, PHONE=强制手机。运行时由用户在设置中切换。 */
+enum class UiType { WEAR, PHONE }
+
+/**
+ * 全局 UI 类型 — 启动时从 LocalData 读取, 用户在设置中切换时实时更新。
+ * auto 包 [actualUiType] 读这个值。
+ */
+@Volatile
+var uiType: UiType = UiType.WEAR
+
+/** Int (proto 字段) → UiType 转换。0 或未设置 = WEAR (默认手表), 1 = PHONE。 */
+internal fun Int.toUiTypeOrWear(): UiType = when (this) {
+    1 -> UiType.PHONE
+    else -> UiType.WEAR
+}
+
 @HiltAndroidApp
 class KiliKili : MultiDexApplication() {
 
@@ -52,6 +68,8 @@ class KiliKili : MultiDexApplication() {
         lastThemeMode = LocalData.settings.theme.nightMode.toSystemValue()
         setDefaultNightMode(lastThemeMode)
         LocaleDelegate.defaultLocale = getLocale()
+        // 同步启动时持久化的 UI 类型
+        uiType = LocalData.settings.uiType.toUiTypeOrWear()
         applicationScope.launch {
             LocalData.settingsStateFlow.collectLatest { config ->
                 config?.let {
@@ -60,6 +78,11 @@ class KiliKili : MultiDexApplication() {
                         withContext(Dispatchers.Main) {
                             setDefaultNightMode(lastThemeMode)
                         }
+                    }
+                    // 同步设置里的 uiType 到全局
+                    val newUiType = it.uiType.toUiTypeOrWear()
+                    if (uiType != newUiType) {
+                        uiType = newUiType
                     }
                     // Update locale when language changes
                     val newLocale = getLocale(it.language)

@@ -14,11 +14,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
+import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -46,8 +46,8 @@ fun OpusDetailScreen(
     val pagerState = rememberPagerState(pageCount = { 2 })
     
     val opusDetailScrollState = rememberScrollState()
-    val commentScrollState = rememberScalingLazyListState()
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val commentScrollState = rememberAppLazyListState()
+    val scrollBehavior = rememberAppScrollBehavior()
 
     LaunchedEffect(opusId) {
         viewModel.loadOpus(opusId)
@@ -80,10 +80,10 @@ fun OpusDetailScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = commentScrollState,
         modifier = Modifier.fillMaxSize(),
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.opus_detail),
             showBackIcon = true,
             onBackClick = onNavigateBack,

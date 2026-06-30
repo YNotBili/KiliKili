@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.huanli233.biliwebapi.bean.login.TvCookie
 import com.huanli233.biliwebapi.bean.login.TvQrCodePoll
 import com.huanli233.biliwebapi.bean.login.TvTokenInfo
+import rj.kilikili.api.BilibiliApiException
 import rj.kilikili.data.account.AccountEntity
 import rj.kilikili.data.account.AccountRepository
 import rj.kilikili.data.account.CookieEntity
@@ -85,15 +86,16 @@ class HdQrCodeLoginViewModel @Inject constructor(
                         }
                     }
                     .onFailure { e ->
+                        val apiCode = (e as? BilibiliApiException)?.code
                         val msg = e.message ?: ""
-                        when {
-                            msg.contains("86038") -> {
+                        when (apiCode) {
+                            86038 -> {
                                 _uiState.value = HdQrCodeState(status = HdQrStatus.EXPIRED)
                                 return@launch
                             }
                             // 86039/86042: 尚未扫码；86090: 已扫码未确认 → 继续轮询
-                            msg.contains("86039") || msg.contains("86042") -> { }
-                            msg.contains("86090") -> {
+                            86039, 86042 -> { }
+                            86090 -> {
                                 _uiState.value = HdQrCodeState(status = HdQrStatus.SCANNED)
                             }
                             else -> {

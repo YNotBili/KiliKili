@@ -48,19 +48,20 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.PaddingDefaults
-import androidx.wear.compose.material3.ScreenScaffold
+import rj.kilikili.ui.components.auto.AppScreenScaffold
 import androidx.wear.compose.material3.TimeText
 import androidx.wear.compose.material3.verticalContentPadding
 import rj.kilikili.R
 import rj.kilikili.data.setting.LocalData
-import rj.kilikili.ui.components.scrollAwareTopBar
+import rj.kilikili.ui.components.auto.appTopBar
 import com.huanli233.biliwebapi.bean.video.VideoInfo
 import kotlinx.coroutines.launch
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import rj.kilikili.ui.components.auto.AppLazyListState
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import rj.kilikili.ui.components.rememberEnterAlwaysScrollBehavior
+import rj.kilikili.ui.components.auto.rememberAppScrollBehavior
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,13 +74,13 @@ fun RecommendScreen(
 ) {
     val videos = viewModel.videos.collectAsLazyPagingItems()
     val scope = rememberCoroutineScope()
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState()
     var isRefreshing by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     
     // Create ScrollBehavior for TopBar
-    val scrollBehavior = rememberEnterAlwaysScrollBehavior()
+    val scrollBehavior = rememberAppScrollBehavior()
     
     LaunchedEffect(videos.loadState.refresh) {
         if (videos.loadState.refresh is LoadState.NotLoading && isRefreshing) {
@@ -87,9 +88,9 @@ fun RecommendScreen(
         }
     }
 
-    ScreenScaffold(
+    AppScreenScaffold(
         scrollState = scrollState,
-        topBar = scrollAwareTopBar(
+        topBar = appTopBar(
             title = stringResource(R.string.recommend),
             showBackIcon = false,
             showMenuIcon = true,
@@ -186,7 +187,7 @@ fun RecommendScreen(
 @Composable
 private fun ContentView(
     videos: LazyPagingItems<VideoInfo>,
-    scrollState: ScalingLazyListState,
+    scrollState: rj.kilikili.ui.components.auto.AppLazyListState,
     paddingValues: PaddingValues,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
@@ -201,7 +202,7 @@ private fun ContentView(
     ) {
         ScalingLazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = scrollState,
+            state = (scrollState as rj.kilikili.ui.components.wear.WearLazyListStateAdapter).delegate,
             contentPadding = paddingValues
         ) {
             item {

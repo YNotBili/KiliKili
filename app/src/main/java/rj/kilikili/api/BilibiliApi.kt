@@ -25,7 +25,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.Cookie
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
@@ -111,6 +112,8 @@ class AppCookieManager @Inject constructor(
 
     private val currentAccountCookiesCache = mutableListOf<CookieEntity>()
 
+    private val cookieCacheWriteMutex = Mutex()
+
     private var activeAccountCollectorJob: Job? = null
 
     init {
@@ -127,20 +130,22 @@ class AppCookieManager @Inject constructor(
     }
 
     private suspend fun loadCookiesIntoCacheForAccount(accountId: Long) {
-        val cookiesForAccount = accountRepository.getCookiesById(accountId)
-        synchronized(currentAccountCookiesCache) {
-            currentAccountCookiesCache.clear()
-            currentAccountCookiesCache.addAll(cookiesForAccount)
+        cookieCacheWriteMutex.withLock {
+            val cookiesForAccount = accountRepository.getCookiesById(accountId)
+            synchronized(currentAccountCookiesCache) {
+                currentAccountCookiesCache.clear()
+                currentAccountCookiesCache.addAll(cookiesForAccount)
+            }
         }
     }
 
 
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
-        synchronized(currentAccountCookiesCache) {
-            val cookies = currentAccountCookiesCache.map { it.toOkHttpCookie() }
-            ApiDebugLogger.logCookiesForRequest(url, cookies)
-            return cookies
+        val cookies = synchronized(currentAccountCookiesCache) {
+            currentAccountCookiesCache.map { it.toOkHttpCookie() }
         }
+        ApiDebugLogger.logCookiesForRequest(url, cookies)
+        return cookies
     }
 
     override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
@@ -149,22 +154,25 @@ class AppCookieManager @Inject constructor(
         val uid = uidInCookies ?: accountRepository.activeAccount.value?.accountId ?: 0
         val cookieEntities = cookies.map { it.toCookieEntity(uid) }
 
-        runBlocking {
-            if (uidInCookies != null) {
-                accountRepository.setActiveAccount(uid)
-                accountRepository.activeAccount
-            }
-            accountRepository.addCookies(cookieEntities)
+        applicationScope.launch(Dispatchers.IO) {
+            cookieCacheWriteMutex.withLock {
+                if (uidInCookies != null) {
+                    accountRepository.setActiveAccount(uid)
+                }
+                accountRepository.addCookies(cookieEntities)
 
-            synchronized(currentAccountCookiesCache) {
-                currentAccountCookiesCache.removeAll { it.accountId == uid && cookieEntities.any { entity -> entity.name == it.name } }
-                currentAccountCookiesCache.addAll(cookieEntities)
+                synchronized(currentAccountCookiesCache) {
+                    currentAccountCookiesCache.removeAll { it.accountId == uid && cookieEntities.any { entity -> entity.name == it.name } }
+                    currentAccountCookiesCache.addAll(cookieEntities)
+                }
             }
         }
     }
 }
 
 object WbiDataManager : com.huanli233.biliwebapi.httplib.WbiDataManager {
+    private val writeMutex = Mutex()
+
     override var wbiData: WbiSignKeyInfo
         get() = WbiSignKeyInfo(
             LocalData.settings.apiCache.wbiMixinKey,
@@ -172,10 +180,12 @@ object WbiDataManager : com.huanli233.biliwebapi.httplib.WbiDataManager {
         )
         set(value) {
             applicationScope.launch {
-                LocalData.edit {
-                    apiCache = apiCache.edit {
-                        wbiLastUpdated = value.lastUpdated
-                        wbiMixinKey = value.mixinKey
+                writeMutex.withLock {
+                    LocalData.edit {
+                        apiCache = apiCache.edit {
+                            wbiLastUpdated = value.lastUpdated
+                            wbiMixinKey = value.mixinKey
+                        }
                     }
                 }
             }

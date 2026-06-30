@@ -1,4 +1,4 @@
-package rj.kilikili.ui.components
+package rj.kilikili.ui.components.wear
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import rj.kilikili.ui.components.auto.rememberAppLazyListState
+import rj.kilikili.ui.components.wear.WearLazyListStateAdapter
 import androidx.wear.compose.material3.ScreenScaffold
 
 @Composable
@@ -33,7 +34,7 @@ fun <T> SelectionDialog(
     onDismiss: () -> Unit,
     onConfirm: (T) -> Unit
 ) {
-    val scrollState = rememberScalingLazyListState()
+    val scrollState = rememberAppLazyListState().let { (it as WearLazyListStateAdapter).delegate }
 
     Box(
         modifier = Modifier

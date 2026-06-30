@@ -1,6 +1,6 @@
 package com.huanli233.biliwebapi.httplib
 
-import android.util.Log
+import com.huanli233.biliwebapi.ApiDebugLogger
 import com.huanli233.biliwebapi.BiliWebApi
 import com.huanli233.biliwebapi.api.interfaces.IRequestParamApi
 import com.huanli233.biliwebapi.api.util.BiliTicketUtil
@@ -23,7 +23,6 @@ import okhttp3.Interceptor
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.internal.http.HttpMethod
 import retrofit2.Invocation
 import okio.Buffer
@@ -59,31 +58,13 @@ class BilibiliApiInterceptor(
 
         val finalRequest = requestBuilder.build()
 
-        // Log request
-        Log.d("BilibiliApiInterceptor", "=== Request ===")
-        Log.d("BilibiliApiInterceptor", "URL: ${finalRequest.url}")
-        Log.d("BilibiliApiInterceptor", "Method: ${finalRequest.method}")
-        Log.d("BilibiliApiInterceptor", "Header: ${finalRequest.headers}")
-        Log.d("BilibiliApiInterceptor", "Body: ${finalRequest.body?.readString()}")
+        ApiDebugLogger.logFullRequest(finalRequest)
 
         val response = chain.proceed(finalRequest)
 
-        // Log response
-        Log.d("BilibiliApiInterceptor", "=== Response ===")
-        Log.d("BilibiliApiInterceptor", "Status: ${response.code}")
-        Log.d("BilibiliApiInterceptor", "Header: ${response.headers}")
+        ApiDebugLogger.logFullResponse(response)
 
-        val responseBody = response.body
-        val responseBodyString = responseBody.string()
-        Log.d("BilibiliApiInterceptor", "Response Body: $responseBodyString")
-
-        // Recreate response with the body we just read
-        val newResponseBody = responseBodyString
-            .toResponseBody(responseBody.contentType())
-
-        return response.newBuilder()
-            .body(newResponseBody)
-            .build()
+        return response
     }
 
     private fun checkCookieParams(request: Request) {
@@ -213,11 +194,11 @@ class BilibiliApiInterceptor(
         invocation?.method()?.let { method ->
             val csrf = biliWebApi.cookieManager.loadForRequest(request.url).find { it.name == "bili_jct" }?.value.orEmpty()
             val csrfAnnotation = method.getAnnotation(Csrf::class.java)
-            
+
             if (HttpMethod.requiresRequestBody(request.method)) {
                 val contentType = request.body?.contentType()
                 val isJsonBody = contentType?.toString()?.contains("application/json") == true
-                
+
                 if (isJsonBody && csrfAnnotation?.forceQuery == true) {
                     url(this.build().url.newBuilder().addQueryParameter("csrf", csrf).build())
                 } else if (!isJsonBody) {
