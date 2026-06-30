@@ -32,7 +32,7 @@ internal class WearLazyListScopeAdapter(
         contentType: (Int) -> Any?,
         itemContent: @Composable (Int) -> Unit
     ) {
-        delegate.items(count, key, contentType) { index ->
+        delegate.items(count, key) { index ->
             itemContent(index)
         }
     }
@@ -43,8 +43,13 @@ internal class WearLazyListScopeAdapter(
         contentType: ((T) -> Any?)?,
         itemContent: @Composable (T) -> Unit
     ) {
-        delegate.items(data, key) { item ->
-            itemContent(item)
+        // ScalingLazyListScope 的 items(List<T>) 在这个版本里是 extension function，
+        // 直接调用容易重载选错。用 count 版本按索引展开，保留 key (wear 列表 items 无 contentType)。
+        delegate.items(
+            count = data.size,
+            key = key?.let { k -> { index: Int -> k(data[index]) } }
+        ) { index ->
+            itemContent(data[index])
         }
     }
 }

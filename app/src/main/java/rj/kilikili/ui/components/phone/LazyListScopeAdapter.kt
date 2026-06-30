@@ -38,8 +38,14 @@ internal class PhoneLazyListScopeAdapter(
         contentType: ((T) -> Any?)?,
         itemContent: @Composable (T) -> Unit
     ) {
-        delegate.items<T>(data, key, contentType) { item ->
-            itemContent(item)
+        // LazyListScope 的 items(List<T>) 在这个版本里是 extension function，
+        // 直接调用容易重载选错。用 count 版本按索引展开，保留 key/contentType。
+        delegate.items(
+            count = data.size,
+            key = key?.let { k -> { index: Int -> k(data[index]) } },
+            contentType = contentType?.let { c -> { index: Int -> c(data[index]) } } ?: { null }
+        ) { index ->
+            itemContent(data[index])
         }
     }
 }
