@@ -45,8 +45,8 @@ import rj.kilikili.data.setting.LocalData
 import com.valentinilk.shimmer.shimmer
 
 import rj.kilikili.UiType
+import rj.kilikili.actualUiType
 import rj.kilikili.ui.components.auto.AppLazyListState
-import rj.kilikili.ui.components.auto.actualUiType
 import rj.kilikili.ui.components.auto.shouldLoadItem
 import rj.kilikili.utils.extensions.toHttpsUrl
 

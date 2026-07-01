@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.PaddingDefaults
 import rj.kilikili.UiType
+import rj.kilikili.actualUiType
 
 @Composable
 fun appVerticalOptContentPadding(): Dp = when (actualUiType) {

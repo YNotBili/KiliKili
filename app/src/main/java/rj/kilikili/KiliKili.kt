@@ -7,9 +7,15 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.multidex.MultiDex
 import androidx.multidex.MultiDexApplication
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.crossfade
 import com.elvishew.xlog.LogLevel
 import com.elvishew.xlog.XLog
 import com.elvishew.xlog.printer.AndroidPrinter
+import rj.kilikili.api.setOkHttpSsl
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.data.setting.toSystemValue
 import rj.kilikili.utils.locale.LocaleDelegate
@@ -20,10 +26,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
 import java.util.Locale
 
 @HiltAndroidApp
-class KiliKili : MultiDexApplication() {
+class KiliKili : MultiDexApplication(), SingletonImageLoader.Factory {
     init {
         application = this
     }
@@ -88,6 +95,17 @@ class KiliKili : MultiDexApplication() {
     fun getLocale(): Locale {
         val tag = LocalData.settings.language
         return getLocale(tag)
+    }
+
+    // Coil 图片加载 — 复用忽略证书的 OkHttp, 保证 HTTPS 图片在自签/代理场景也能加载。
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        val okHttpClient = setOkHttpSsl(OkHttpClient.Builder()).build()
+        return ImageLoader.Builder(context)
+            .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = { okHttpClient }))
+            }
+            .crossfade(true)
+            .build()
     }
 
     companion object {

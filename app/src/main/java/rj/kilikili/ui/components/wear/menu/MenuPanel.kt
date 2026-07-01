@@ -27,9 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import rj.kilikili.ui.components.auto.rememberAppLazyListState
-import rj.kilikili.ui.components.wear.WearLazyListStateAdapter
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
@@ -65,8 +64,8 @@ fun MenuPanel(
     onDismiss: () -> Unit = {}
 ) {
     val loggedIn = remember { AccountManager.loggedIn() }
-    val scrollState = rememberAppLazyListState().let { (it as WearLazyListStateAdapter).delegate }
-    
+    val scrollState = rememberTransformingLazyColumnState()
+
     val filteredItems = remember(menuItems, loggedIn) {
         menuItems.filter { item ->
             (!item.requireLoggedIn || loggedIn) &&
@@ -100,9 +99,9 @@ fun MenuPanel(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
-        scrollState = scrollState
+        scrollInfoProvider = androidx.wear.compose.foundation.ScrollInfoProvider(scrollState)
     ) {
-        ScalingLazyColumn(
+        TransformingLazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .systemGestureExclusion()
@@ -114,7 +113,7 @@ fun MenuPanel(
                             val change = event.changes.firstOrNull() ?: continue
                             val dragX = change.position.x - change.previousPosition.x
                             val dragY = change.position.y - change.previousPosition.y
-                            
+
                             if (abs(dragX) > abs(dragY) && abs(dragX) > 0) {
                                 event.changes.forEach { it.consume() }
                             }

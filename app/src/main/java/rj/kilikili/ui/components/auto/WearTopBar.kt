@@ -2,7 +2,7 @@ package rj.kilikili.ui.components.auto
 
 import androidx.compose.runtime.Composable
 import rj.kilikili.UiType
-import rj.kilikili.uiType
+import rj.kilikili.actualUiType
 import rj.kilikili.data.menu.MenuItem
 import rj.kilikili.ui.components.wear.WearTopBar as wearWearTopBar
 import rj.kilikili.ui.components.phone.ScrollAwareTopBar as phoneTopBar

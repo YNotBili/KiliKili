@@ -3,7 +3,7 @@ package rj.kilikili.ui.components.auto
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import rj.kilikili.UiType
-import rj.kilikili.uiType
+import rj.kilikili.actualUiType
 
 /**
  * 统一 LazyListState 抽象 — wear ScalingLazyListState / phone LazyListState 都适配成此接口。

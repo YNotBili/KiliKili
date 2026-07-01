@@ -81,7 +81,7 @@ fun HdQrCodeLoginHost(
     }
 
     AppScreenScaffold(
-        scrollState = currentScrollState,
+        scrollState = null,
         topBar = appTopBar(
             title = "登录",
             showBackIcon = true,

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.wear.compose.navigation.composable
+import rj.kilikili.ui.navigation.appComposable
 import rj.kilikili.ui.screens.setting.AboutScreen
 import rj.kilikili.ui.screens.setting.DeveloperOptionsScreen
 import rj.kilikili.ui.screens.setting.PlayerSettingsScreen
@@ -14,28 +14,28 @@ import rj.kilikili.ui.screens.setting.ThemeColorScreen
 import rj.kilikili.ui.screens.setting.UiSettingsScreen
 
 fun NavGraphBuilder.settingsGraph(navController: NavController, onMenuClick: () -> Unit = {}) {
-    composable(Screen.Settings.route) {
+    appComposable(Screen.Settings.route) {
         SettingsScreen(
             navController = navController,
             onMenuClick = onMenuClick
         )
     }
-    composable(Screen.UiSettings.route) {
+    appComposable(Screen.UiSettings.route) {
         UiSettingsScreen(navController = navController)
     }
-    composable(Screen.PlayerSettings.route) {
+    appComposable(Screen.PlayerSettings.route) {
         PlayerSettingsScreen(navController = navController)
     }
-    composable(Screen.About.route) {
+    appComposable(Screen.About.route) {
         AboutScreen(navController = navController)
     }
-    composable(Screen.ThemeColor.route) {
+    appComposable(Screen.ThemeColor.route) {
         ThemeColorScreen(navController = navController)
     }
-    composable(Screen.ViewPreview.route) {
+    appComposable(Screen.ViewPreview.route) {
         Box(modifier = Modifier.fillMaxSize())
     }
-    composable(Screen.DeveloperOptions.route) {
+    appComposable(Screen.DeveloperOptions.route) {
         DeveloperOptionsScreen(navController = navController)
     }
 }

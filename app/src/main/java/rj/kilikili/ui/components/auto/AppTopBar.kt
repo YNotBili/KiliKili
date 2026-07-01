@@ -3,7 +3,7 @@ package rj.kilikili.ui.components.auto
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import rj.kilikili.UiType
-import rj.kilikili.uiType
+import rj.kilikili.actualUiType
 import rj.kilikili.ui.components.phone.ScrollAwareTopBar as phoneScrollAwareTopBar
 import rj.kilikili.ui.components.wear.ScrollAwareTopBar as wearScrollAwareTopBar
 

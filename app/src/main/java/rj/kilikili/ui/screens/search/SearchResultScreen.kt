@@ -49,7 +49,7 @@ import coil3.request.crossfade
 import rj.kilikili.ui.viewmodel.ArticleRedirectState
 import rj.kilikili.utils.MsgUtil
 import rj.kilikili.UiType
-import rj.kilikili.ui.components.auto.actualUiType
+import rj.kilikili.actualUiType
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

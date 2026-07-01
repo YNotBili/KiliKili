@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import rj.kilikili.UiType
+import rj.kilikili.actualUiType
 import rj.kilikili.ui.components.phone.PhoneLazyListScopeAdapter
 import rj.kilikili.ui.components.phone.PhoneLazyListStateAdapter
 import rj.kilikili.ui.components.wear.TransformingLazyListScopeAdapter

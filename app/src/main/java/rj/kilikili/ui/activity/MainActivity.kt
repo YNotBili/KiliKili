@@ -7,6 +7,7 @@ import rj.kilikili.ui.activity.base.BaseActivity
 import rj.kilikili.ui.navigation.AppNavHost
 import rj.kilikili.ui.theme.BiliZepamTheme
 import rj.kilikili.uiType
+import rj.kilikili.actualUiType
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 

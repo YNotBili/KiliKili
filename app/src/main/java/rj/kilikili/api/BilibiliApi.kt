@@ -1,7 +1,6 @@
 package rj.kilikili.api
 
 import android.annotation.SuppressLint
-import android.os.Build
 import com.huanli233.biliwebapi.ApiDebugLogger
 import rj.kilikili.KiliKili
 import rj.kilikili.applicationScope
@@ -53,8 +52,7 @@ val bilibiliApi = object : BiliWebApi(
 }
 
 @Synchronized
-private fun setOkHttpSsl(okhttpBuilder: OkHttpClient.Builder): OkHttpClient.Builder {
-    if (Build.VERSION.SDK_INT > 22) return okhttpBuilder
+internal fun setOkHttpSsl(okhttpBuilder: OkHttpClient.Builder): OkHttpClient.Builder {
     try {
         @SuppressLint("CustomX509TrustManager") val trustAllCert: X509TrustManager =
             object : X509TrustManager {
@@ -77,7 +75,9 @@ private fun setOkHttpSsl(okhttpBuilder: OkHttpClient.Builder): OkHttpClient.Buil
                 }
             }
         val sslSocketFactory: SSLSocketFactory = SSLSocketFactoryCompat(trustAllCert)
-        okhttpBuilder.sslSocketFactory(sslSocketFactory, trustAllCert)
+        okhttpBuilder
+            .sslSocketFactory(sslSocketFactory, trustAllCert)
+            .hostnameVerifier { _, _ -> true }
     } catch (e: java.lang.Exception) {
         throw RuntimeException(e)
     }

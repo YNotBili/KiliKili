@@ -11,6 +11,7 @@ import rj.kilikili.data.repository.SearchRepository
 import com.huanli233.biliwebapi.bean.search.SearchItem
 import com.huanli233.biliwebapi.httplib.BilibiliApiInterceptor
 import rj.kilikili.api.bilibiliApi
+import rj.kilikili.api.setOkHttpSsl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -74,10 +75,11 @@ class SearchResultViewModel @Inject constructor(
     private val _loadingArticles = MutableStateFlow<Set<Long>>(emptySet())
     val loadingArticles: StateFlow<Set<Long>> = _loadingArticles.asStateFlow()
     
-    private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(BilibiliApiInterceptor(bilibiliApi))
-        .followRedirects(false)
-        .build()
+    private val okHttpClient = setOkHttpSsl(
+        OkHttpClient.Builder()
+            .addInterceptor(BilibiliApiInterceptor(bilibiliApi))
+            .followRedirects(false)
+    ).build()
     
     fun convertCvidToOpusId(cvid: Long, onSuccess: (Long) -> Unit, onError: (String) -> Unit) {
         _loadingArticles.value += cvid

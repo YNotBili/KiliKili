@@ -18,6 +18,7 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import rj.kilikili.KiliKili
+import rj.kilikili.api.setOkHttpSsl
 import rj.kilikili.data.di.AppDependenciesEntryPoint
 import rj.kilikili.data.download.DownloadDao
 import rj.kilikili.data.download.DownloadEntity
@@ -65,7 +66,7 @@ class DownloadWorker(
             try {
                 val headers: Map<String, String> = parseHeaders(entity.headersJson)
 
-                val client = OkHttpClient()
+                val client = setOkHttpSsl(OkHttpClient.Builder()).build()
                 val reqBuilder = Request.Builder().url(entity.url)
                 headers.forEach { (k, v) -> reqBuilder.addHeader(k, v) }
                 val response = client.newCall(reqBuilder.build()).execute()

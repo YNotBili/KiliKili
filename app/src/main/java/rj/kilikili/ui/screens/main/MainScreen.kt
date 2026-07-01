@@ -9,12 +9,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,12 +31,16 @@ import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Velocity
 import kotlin.math.abs
+import kotlinx.coroutines.launch
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.wear.compose.navigation.SwipeDismissableNavHost
-import androidx.wear.compose.navigation.composable
-import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import androidx.navigation.navArgument
+import rj.kilikili.UiType
+import rj.kilikili.actualUiType
+import rj.kilikili.uiType
+import rj.kilikili.ui.components.phone.menu.PhoneMenuDrawerContent
+import rj.kilikili.ui.navigation.AppNavHostRoute
+import rj.kilikili.ui.navigation.appComposable
+import rj.kilikili.ui.navigation.rememberAppNavController
 import rj.kilikili.R
 import rj.kilikili.data.account.AccountManager
 import rj.kilikili.data.menu.MenuConfigManager
@@ -90,10 +99,32 @@ import java.net.URLDecoder
 
 @Composable
 fun MainScreen(mainNavController: androidx.navigation.NavController) {
-    val contentNavController = rememberSwipeDismissableNavController()
+    // 顶层 key(actualUiType) — 切换 uiType 时强制重建, 避免 wear/phone 状态污染。
+    key(actualUiType) {
+    val contentNavController = rememberAppNavController()
     val menuConfig by remember { mutableStateOf(MenuConfigManager.readMenuConfig()) }
     var isMenuExpanded by remember { mutableStateOf(false) }
-    
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    val openMenu: () -> Unit = {
+        when (uiType) {
+            UiType.WEAR -> isMenuExpanded = true
+            UiType.PHONE -> scope.launch { drawerState.open() }
+        }
+    }
+
+    // 一级页面跳转 — 清空整个返回栈只留新页面, 使每个一级页都是独立根 (按返回直接退出 app)。
+    // 不能用 popUpTo(startDestinationRoute): 一旦该 destination 已被弹出, popBackStackInternal
+    // 会静默 return false 不弹 (androidx.navigation 2.9.3 NavControllerImpl.kt:462), 导致
+    // "一级页 → 另一一级页"时旧页面残留。手动循环 popBackStack 是唯一可靠方式。
+    val navigateTopLevel: (String) -> Unit = { route ->
+        while (contentNavController.popBackStack()) { /* 清空栈 */ }
+        contentNavController.navigate(route) {
+            launchSingleTop = true
+        }
+    }
+
     val menuGestureBlocker = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -114,25 +145,107 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        SwipeDismissableNavHost(
-            navController = contentNavController,
-            startDestination = Screen.Recommend.route
-        ) {
-            composable(Screen.Recommend.route) {
-                RecommendScreen(
-                    onVideoClick = { videoInfo ->
-                        contentNavController.navigate(
-                            Screen.VideoDetail.createRoute(videoInfo.aid, videoInfo.bvid)
-                        )
-                    },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded },
-                    onPopularClick = { contentNavController.navigate("popular") },
-                    onPreciousClick = { contentNavController.navigate("precious") }
+    when (actualUiType) {
+            UiType.WEAR -> {
+                MainNavHost(
+                    contentNavController = contentNavController,
+                    openMenu = openMenu,
+                    menuConfig = menuConfig
                 )
             }
+            UiType.PHONE -> {
+                ModalNavigationDrawer(
+                    drawerState = drawerState,
+                    drawerContent = {
+                        PhoneMenuDrawerContent(
+                            menuItems = menuConfig.menuItems,
+                            drawerState = drawerState,
+                            scope = scope,
+                            onSelect = { route ->
+                                navigateTopLevel(route)
+                            }
+                        )
+                    },
+                    content = {
+                        MainNavHost(
+                            contentNavController = contentNavController,
+                            openMenu = openMenu,
+                            menuConfig = menuConfig
+                        )
+                    }
+                )
+            }
+        }
 
-            composable("popular") {
+        if (actualUiType == UiType.WEAR) {
+            AnimatedVisibility(
+                visible = isMenuExpanded,
+                enter = slideInHorizontally { it } + fadeIn(),
+                exit = slideOutHorizontally { it } + fadeOut(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (isMenuExpanded) {
+                            Modifier
+                                .systemGestureExclusion()
+                                .nestedScroll(menuGestureBlocker)
+                                .pointerInput(Unit) {
+                                    awaitPointerEventScope {
+                                        while (true) {
+                                            val event = awaitPointerEvent(PointerEventPass.Initial)
+                                            val change = event.changes.firstOrNull() ?: continue
+                                            val dragX = change.position.x - change.previousPosition.x
+                                            val dragY = change.position.y - change.previousPosition.y
+
+                                            if (abs(dragX) > abs(dragY) && abs(dragX) > 0) {
+                                                event.changes.forEach { it.consume() }
+                                            }
+                                        }
+                                    }
+                                }
+                        } else {
+                            Modifier
+                        }
+                    )
+            ) {
+                AppMenuPanel(
+                    modifier = Modifier.fillMaxSize(),
+                    menuItems = menuConfig.menuItems,
+                    onSelect = { route ->
+                        navigateTopLevel(route)
+                        isMenuExpanded = false
+                    },
+                    onDismiss = { isMenuExpanded = false }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainNavHost(
+    contentNavController: androidx.navigation.NavHostController,
+    openMenu: () -> Unit,
+    menuConfig: rj.kilikili.data.menu.MenuConfig
+) {
+    AppNavHostRoute(
+        navController = contentNavController,
+        startDestination = Screen.Recommend.route
+    ) { nc ->
+        appComposable(Screen.Recommend.route) {
+            RecommendScreen(
+                onVideoClick = { videoInfo ->
+                    contentNavController.navigate(
+                        Screen.VideoDetail.createRoute(videoInfo.aid, videoInfo.bvid)
+                    )
+                },
+                onMenuClick = openMenu,
+                onPopularClick = { contentNavController.navigate("popular") },
+                onPreciousClick = { contentNavController.navigate("precious") }
+            )
+        }
+
+            appComposable("popular") {
                 PopularScreen(
                     onVideoClick = { videoInfo ->
                         contentNavController.navigate(
@@ -143,7 +256,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable("precious") {
+            appComposable("precious") {
                 PreciousScreen(
                     onVideoClick = { videoInfo ->
                         contentNavController.navigate(
@@ -154,7 +267,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "bangumi/{mediaId}",
                 arguments = listOf(
                     navArgument("mediaId") { type = NavType.LongType }
@@ -170,7 +283,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "bangumi_from_ep/{epId}",
                 arguments = listOf(
                     navArgument("epId") { type = NavType.LongType }
@@ -217,7 +330,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 }
             }
 
-            composable(
+            appComposable(
                 route = "series/{type}/{mid}/{id}/{name}",
                 arguments = listOf(
                     navArgument("type") { type = NavType.StringType },
@@ -245,7 +358,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.Dynamic.route) {
+            appComposable(Screen.Dynamic.route) {
                 DynamicHomeScreen(
                     onDynamicClick = { dynamic ->
                         val major = dynamic.modules.contentModule.major
@@ -273,11 +386,11 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                         val encodedUrls = imageUrls.joinToString(",") { java.net.URLEncoder.encode(it, "UTF-8") }
                         contentNavController.navigate("imageViewer/$encodedUrls/$initialPage")
                     },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.VideoDetail.route,
                 arguments = listOf(
                     navArgument("avid") { type = NavType.LongType },
@@ -287,7 +400,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 VideoDetailScreen(navController = contentNavController)
             }
 
-            composable(
+            appComposable(
                 route = Screen.DynamicDetail.route,
                 arguments = listOf(
                     navArgument("dynamicId") { type = NavType.StringType }
@@ -327,7 +440,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.OpusDetail.route,
                 arguments = listOf(
                     navArgument("opusId") { type = NavType.StringType }
@@ -356,7 +469,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "comment_detail/{replyId}?oid={oid}&type={type}",
                 arguments = listOf(
                     navArgument("replyId") { type = NavType.LongType },
@@ -394,7 +507,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "write_reply/{oid}/{rpid}/{parent}?parentSender={parentSender}",
                 arguments = listOf(
                     navArgument("oid") { type = NavType.LongType },
@@ -424,7 +537,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "image/{imageUrl}/{initialPage}",
                 arguments = listOf(
                     navArgument("imageUrl") { type = NavType.StringType },
@@ -444,7 +557,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "imageViewer/{imageUrls}/{initialPage}",
                 arguments = listOf(
                     navArgument("imageUrls") { type = NavType.StringType },
@@ -464,7 +577,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "user/{mid}",
                 arguments = listOf(
                     navArgument("mid") { type = NavType.LongType }
@@ -496,7 +609,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "collection/{seasonId}",
                 arguments = listOf(
                     navArgument("seasonId") { type = NavType.LongType }
@@ -509,7 +622,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "player/{aid}/{cid}",
                 arguments = listOf(
                     navArgument("aid") { type = NavType.LongType },
@@ -528,7 +641,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "player_local?path={path}&title={title}",
                 arguments = listOf(
                     navArgument("path") { type = NavType.StringType },
@@ -547,7 +660,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.DownloadList.route) {
+            appComposable(Screen.DownloadList.route) {
                 DownloadListScreen(
                     onNavigateBack = { contentNavController.popBackStack() },
                     onPlayLocal = { path, title ->
@@ -555,11 +668,11 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                             "player_local?path=${Uri.encode(path)}&title=${Uri.encode(title)}"
                         )
                     },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(Screen.MySpace.route) {
+            appComposable(Screen.MySpace.route) {
                 MySpaceScreen(
                     onNavigateToUserProfile = { userId ->
                         contentNavController.navigate("user/$userId")
@@ -591,11 +704,11 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                     onNavigateToFollowTags = {
                         contentNavController.navigate(Screen.FollowTags.route)
                     },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable("history") {
+            appComposable("history") {
                 HistoryScreen(
                     onVideoClick = { videoInfo ->
                         contentNavController.navigate(
@@ -606,7 +719,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable("watch_later") {
+            appComposable("watch_later") {
                 WatchLaterScreen(
                     onVideoClick = { videoInfo ->
                         contentNavController.navigate(
@@ -617,7 +730,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable("favorite") {
+            appComposable("favorite") {
                 FavoriteScreen(
                     onFolderClick = { fid, name ->
                         val encodedName = java.net.URLEncoder.encode(name, "UTF-8")
@@ -630,7 +743,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = "favorite_videos/{fid}/{name}",
                 arguments = listOf(
                     navArgument("fid") { type = NavType.LongType },
@@ -655,7 +768,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable("opus_favorite") {
+            appComposable("opus_favorite") {
                 OpusFavoriteScreen(
                     onOpusClick = { opusId ->
                         contentNavController.navigate("opus_detail/$opusId")
@@ -664,7 +777,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable("following") {
+            appComposable("following") {
                 val mid = AccountManager.currentAccount.accountId
                 FollowingScreen(
                     mid = mid,
@@ -675,9 +788,9 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.Search.route) {
+            appComposable(Screen.Search.route) {
                 SearchScreen(
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded },
+                    onMenuClick = openMenu,
                     onSearch = { query ->
                         contentNavController.navigate(Screen.SearchResult.createRoute(query))
                     },
@@ -687,7 +800,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.SearchResult.route,
                 arguments = listOf(
                     navArgument("keyword") { type = NavType.StringType }
@@ -712,7 +825,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 
             // ===== 新功能路由 =====
 
-            composable(Screen.Ranking.route) {
+            appComposable(Screen.Ranking.route) {
                 RankingScreen(
                     onVideoClick = { videoInfo ->
                         contentNavController.navigate(
@@ -720,21 +833,21 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                         )
                     },
                     onNavigateBack = { contentNavController.popBackStack() },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(Screen.Timeline.route) {
+            appComposable(Screen.Timeline.route) {
                 TimelineScreen(
                     onBangumiClick = { seasonId ->
                         contentNavController.navigate("bangumi/$seasonId")
                     },
                     onNavigateBack = { contentNavController.popBackStack() },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(Screen.MessageCenter.route) {
+            appComposable(Screen.MessageCenter.route) {
                 MessageCenterScreen(
                     onLikeClick = {
                         contentNavController.navigate(Screen.LikeMessages.route)
@@ -752,29 +865,29 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                         contentNavController.navigate(Screen.PrivateMessages.route)
                     },
                     onNavigateBack = { contentNavController.popBackStack() },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(Screen.LikeMessages.route) {
+            appComposable(Screen.LikeMessages.route) {
                 LikeMessagesScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.ReplyMessages.route) {
+            appComposable(Screen.ReplyMessages.route) {
                 ReplyMessagesScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.SystemMessages.route) {
+            appComposable(Screen.SystemMessages.route) {
                 SystemMessagesScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.Conversation.route,
                 arguments = listOf(
                     navArgument("talkerUid") { type = NavType.LongType },
@@ -792,7 +905,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.DanmakuSend.route,
                 arguments = listOf(
                     navArgument("cid") { type = NavType.LongType },
@@ -812,7 +925,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.FollowingBangumi.route) {
+            appComposable(Screen.FollowingBangumi.route) {
                 rj.kilikili.ui.screens.bangumi.FollowingBangumiScreen(
                     onBangumiClick = { mediaId ->
                         contentNavController.navigate("bangumi/$mediaId")
@@ -821,13 +934,13 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.LoginRecords.route) {
+            appComposable(Screen.LoginRecords.route) {
                 LoginRecordScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.SendDynamic.route) {
+            appComposable(Screen.SendDynamic.route) {
                 SendDynamicScreen(
                     onNavigateBack = { contentNavController.popBackStack() },
                     onPublishSuccess = { dynamicId ->
@@ -836,7 +949,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.PrivateMessages.route) {
+            appComposable(Screen.PrivateMessages.route) {
                 PrivateMsgScreen(
                     onSessionClick = { talkerUid ->
                         // TODO: 跳转到私信聊天详情页
@@ -845,31 +958,31 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.VipCenter.route) {
+            appComposable(Screen.VipCenter.route) {
                 VipScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.CoinLog.route) {
+            appComposable(Screen.CoinLog.route) {
                 CoinLogScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.ExpLog.route) {
+            appComposable(Screen.ExpLog.route) {
                 ExpLogScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.LiveMedalWall.route) {
+            appComposable(Screen.LiveMedalWall.route) {
                 LiveMedalWallScreen(
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
             }
 
-            composable(Screen.FollowTags.route) {
+            appComposable(Screen.FollowTags.route) {
                 FollowTagScreen(
                     onTagClick = { tagId, name ->
                         // TODO: 跳转到分组用户列表
@@ -878,17 +991,17 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.PopularSeries.route) {
+            appComposable(Screen.PopularSeries.route) {
                 PopularSeriesScreen(
                     onSeriesClick = { seriesId, name ->
                         contentNavController.navigate("popular_series/${seriesId}/${Uri.encode(name)}")
                     },
                     onNavigateBack = { contentNavController.popBackStack() },
-                    onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                    onMenuClick = openMenu
                 )
             }
 
-            composable(
+            appComposable(
                 route = "popular_series/{seriesId}/{name}",
                 arguments = listOf(
                     navArgument("seriesId") { type = NavType.IntType },
@@ -907,7 +1020,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(Screen.HotSearch.route) {
+            appComposable(Screen.HotSearch.route) {
                 HotSearchScreen(
                     onSearch = { query ->
                         contentNavController.navigate(Screen.SearchResult.createRoute(query))
@@ -916,7 +1029,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 )
             }
 
-            composable(
+            appComposable(
                 route = Screen.FansList.route,
                 arguments = listOf(navArgument("mid") { type = NavType.LongType })
             ) { entry ->
@@ -930,7 +1043,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 
             settingsGraph(
                 contentNavController,
-                onMenuClick = { isMenuExpanded = !isMenuExpanded }
+                onMenuClick = openMenu
             )
 
             loginGraph(
@@ -947,49 +1060,4 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 }
             )
         }
-        
-        AnimatedVisibility(
-            visible = isMenuExpanded,
-            enter = slideInHorizontally { it } + fadeIn(),
-            exit = slideOutHorizontally { it } + fadeOut(),
-            modifier = Modifier
-                .fillMaxSize()
-                .then(
-                    if (isMenuExpanded) {
-                        Modifier
-                            .systemGestureExclusion()
-                            .nestedScroll(menuGestureBlocker)
-                            .pointerInput(Unit) {
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        val event = awaitPointerEvent(PointerEventPass.Initial)
-                                        val change = event.changes.firstOrNull() ?: continue
-                                        val dragX = change.position.x - change.previousPosition.x
-                                        val dragY = change.position.y - change.previousPosition.y
-                                        
-                                        if (abs(dragX) > abs(dragY) && abs(dragX) > 0) {
-                                            event.changes.forEach { it.consume() }
-                                        }
-                                    }
-                                }
-                            }
-                    } else {
-                        Modifier
-                    }
-                )
-        ) {
-            AppMenuPanel(
-                modifier = Modifier.fillMaxSize(),
-                menuItems = menuConfig.menuItems,
-                onSelect = { route ->
-                    contentNavController.navigate(route) {
-                        popUpTo(Screen.Recommend.route) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                    isMenuExpanded = false
-                },
-                onDismiss = { isMenuExpanded = false }
-            )
-        }
-    }
 }

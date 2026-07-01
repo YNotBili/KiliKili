@@ -2,6 +2,7 @@ package rj.kilikili.utils
 
 import com.huanli233.biliwebapi.httplib.BilibiliApiInterceptor
 import rj.kilikili.api.bilibiliApi
+import rj.kilikili.api.setOkHttpSsl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -9,10 +10,11 @@ import okhttp3.Request
 
 object ArticleRedirectUtil {
     private val okHttpClient by lazy {
-        OkHttpClient.Builder()
-            .addInterceptor(BilibiliApiInterceptor(bilibiliApi))
-            .followRedirects(false)
-            .build()
+        setOkHttpSsl(
+            OkHttpClient.Builder()
+                .addInterceptor(BilibiliApiInterceptor(bilibiliApi))
+                .followRedirects(false)
+        ).build()
     }
     
     suspend fun convertCvidToOpusId(cvid: Long): Result<Long> = withContext(Dispatchers.IO) {

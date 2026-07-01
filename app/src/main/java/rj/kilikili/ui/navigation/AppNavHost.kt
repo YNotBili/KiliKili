@@ -7,19 +7,17 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.wear.compose.navigation.SwipeDismissableNavHost
-import androidx.wear.compose.navigation.composable
-import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import rj.kilikili.ui.common.CustomSnackbarHost
 import rj.kilikili.ui.screens.main.MainScreen
 import rj.kilikili.ui.screens.main.MainUiState
 import rj.kilikili.ui.screens.main.MainViewModel
 import rj.kilikili.ui.screens.setup.SetupScreen
 
+/** 顶层 NavHost 入口 — 集成 MainViewModel 决定 startDestination, 然后调底层 AppNavHost。 */
 @Composable
 fun AppNavHost(mainViewModel: MainViewModel = hiltViewModel()) {
     val uiState by mainViewModel.uiState.collectAsState()
-    val navController = rememberSwipeDismissableNavController()
+    val navController = rememberAppNavController()
 
     val startDestination = when (uiState) {
         is MainUiState.NeedsSetup -> NavGraph.SETUP
@@ -29,15 +27,15 @@ fun AppNavHost(mainViewModel: MainViewModel = hiltViewModel()) {
     }
 
     Box {
-        SwipeDismissableNavHost(
+        AppNavHostRoute(
             navController = navController,
             startDestination = startDestination
-        ) {
-            composable(NavGraph.SETUP) {
+        ) { nc ->
+            appComposable(NavGraph.SETUP) {
                 SetupScreen(
                     onSetupComplete = {
                         mainViewModel.onSetupComplete()
-                        navController.navigate(NavGraph.LOGIN) {
+                        nc.navigate(NavGraph.LOGIN) {
                             popUpTo(NavGraph.SETUP) { inclusive = true }
                         }
                     }
@@ -45,27 +43,27 @@ fun AppNavHost(mainViewModel: MainViewModel = hiltViewModel()) {
             }
 
             loginGraph(
-                navController = navController,
+                navController = nc,
                 onLoginSuccess = {
-                    navController.navigate(NavGraph.MAIN) {
+                    nc.navigate(NavGraph.MAIN) {
                         popUpTo(NavGraph.LOGIN) { inclusive = true }
                     }
                 },
                 onSkip = {
-                    navController.navigate(NavGraph.MAIN) {
+                    nc.navigate(NavGraph.MAIN) {
                         popUpTo(NavGraph.LOGIN) { inclusive = true }
                     }
                 }
             )
 
-            mainGraph(navController)
+            mainGraph(nc)
         }
         CustomSnackbarHost()
     }
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavController) {
-    composable(NavGraph.MAIN) {
+    appComposable(NavGraph.MAIN) {
         MainScreen(navController)
     }
 }
