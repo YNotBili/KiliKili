@@ -139,13 +139,13 @@ fun UserProfileScreen(
                         1 -> DynamicsPage(paddingValues = paddingValues, mid = mid, onDynamicClick = onDynamicClick, onVideoClick = onVideoClick, onImageClick = onImageClick)
                         2 -> VideosPage(paddingValues = paddingValues, viewModel = viewModel, onVideoClick = onVideoClick, onSeriesClick = onSeriesClick)
                         3 -> ArticlesPage(paddingValues = paddingValues, viewModel = viewModel, onOpusClick = onOpusClick)
-                        else -> PlaceholderListPage(paddingValues)
+                        else -> ElectricPanelTab(mid = mid, paddingValues = paddingValues, onUserClick = { uid -> /* navigate to user profile */ })
                     }
                 }
             }
 
             DotsIndicator(
-                dotCount = 4,
+                dotCount = 5,
                 pagerState = pagerState,
                 type = WormIndicatorType(
                     dotsGraphic = DotGraphic(

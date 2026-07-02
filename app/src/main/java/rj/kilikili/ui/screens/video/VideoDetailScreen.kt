@@ -35,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Star
@@ -48,6 +49,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,9 +77,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import rj.kilikili.R
+import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.ui.dialog.CoinDialog
 import rj.kilikili.ui.dialog.DownloadDialog
 import rj.kilikili.ui.dialog.FavoriteDialog
+import rj.kilikili.ui.dialog.ReportDialog
 import rj.kilikili.ui.dialog.VideoPage
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -115,6 +119,10 @@ fun VideoDetailScreen(
     var showCoinDialog by remember { mutableStateOf(false) }
     var showFavoriteDialog by remember { mutableStateOf(false) }
     var showDownloadDialog by remember { mutableStateOf(false) }
+    var showVideoMoreDialog by remember { mutableStateOf(false) }
+    var showReportDialog by remember { mutableStateOf(false) }
+    var showDmReportDialog by remember { mutableStateOf(false) }
+    val reportVm: rj.kilikili.ui.viewmodel.ReportViewModel = hiltViewModel()
 
     var pendingDownloadPages by remember { mutableStateOf<List<VideoPage>?>(null) }
 
@@ -244,6 +252,7 @@ fun VideoDetailScreen(
                                         onWatchLaterClick = { viewModel.addToWatchLater() },
                                         onDownloadClick = { showDownloadDialog = true },
                                         onShareClick = { },
+                                        onMoreClick = { showVideoMoreDialog = true },
                                         onPlayClick = {
                                             uiState.videoInfo?.let { video ->
                                                 navController.navigate("player/${video.aid}/${video.cid}")
@@ -263,7 +272,7 @@ fun VideoDetailScreen(
                                             if (videoInfo != null && videoInfo.ugcSeason != null) {
                                                 val season = videoInfo.ugcSeason
                                                 val encodedName = java.net.URLEncoder.encode(season?.title.toString(), "UTF-8")
-                                                navController.navigate("series/season/${videoInfo.owner.mid}/$seasonId/$encodedName")
+                                                navController.navigate("collection/${videoInfo.owner.mid}/$seasonId/$encodedName")
                                             }
                                         },
                                         onTagClick = { }
@@ -373,6 +382,63 @@ fun VideoDetailScreen(
             }
         )
     }
+
+    if (showVideoMoreDialog) {
+        val aid = uiState.videoInfo?.aid ?: 0L
+        AdaptDialog(
+            onDismissRequest = { showVideoMoreDialog = false },
+            title = { Text(stringResource(R.string.video_more)) },
+            text = {
+                Column {
+                    listOf(
+                        R.string.video_note to "note_list/$aid",
+                        R.string.vote to "vote/0",
+                        R.string.danmaku_filter to "dm_filter",
+                        R.string.video_report to "report_video",
+                        R.string.reserve to "reserve/0/${uiState.videoInfo?.owner?.mid ?: 0L}"
+                    ).forEach { (labelRes, _) ->
+                        TextButton(
+                            onClick = {
+                                showVideoMoreDialog = false
+                                when (labelRes) {
+                                    R.string.video_note -> navController.navigate("note_list/$aid")
+                                    R.string.vote -> navController.navigate("vote/0")
+                                    R.string.danmaku_filter -> navController.navigate("dm_filter")
+                                    R.string.video_report -> showReportDialog = true
+                                    R.string.reserve -> navController.navigate("reserve/0/${uiState.videoInfo?.owner?.mid ?: 0L}")
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(labelRes), modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { showVideoMoreDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    if (showReportDialog && uiState.videoInfo != null) {
+        ReportDialog(
+            visible = true,
+            title = stringResource(R.string.video_report),
+            onDismiss = { showReportDialog = false },
+            onConfirm = { reason, content ->
+                reportVm.reportReply(uiState.videoInfo!!.aid, 0L, 1, "$reason $content")
+                showReportDialog = false
+            }
+        )
+        androidx.compose.runtime.LaunchedEffect(Unit) {
+            reportVm.events.collect {
+                when (it) {
+                    is rj.kilikili.ui.viewmodel.ReportViewModel.Event.Success -> MsgUtil.showMsg("已举报")
+                    is rj.kilikili.ui.viewmodel.ReportViewModel.Event.Failed -> MsgUtil.showMsg(it.msg)
+                }
+            }
+        }
+    }
 }
 
 
@@ -403,6 +469,7 @@ private fun VideoDetailContent(
     onWatchLaterClick: () -> Unit,
     onDownloadClick: () -> Unit,
     onShareClick: () -> Unit,
+    onMoreClick: () -> Unit,
     onPlayClick: () -> Unit,
     onCoverClick: () -> Unit,
     onUploaderClick: (Long) -> Unit,
@@ -774,6 +841,18 @@ private fun VideoDetailContent(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(stringResource(R.string.action_share))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        FilledTonalButton(
+            onClick = onMoreClick,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(Icons.Filled.MoreVert, contentDescription = null)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(stringResource(R.string.video_more))
         }
 
         Spacer(modifier = Modifier.height(16.dp))

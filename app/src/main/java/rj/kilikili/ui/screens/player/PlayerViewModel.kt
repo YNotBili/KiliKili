@@ -8,28 +8,42 @@ import rj.kilikili.api.apiResultNonNull
 import rj.kilikili.api.bilibiliApi
 import rj.kilikili.data.download.DownloadManager
 import rj.kilikili.data.download.DownloadRequest
+import rj.kilikili.data.repository.DanmakuRepository
 import rj.kilikili.data.repository.VideoRepository
 import rj.kilikili.data.setting.LocalData
 import com.huanli233.biliwebapi.api.interfaces.IVideoApi
+import com.huanli233.biliwebapi.bean.video.PlayUrlData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser
+import rj.kilikili.data.proto.DanmakuSource
+import rj.kilikili.parser.BilibiliProtoDanmakuParser
+import rj.kilikili.parser.DanmakuListDataSource
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import tv.danmaku.ijk.media.player.IMediaPlayer
 import java.net.URL
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
 private const val BILIBILI_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
 private const val BILIBILI_REFERER = "https://bilibili.com"
@@ -37,11 +51,17 @@ private const val BILIBILI_REFERER = "https://bilibili.com"
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val videoRepository: VideoRepository,
-    private val downloadManager: DownloadManager
+    private val downloadManager: DownloadManager,
+    private val danmakuRepository: DanmakuRepository
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(PlayerUiState())
     val uiState: StateFlow<PlayerUiState> = _uiState.asStateFlow()
+
+    /** 弹幕来源（设置项），供 UI 触发 parser 重建 */
+    val danmakuSource: StateFlow<DanmakuSource> = LocalData.settingsStateFlow
+        .map { it?.playerSettings?.danmakuSource ?: DanmakuSource.DANMAKU_SOURCE_PROTOBUF }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, DanmakuSource.DANMAKU_SOURCE_PROTOBUF)
     
     private var progressReportJob: Job? = null
     private var lastReportedProgress: Long = 0
@@ -336,21 +356,21 @@ class PlayerViewModel @Inject constructor(
                     
                     if (playUrlData != null) {
                         val videoUrl = playUrlData.durl?.firstOrNull()?.url ?: ""
-                        val danmakuUrl = "https://comment.bilibili.com/$cid.xml"
-                        
+                        val videoDurationMs = computeDurationMs(playUrlData)
+
                         val currentPageIndex = _uiState.value.pages.indexOfFirst { it.cid == cid }
-                        
+
                         val playerInfo = videoRepository.getPlayerInfo(aid, cid).getOrNull()
                         val historyProgress = if (playerInfo?.lastPlayCid == cid) {
                             playerInfo.lastPlayTime
                         } else {
                             0L
                         }
-                        
+
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             videoUrl = videoUrl,
-                            danmakuUrl = danmakuUrl,
+                            videoDurationMs = videoDurationMs,
                             aid = aid,
                             cid = cid,
                             currentPage = currentPageIndex,
@@ -395,42 +415,111 @@ class PlayerViewModel @Inject constructor(
         )
     }
     
-    suspend fun createDanmakuParser(danmakuUrl: String): BaseDanmakuParser? {
+    suspend fun createDanmakuParser(
+        cid: Long,
+        aid: Long,
+        totalDurationMs: Long
+    ): BaseDanmakuParser? {
         _uiState.value = _uiState.value.copy(isLoadingDanmaku = true, danmakuError = null)
+        val source = LocalData.settings.playerSettings?.danmakuSource
+            ?: DanmakuSource.DANMAKU_SOURCE_PROTOBUF
         return withContext(Dispatchers.IO) {
             try {
-                val parser = BiliDanmukuParser()
-
-                val loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI)
-                if (loader == null) {
-                    Log.e("Danmaku", "Failed to create danmaku loader")
-                    return@withContext null
+                if (source == DanmakuSource.DANMAKU_SOURCE_PROTOBUF) {
+                    val protoParser = loadProtoDanmaku(cid, aid, totalDurationMs)
+                    if (protoParser != null) {
+                        Log.d("Danmaku", "Protobuf danmaku loaded for cid=$cid")
+                        protoParser
+                    } else {
+                        Log.w("Danmaku", "Protobuf danmaku empty, fallback to XML for cid=$cid")
+                        loadXmlDanmaku(cid)
+                    }
+                } else {
+                    Log.d("Danmaku", "XML danmaku mode for cid=$cid")
+                    loadXmlDanmaku(cid)
                 }
-
-                // B站的弹幕数据是 deflate 压缩的（不带 zlib header），需要先解压
-                val rawInputStream = URL(danmakuUrl).openStream()
-                val inflater = java.util.zip.Inflater(true)
-                val inflaterInputStream = java.util.zip.InflaterInputStream(rawInputStream, inflater)
-                
-                loader.load(inflaterInputStream)
-
-                val dataSource = loader.dataSource
-                if (dataSource == null) {
-                    Log.e("Danmaku", "Failed to get danmaku data source")
-                    return@withContext null
-                }
-
-                parser.load(dataSource)
-                return@withContext parser
             } catch (e: Exception) {
                 val errorMsg = "Error loading danmaku: ${e.message}"
                 Log.e("Danmaku", errorMsg, e)
                 _uiState.value = _uiState.value.copy(danmakuError = errorMsg)
-                return@withContext null
+                null
             } finally {
                 _uiState.value = _uiState.value.copy(isLoadingDanmaku = false)
             }
         }
+    }
+
+    private suspend fun loadProtoDanmaku(
+        cid: Long,
+        aid: Long,
+        totalDurationMs: Long
+    ): BilibiliProtoDanmakuParser? {
+        val segments = max(1, ceil(totalDurationMs / 360_000.0).toInt())
+        val maxSegment = min(segments, 2000) // 防御性上限：200h 视频
+        Log.d("Danmaku", "Loading protobuf segments: $maxSegment for cid=$cid")
+
+        val allElems = mutableListOf<bilibili.community.service.dm.v1.Dm.DanmakuElem>()
+        var anySuccess = false
+        coroutineScope {
+            val concurrency = 4
+            val semaphore = kotlinx.coroutines.sync.Semaphore(concurrency)
+            val jobs = (1..maxSegment).map { idx ->
+                async(Dispatchers.IO) {
+                    semaphore.acquire()
+                    try {
+                        val elems = danmakuRepository.getDanmakuSegment(
+                            oid = cid,
+                            pid = aid,
+                            segmentIndex = idx
+                        ).getOrNull() ?: return@async
+                        if (elems.isEmpty()) return@async
+                        synchronized(allElems) {
+                            allElems.addAll(elems)
+                        }
+                        anySuccess = true
+                    } catch (e: Exception) {
+                        Log.w("Danmaku", "segment $idx failed: ${e.message}")
+                    } finally {
+                        semaphore.release()
+                    }
+                }
+            }
+            jobs.awaitAll()
+        }
+
+        if (!anySuccess || allElems.isEmpty()) {
+            return null
+        }
+        val parser = BilibiliProtoDanmakuParser()
+        parser.load(DanmakuListDataSource(allElems))
+        return parser
+    }
+
+    private suspend fun loadXmlDanmaku(cid: Long): BaseDanmakuParser? {
+        val danmakuUrl = "https://comment.bilibili.com/$cid.xml"
+        val parser = BiliDanmukuParser()
+        val loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI)
+            ?: run {
+                Log.e("Danmaku", "Failed to create danmaku loader")
+                return null
+            }
+        // B 站弹幕数据是 deflate 压缩的（不带 zlib header），需要先解压
+        val rawInputStream = URL(danmakuUrl).openStream()
+        val inflater = java.util.zip.Inflater(true)
+        val inflaterInputStream = java.util.zip.InflaterInputStream(rawInputStream, inflater)
+        loader.load(inflaterInputStream)
+        val dataSource = loader.dataSource
+            ?: run {
+                Log.e("Danmaku", "Failed to get danmaku data source")
+                return null
+            }
+        parser.load(dataSource)
+        return parser
+    }
+
+    private fun computeDurationMs(playUrlData: PlayUrlData): Long {
+        val total = playUrlData.durl?.sumOf { it.length } ?: 0L
+        return if (total > 0) total else 0L
     }
     
     fun toggleDanmaku() {
@@ -580,7 +669,6 @@ data class PlayerUiState(
     val danmakuError: String? = null,
     val error: String? = null,
     val videoUrl: String = "",
-    val danmakuUrl: String = "",
     val title: String = "",
     val coverUrl: String = "",
     val aid: Long = 0,
@@ -592,6 +680,7 @@ data class PlayerUiState(
     val availableQualities: List<VideoQuality> = emptyList(),
     val currentQuality: Int = 64,
     val videoAspectRatio: Float = 16f / 9f,
+    val videoDurationMs: Long = 0L,
     val isLocalMode: Boolean = false
 )
 

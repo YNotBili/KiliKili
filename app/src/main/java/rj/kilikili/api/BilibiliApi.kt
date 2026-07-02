@@ -212,7 +212,12 @@ fun <T> ApiResponse<T>?.toResultNonNull(): Result<T> {
     val data = this?.data
     return if (this?.code == 0 && data != null) {
         Result.success(data)
-    } else Result.failure(BilibiliApiException(this?.code ?: Int.MIN_VALUE, "code=${this?.code} ${this?.message}, data=${data}"))
+    } else {
+        val code = this?.code ?: Int.MIN_VALUE
+        val message = if (code == Int.MIN_VALUE) "未知错误"
+                       else rj.kilikili.utils.encode.ErrorMessages.resolve(code)
+        Result.failure(BilibiliApiException(code, message))
+    }
 }
 
 fun <T> Result<ApiResponse<T>>.apiResultNonNull(): Result<T> {

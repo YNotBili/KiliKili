@@ -325,12 +325,17 @@ fun PlayerScreen(
         }
     }
 
-    LaunchedEffect(uiState.danmakuUrl) {
-        if (uiState.danmakuUrl.isNotEmpty()) {
-            Log.d("Danmaku", "Loading danmaku from: ${uiState.danmakuUrl}")
+    val danmakuSource by viewModel.danmakuSource.collectAsState()
+    LaunchedEffect(uiState.cid, uiState.aid, uiState.videoDurationMs, danmakuSource) {
+        if (uiState.cid != 0L && uiState.videoDurationMs > 0L) {
+            Log.d("Danmaku", "Loading danmaku: cid=${uiState.cid} aid=${uiState.aid} duration=${uiState.videoDurationMs}ms source=$danmakuSource")
             danmakuError = null
             try {
-                val parser = viewModel.createDanmakuParser(uiState.danmakuUrl)
+                val parser = viewModel.createDanmakuParser(
+                    cid = uiState.cid,
+                    aid = uiState.aid,
+                    totalDurationMs = uiState.videoDurationMs
+                )
                 if (parser != null) {
                     danmakuParser = parser
                     Log.d("Danmaku", "Danmaku parser created successfully - parser: $danmakuParser")
@@ -345,7 +350,7 @@ fun PlayerScreen(
                 danmakuError = errorMsg
             }
         } else {
-            Log.d("Danmaku", "Danmaku URL is empty - uiState.danmakuUrl: '${uiState.danmakuUrl}'")
+            Log.d("Danmaku", "Skip danmaku load: cid=${uiState.cid} durationMs=${uiState.videoDurationMs}")
         }
     }
 

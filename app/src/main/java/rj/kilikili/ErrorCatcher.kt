@@ -18,7 +18,6 @@ class ErrorCatcher : Thread.UncaughtExceptionHandler {
         } catch (t: Throwable) {
             t.printStackTrace()
         }
-
         throwable.printStackTrace()
     }
 

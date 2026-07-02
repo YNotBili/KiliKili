@@ -8,10 +8,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +45,7 @@ fun DynamicCard(
     onImageClick: (List<String>, Int) -> Unit = { _, _ -> },
     onLikeClick: ((String, Boolean) -> Unit)? = null,
     onDynamicClick: (Dynamic) -> Unit = {},
+    onMoreClick: ((Dynamic) -> Unit)? = null,
     showFullContent: Boolean = false,
     modifier: Modifier = Modifier
 ) {
@@ -74,7 +78,7 @@ fun DynamicCard(
                     
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(dynamic.modules.authorModule.face)
+                            .data(normalizeImageUrl(dynamic.modules.authorModule.face))
                             .crossfade(200)
                             .build(),
                         contentDescription = null,
@@ -114,7 +118,13 @@ fun DynamicCard(
                     )
                 }
             }
-            
+
+            if (onMoreClick != null) {
+                IconButton(onClick = { onMoreClick(dynamic) }) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = stringResource(rj.kilikili.R.string.dynamic_more))
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
             
             dynamic.modules.contentModule.desc?.let { desc ->
@@ -317,7 +327,7 @@ private fun ImageMajorContent(imageUrl: String) {
         
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(if (imageUrl.startsWith("http")) imageUrl else "http:$imageUrl")
+                .data(normalizeImageUrl(imageUrl))
                 .crossfade(200)
                 .build(),
             contentDescription = null,
@@ -414,7 +424,7 @@ private fun OpusImageGrid(
                             .clickable { onImageClick(index) }
                     ) {
                         AsyncImage(
-                            model = pic.url,
+                            model = normalizeImageUrl(pic.url),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
@@ -435,7 +445,7 @@ private fun OpusImageGrid(
                         .clickable { onImageClick(0) }
                 ) {
                     AsyncImage(
-                        model = pics[0].url,
+                        model = normalizeImageUrl(pics[0].url),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
@@ -453,7 +463,7 @@ private fun OpusImageGrid(
                                 .clickable { onImageClick(i) }
                         ) {
                             AsyncImage(
-                                model = pics[i].url,
+                                model = normalizeImageUrl(pics[i].url),
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
@@ -482,7 +492,7 @@ private fun OpusImageGrid(
                                     .clickable { onImageClick(index) }
                             ) {
                                 AsyncImage(
-                                    model = pics[index].url,
+                                    model = normalizeImageUrl(pics[index].url),
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
@@ -514,7 +524,7 @@ private fun OpusImageGrid(
                                     .clickable { onImageClick(col) }
                             ) {
                                 AsyncImage(
-                                    model = pics[col].url,
+                                    model = normalizeImageUrl(pics[col].url),
                                     contentDescription = null,
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
@@ -590,7 +600,7 @@ private fun OriginDynamicCard(
                                         .aspectRatio(16f / 9f)
                                 ) {
                                     AsyncImage(
-                                        model = video.cover,
+                                        model = normalizeImageUrl(video.cover),
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
@@ -621,7 +631,7 @@ private fun OriginDynamicCard(
                                                 .aspectRatio(1f)
                                         ) {
                                             AsyncImage(
-                                                model = pic.url,
+                                                model = normalizeImageUrl(pic.url),
                                                 contentDescription = null,
                                                 modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
@@ -659,5 +669,14 @@ private fun formatCount(count: Long): String {
         count >= 100000000 -> String.format("%.1f亿", count / 100000000.0)
         count >= 10000 -> String.format("%.1f万", count / 10000.0)
         else -> count.toString()
+    }
+}
+
+private fun normalizeImageUrl(url: String?): String {
+    if (url.isNullOrBlank()) return ""
+    return when {
+        url.startsWith("//") -> "https:$url"
+        url.startsWith("http://") -> url.replaceFirst("http://", "https://")
+        else -> url
     }
 }

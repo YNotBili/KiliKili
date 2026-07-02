@@ -10,4 +10,6 @@
     <color name="link">#66ccff</color>
 
     <color name="transparent">#00000000</color>
+
+    <color name="ic_launcher_background">#00AEEC</color>
 </resources>

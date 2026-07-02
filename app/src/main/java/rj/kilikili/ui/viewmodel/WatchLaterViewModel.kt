@@ -2,6 +2,7 @@ package rj.kilikili.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import rj.kilikili.data.repository.WatchLaterExRepository
 import rj.kilikili.data.repository.WatchLaterRepository
 import com.huanli233.biliwebapi.bean.watchlater.WatchLaterItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +20,8 @@ sealed class WatchLaterUiState {
 
 @HiltViewModel
 class WatchLaterViewModel @Inject constructor(
-    private val watchLaterRepository: WatchLaterRepository
+    private val watchLaterRepository: WatchLaterRepository,
+    private val watchLaterExRepository: WatchLaterExRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WatchLaterUiState>(WatchLaterUiState.Loading)
@@ -57,6 +59,34 @@ class WatchLaterViewModel @Inject constructor(
                         error.message ?: "Delete failed"
                     )
                 }
+            )
+        }
+    }
+
+    fun batchDelete(aids: List<Long>, onDone: (Boolean, String?) -> Unit) {
+        if (aids.isEmpty()) { onDone(true, null); return }
+        viewModelScope.launch {
+            watchLaterExRepository.batchDeleteWatchLater(aids).fold(
+                onSuccess = { onDone(true, null); loadWatchLaterList() },
+                onFailure = { onDone(false, it.message) }
+            )
+        }
+    }
+
+    fun clearAll(onDone: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            watchLaterExRepository.clearWatchLater().fold(
+                onSuccess = { onDone(true, null); loadWatchLaterList() },
+                onFailure = { onDone(false, it.message) }
+            )
+        }
+    }
+
+    fun copyItem(fromAid: Long, toAid: Long, onDone: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            watchLaterExRepository.copyToWatchLater(fromAid, toAid).fold(
+                onSuccess = { onDone(true, null) },
+                onFailure = { onDone(false, it.message) }
             )
         }
     }

@@ -1,8 +1,13 @@
 ﻿package rj.kilikili.ui.screens.dynamic
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import rj.kilikili.ui.widget.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,8 +50,23 @@ fun DynamicHomeScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberAppLazyListState(initialFirstVisibleItemIndex = 0)
     var isRefreshing by remember { mutableStateOf(false) }
+    var moreDynamic by remember { mutableStateOf<Dynamic?>(null) }
+    var editDynamic by remember { mutableStateOf<Dynamic?>(null) }
+    var editContent by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.events.collect { ev ->
+            when (ev) {
+                is DynamicViewModel.DynamicEvent.Removed -> rj.kilikili.utils.MsgUtil.showMsg("已删除")
+                is DynamicViewModel.DynamicEvent.Topped -> rj.kilikili.utils.MsgUtil.showMsg("已置顶")
+                is DynamicViewModel.DynamicEvent.Untopped -> rj.kilikili.utils.MsgUtil.showMsg("已取消置顶")
+                is DynamicViewModel.DynamicEvent.Edited -> rj.kilikili.utils.MsgUtil.showMsg("已保存")
+                is DynamicViewModel.DynamicEvent.Failed -> rj.kilikili.utils.MsgUtil.showMsg(ev.msg)
+            }
+        }
+    }
     
     LaunchedEffect(dynamics.loadState.refresh) {
         if (dynamics.loadState.refresh is LoadState.NotLoading && isRefreshing) {
@@ -111,7 +131,8 @@ fun DynamicHomeScreen(
                                         onLikeClick = { dynamicId, isLiked ->
                                             viewModel.likeDynamic(dynamicId, isLiked)
                                         },
-                                        onDynamicClick = onDynamicClick
+                                        onDynamicClick = onDynamicClick,
+                                        onMoreClick = { moreDynamic = dynamic }
                                     )
                                 }
                             }
@@ -129,5 +150,57 @@ fun DynamicHomeScreen(
                 }
             }
         }
+    }
+
+    moreDynamic?.let { d ->
+        rj.kilikili.ui.dialog.AdaptDialog(
+            onDismissRequest = { moreDynamic = null },
+            title = { Text(stringResource(R.string.dynamic_more)) },
+            text = {
+                Column {
+                    androidx.compose.material3.TextButton(
+                        onClick = { editContent = d.modules.contentModule.desc?.text.orEmpty(); editDynamic = d; moreDynamic = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(R.string.dynamic_edit), modifier = Modifier.fillMaxWidth()) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.setTop(d.id); moreDynamic = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(R.string.dynamic_set_top), modifier = Modifier.fillMaxWidth()) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.removeTop(d.id); moreDynamic = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(R.string.dynamic_unset_top), modifier = Modifier.fillMaxWidth()) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { viewModel.remove(d.id); moreDynamic = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(R.string.dynamic_delete), modifier = Modifier.fillMaxWidth()) }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { moreDynamic = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    editDynamic?.let { d ->
+        rj.kilikili.ui.dialog.AdaptDialog(
+            onDismissRequest = { editDynamic = null },
+            title = { Text(stringResource(R.string.dynamic_edit)) },
+            text = {
+                OutlinedTextField(
+                    value = editContent,
+                    onValueChange = { editContent = it },
+                    label = { Text(stringResource(R.string.dynamic_edit_content)) },
+                    minLines = 3,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = { close ->
+                TextButton(onClick = {
+                    viewModel.edit(d.id, editContent.trim())
+                    editDynamic = null
+                }) { Text(stringResource(R.string.dynamic_edit_save)) }
+            },
+            dismissButton = { TextButton(onClick = { editDynamic = null }) { Text(stringResource(R.string.cancel)) } }
+        )
     }
 }

@@ -18,6 +18,8 @@ import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.LiveTv
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.google.gson.Gson
 import rj.kilikili.R
@@ -36,6 +38,9 @@ val DEFAULT_MENU_LIST = listOf(
     menuItem("ranking", Screen.Ranking.route, R.string.ranking, Icons.Outlined.Star),
     menuItem("timeline", Screen.Timeline.route, R.string.timeline, Icons.Outlined.Schedule),
     menuItem("popular_series", Screen.PopularSeries.route, R.string.popular_series, Icons.Outlined.Category),
+    menuItem("followed_live", Screen.FollowedLive.route, R.string.followed_live, Icons.Outlined.LiveTv, requireLoggedIn = true),
+    menuItem("pgc_index", Screen.PgcIndex.route, R.string.pgc_index, Icons.Outlined.Category),
+    menuItem("pgc_rank", Screen.PgcRank.route, R.string.pgc_rank, Icons.Outlined.Star),
     menuItem("search", Screen.Search.route, R.string.search, Icons.Outlined.Search),
     menuItem("settings", Screen.Settings.route, R.string.settings, Icons.Outlined.Settings, required = true)
 )

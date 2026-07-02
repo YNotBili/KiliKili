@@ -7,6 +7,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import rj.kilikili.data.menu.MenuConfig
 import rj.kilikili.data.proto.ApiCache
 import rj.kilikili.data.proto.AppSettings
+import rj.kilikili.data.proto.DanmakuSource
 import rj.kilikili.data.proto.ImageFormat
 import rj.kilikili.data.proto.NightMode
 import rj.kilikili.data.proto.PlayerSettings
@@ -83,6 +84,7 @@ object AppSettingsSerializer : Serializer<AppSettings> {
             danmakuBold = false
             danmakuAreaTop = 0.0f
             danmakuAreaBottom = 0.0f
+            danmakuSource = DanmakuSource.DANMAKU_SOURCE_PROTOBUF
         }
         menuConfig = MenuConfig().toString()
     }

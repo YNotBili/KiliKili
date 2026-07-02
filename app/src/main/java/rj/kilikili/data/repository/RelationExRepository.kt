@@ -24,4 +24,14 @@ class RelationExRepository @Inject constructor() {
         return bilibiliApi.api(IRelationExApi::class) { getFollowedUpper() }
             .apiResultNonNull().map { it.list }
     }
+
+    suspend fun getSameFollowing(mid: Long): Result<List<FollowUser>> {
+        return bilibiliApi.api(IRelationExApi::class) { getSameFollowing(mid) }
+            .apiResultNonNull().map { it.list }
+    }
+
+    suspend fun searchFollowing(mid: Long, keyword: String): Result<List<FollowUser>> {
+        return bilibiliApi.api(IRelationExApi::class) { searchFollowing(mid, keyword) }
+            .apiResultNonNull().map { it.list }
+    }
 }

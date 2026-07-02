@@ -69,6 +69,7 @@ interface IDanmakuApi {
         @Query("type") type: Int = 1,
         @Query("oid") oid: Long,
         @Query("pid") pid: Long = 0,
-        @Query("segment_index") segmentIndex: Int = 1
+        @Query("segment_index") segmentIndex: Int = 1,
+        @Query("pull_mode") pullMode: Int = 1
     ): okhttp3.ResponseBody
 }

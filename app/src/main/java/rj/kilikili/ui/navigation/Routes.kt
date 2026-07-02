@@ -79,6 +79,53 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
         fun createRoute(mid: Long) = "fans_list/$mid"
     }
     data object Blacklist : Screen("blacklist", R.string.blacklist)
+
+    // ===== 阶段 2 新增屏幕 (B 类已有 Repository 补 UI) =====
+    data object FollowedLive : Screen("followed_live", R.string.followed_live)
+    data object SuperChat : Screen("super_chat/{roomId}", R.string.super_chat) {
+        fun createRoute(roomId: Long) = "super_chat/$roomId"
+    }
+    data object DanmakuHistory : Screen("danmaku_history/{roomId}", R.string.danmaku_history) {
+        fun createRoute(roomId: Long) = "danmaku_history/$roomId"
+    }
+    data object SameFollowing : Screen("same_following/{mid}", R.string.same_following) {
+        fun createRoute(mid: Long) = "same_following/$mid"
+    }
+    data object SearchFollowing : Screen("search_following/{mid}", R.string.search_following) {
+        fun createRoute(mid: Long) = "search_following/$mid"
+    }
+    data object RecentCoinVideos : Screen("recent_coin_videos/{mid}", R.string.recent_coin_videos) {
+        fun createRoute(mid: Long) = "recent_coin_videos/$mid"
+    }
+    data object RecentLikeVideos : Screen("recent_like_videos/{mid}", R.string.recent_like_videos) {
+        fun createRoute(mid: Long) = "recent_like_videos/$mid"
+    }
+    data object SearchHistory : Screen("search_history/{mid}", R.string.search_history) {
+        fun createRoute(mid: Long) = "search_history/$mid"
+    }
+
+    // ===== 阶段 3 新增屏幕 =====
+    data object DmFilter : Screen("dm_filter", R.string.danmaku_filter)
+    data object NoteList : Screen("note_list/{oid}", R.string.video_note) {
+        fun createRoute(oid: Long) = "note_list/$oid"
+    }
+    data object Vote : Screen("vote/{voteId}", R.string.vote) {
+        fun createRoute(voteId: Long) = "vote/$voteId"
+    }
+    data object Reserve : Screen("reserve/{reserveId}/{upMid}", R.string.reserve) {
+        fun createRoute(reserveId: Long = 0, upMid: Long = 0) = "reserve/$reserveId/$upMid"
+    }
+    data object Topic : Screen("topic/{topicId}", R.string.topic) {
+        fun createRoute(topicId: Long) = "topic/$topicId"
+    }
+    data object PgcIndex : Screen("pgc_index", R.string.pgc_index)
+    data object PgcRank : Screen("pgc_rank", R.string.pgc_rank)
+    data object PgcReview : Screen("pgc_review/{mediaId}", R.string.pgc_review) {
+        fun createRoute(mediaId: Long) = "pgc_review/$mediaId"
+    }
+    data object Article : Screen("article/{cvid}", R.string.article) {
+        fun createRoute(cvid: Long) = "article/$cvid"
+    }
 }
 
 val allScreens = listOf(

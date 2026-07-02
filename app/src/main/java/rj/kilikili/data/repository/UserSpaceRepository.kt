@@ -1,6 +1,8 @@
 package rj.kilikili.data.repository
 
 import com.huanli233.biliwebapi.api.interfaces.IUserSpaceApi
+import com.huanli233.biliwebapi.api.interfaces.IUserSpaceApi.CoinVideoResult
+import com.huanli233.biliwebapi.api.interfaces.IUserSpaceApi.LikeVideoResult
 import com.huanli233.biliwebapi.api.interfaces.IUserSpaceApi.PopularSeriesItem
 import com.huanli233.biliwebapi.api.interfaces.IUserSpaceApi.UpStatResult
 import com.huanli233.biliwebapi.bean.video.VideoInfo
@@ -28,5 +30,15 @@ class UserSpaceRepository @Inject constructor() {
     suspend fun getPopularSeriesDetail(seriesId: Int): Result<List<VideoInfo>> {
         return bilibiliApi.api(IUserSpaceApi::class) { getPopularSeriesDetail(seriesId) }
             .apiResultNonNull().map { it.list }
+    }
+
+    suspend fun getRecentCoinVideos(mid: Long): Result<CoinVideoResult> {
+        return bilibiliApi.api(IUserSpaceApi::class) { getRecentCoinVideos(mid) }
+            .apiResultNonNull()
+    }
+
+    suspend fun getRecentLikeVideos(mid: Long, page: Int = 1, pageSize: Int = 10): Result<LikeVideoResult> {
+        return bilibiliApi.api(IUserSpaceApi::class) { getRecentLikeVideos(mid, page, pageSize) }
+            .apiResultNonNull()
     }
 }

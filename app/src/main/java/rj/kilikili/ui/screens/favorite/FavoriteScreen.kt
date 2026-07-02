@@ -15,10 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -70,9 +74,13 @@ fun FavoriteScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberAppLazyListState()
     val scope = rememberCoroutineScope()
-    
+
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
+    var moreFolder by remember { mutableStateOf<Pair<Long, String>?>(null) }
+    var renameTarget by remember { mutableStateOf<Pair<Long, String>?>(null) }
+    var showNewDialog by remember { mutableStateOf(false) }
+    var deleteTarget by remember { mutableStateOf<Pair<Long, String>?>(null) }
 
     AppScreenScaffold(
         scrollState = scrollState,
@@ -98,6 +106,7 @@ fun FavoriteScreen(
             isRefreshing = isRefreshing,
             modifier = Modifier.fillMaxSize()
         ) {
+            Box(modifier = Modifier.fillMaxSize()) {
             when (val state = uiState) {
                 is FavoriteUiState.Loading -> {
                     LoadingView(
@@ -125,12 +134,113 @@ fun FavoriteScreen(
                             scrollState = scrollState,
                             paddingValues = paddingValues,
                             onFolderClick = onFolderClick,
-                            onOpusFavoriteClick = onOpusFavoriteClick
+                            onOpusFavoriteClick = onOpusFavoriteClick,
+                            onMoreClick = { fid, name -> moreFolder = fid to name }
                         )
                     }
                 }
             }
+            }
+
+            FloatingActionButton(
+                onClick = { showNewDialog = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Filled.Add, contentDescription = null)
+            }
         }
+    }
+
+    moreFolder?.let { (fid, name) ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { moreFolder = null },
+            title = { Text(name) },
+            text = {
+                Column {
+                    androidx.compose.material3.TextButton(onClick = { renameTarget = fid to name; moreFolder = null }, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.favorite_folder_rename), modifier = Modifier.fillMaxWidth())
+                    }
+                    androidx.compose.material3.TextButton(onClick = { deleteTarget = fid to name; moreFolder = null }, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.favorite_folder_delete), modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { moreFolder = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    renameTarget?.let { (fid, oldName) ->
+        var newName by remember(fid) { mutableStateOf(oldName) }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { renameTarget = null },
+            title = { Text(stringResource(R.string.favorite_folder_rename)) },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("名称") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    if (newName.isBlank()) { rj.kilikili.utils.MsgUtil.showMsg("名称不能为空"); return@TextButton }
+                    viewModel.renameFolder(fid, newName.trim()) { ok, err ->
+                        rj.kilikili.utils.MsgUtil.showMsg(if (ok) "已重命名" else err ?: "失败")
+                        if (ok) renameTarget = null
+                    }
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { renameTarget = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    deleteTarget?.let { (fid, name) ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { deleteTarget = null },
+            title = { Text(stringResource(R.string.favorite_folder_delete)) },
+            text = { Text(stringResource(R.string.favorite_folder_delete_confirm)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    viewModel.deleteFolder(fid) { ok, err ->
+                        rj.kilikili.utils.MsgUtil.showMsg(if (ok) "已删除" else err ?: "失败")
+                        deleteTarget = null
+                    }
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    if (showNewDialog) {
+        var newName by remember { mutableStateOf("") }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showNewDialog = false },
+            title = { Text(stringResource(R.string.favorite_folder_new)) },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = newName,
+                    onValueChange = { newName = it },
+                    label = { Text("名称") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    if (newName.isBlank()) { rj.kilikili.utils.MsgUtil.showMsg("名称不能为空"); return@TextButton }
+                    viewModel.createFolder(newName.trim()) { ok, err ->
+                        rj.kilikili.utils.MsgUtil.showMsg(if (ok) "已创建" else err ?: "失败")
+                        if (ok) showNewDialog = false
+                    }
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { showNewDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
     }
 }
 
@@ -140,7 +250,8 @@ private fun FavoriteFolderList(
     scrollState: rj.kilikili.ui.components.auto.AppLazyListState,
     paddingValues: PaddingValues,
     onFolderClick: (Long, String) -> Unit,
-    onOpusFavoriteClick: () -> Unit
+    onOpusFavoriteClick: () -> Unit,
+    onMoreClick: (Long, String) -> Unit
 ) {
     AppLazyColumn(
         state = scrollState,
@@ -151,7 +262,8 @@ private fun FavoriteFolderList(
         items(data=folders, key = { it.favBox }) { folder ->
             FavoriteFolderCard(
                 folder = folder,
-                onClick = { onFolderClick(folder.favBox, folder.name) }
+                onClick = { onFolderClick(folder.favBox, folder.name) },
+                onMoreClick = { onMoreClick(folder.favBox, folder.name) }
             )
         }
         
@@ -164,7 +276,8 @@ private fun FavoriteFolderList(
 @Composable
 private fun FavoriteFolderCard(
     folder: FavoriteBox,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onMoreClick: () -> Unit
 ) {
     val settings by LocalData.settingsStateFlow.collectAsState()
     val useBackgroundStyle = settings?.uiSettings?.favoriteFolderCardBackgroundStyle ?: false
@@ -243,6 +356,13 @@ private fun FavoriteFolderCard(
                         text = "${folder.count}/${folder.maxCount}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                IconButton(onClick = onMoreClick) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Filled.MoreVert,
+                        contentDescription = stringResource(R.string.dynamic_more)
                     )
                 }
             }

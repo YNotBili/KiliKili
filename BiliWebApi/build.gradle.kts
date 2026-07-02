@@ -4,6 +4,22 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.parcelize)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.protobuf)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.1"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 kotlin {
@@ -38,6 +54,7 @@ dependencies {
         exclude(group = "com.google.code.gson")
     }
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.protobuf.javalite)
 
     implementation(kotlin("reflect"))
 

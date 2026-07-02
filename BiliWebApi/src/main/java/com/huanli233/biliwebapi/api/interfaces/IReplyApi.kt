@@ -10,7 +10,6 @@ import com.huanli233.biliwebapi.bean.reply.ReplySendResult
 import com.huanli233.biliwebapi.httplib.annotation.Csrf
 import com.huanli233.biliwebapi.httplib.annotation.Fields
 import com.huanli233.biliwebapi.httplib.annotation.Queries
-import com.huanli233.biliwebapi.httplib.annotation.WbiSign
 import retrofit2.http.Field
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
@@ -22,7 +21,7 @@ import retrofit2.http.QueryMap
 const val QUERY_KEY_SEEK_REPLY_ID = "seek_rpid"
 
 interface IReplyApi {
-    @WbiSign @GET("/x/v2/reply/wbi/main")
+    @GET("/x/v2/reply/main")
     @Queries(keys = ["plat", "web_location"], values = ["1", "1315875"])
     suspend fun getReplies(
         @Query("type") type: Int,

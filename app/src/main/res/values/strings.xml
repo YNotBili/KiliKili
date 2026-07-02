@@ -242,6 +242,11 @@
     <string name="developer_options">开发者选项</string>
     <string name="advanced">高级</string>
     <string name="data_management">数据管理</string>
+    <string name="experimental_features">实验性功能</string>
+    <string name="danmaku_source">弹幕来源</string>
+    <string name="danmaku_source_desc">选择弹幕加载协议，默认 Protobuf，失败时自动回退 XML</string>
+    <string name="danmaku_source_protobuf">Protobuf（推荐）</string>
+    <string name="danmaku_source_xml">XML（兜底）</string>
     <string name="clear_settings">清空设置</string>
     <string name="clear_settings_desc">将所有设置项重置为默认值，用于解决更新后新设置项的默认值问题</string>
     <string name="clear_settings_warning">确定要清空所有设置吗？此操作会将所有设置项重置为默认值，且无法撤销。</string>
@@ -542,5 +547,64 @@
     <string name="fans_list">粉丝列表</string>
     <string name="danmaku_filter">弹幕过滤</string>
     <string name="blacklist">黑名单</string>
+
+    <!-- 阶段 2 新增 -->
+    <string name="super_chat">醒目留言</string>
+    <string name="danmaku_history">历史弹幕</string>
+    <string name="same_following">共同关注</string>
+    <string name="search_following">搜索关注</string>
+    <string name="search_following_hint">搜索关注的人…</string>
+    <string name="recent_coin_videos">最近投币</string>
+    <string name="recent_like_videos">最近点赞</string>
+    <string name="search_history_hint">搜索历史记录…</string>
+    <string name="search_history_hint_tip">输入关键词搜索历史观看记录</string>
+
+    <!-- 阶段 3 新增 -->
+    <string name="video_note">视频笔记</string>
+    <string name="video_note_add">添加笔记</string>
+    <string name="video_note_title">笔记标题</string>
+    <string name="video_note_content">笔记内容</string>
+    <string name="video_note_delete">删除笔记</string>
+    <string name="video_note_delete_confirm">确定要删除这条笔记吗？</string>
+    <string name="vote">投票</string>
+    <string name="vote_cast">投票</string>
+    <string name="vote_create">创建投票</string>
+    <string name="reserve">预约</string>
+    <string name="topic">话题</string>
+    <string name="topic_feed">话题动态</string>
+    <string name="topic_recommend">话题推荐</string>
+    <string name="topic_like">点赞话题</string>
+    <string name="pgc_index">番剧索引</string>
+    <string name="pgc_rank">番剧排行</string>
+    <string name="pgc_review">番剧评价</string>
+    <string name="pgc_review_short">短评</string>
+    <string name="pgc_review_long">长评</string>
+    <string name="pgc_review_write">写短评</string>
+    <string name="article">专栏</string>
+    <string name="report_submit">提交举报</string>
+    <string name="favorite_folder_new">新建收藏夹</string>
+    <string name="favorite_folder_rename">重命名</string>
+    <string name="favorite_folder_delete">删除收藏夹</string>
+    <string name="favorite_folder_delete_confirm">确定要删除这个收藏夹吗？</string>
+    <string name="watchlater_batch_delete">批量删除</string>
+    <string name="watchlater_clear_all">清空稍后再看</string>
+    <string name="watchlater_clear_confirm">确定要清空所有稍后再看吗？</string>
+    <string name="danmaku_filter_add">添加屏蔽</string>
+    <string name="danmaku_filter_content">屏蔽内容</string>
+    <string name="danmaku_filter_type">类型</string>
+    <string name="danmaku_filter_delete">删除屏蔽</string>
+    <string name="danmaku_filter_delete_confirm">确定要删除这条屏蔽吗？</string>
+    <string name="dynamic_more">更多</string>
+    <string name="dynamic_delete">删除动态</string>
+    <string name="dynamic_delete_confirm_msg">确定要删除这条动态吗？</string>
+    <string name="dynamic_set_top">置顶</string>
+    <string name="dynamic_unset_top">取消置顶</string>
+    <string name="dynamic_edit">编辑动态</string>
+    <string name="dynamic_edit_content">编辑内容</string>
+    <string name="dynamic_edit_save">保存</string>
+    <string name="video_more">视频操作</string>
+    <string name="video_report">举报视频</string>
+    <string name="danmaku_report">举报弹幕</string>
+    <string name="video_aid_hint">视频 ID</string>
 
 </resources>

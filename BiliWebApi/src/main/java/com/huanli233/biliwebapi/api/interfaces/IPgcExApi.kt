@@ -1,8 +1,10 @@
 package com.huanli233.biliwebapi.api.interfaces
 
+import com.google.gson.annotations.SerializedName
 import com.huanli233.biliwebapi.bean.ApiResponse
 import com.huanli233.biliwebapi.bean.bangumi.BangumiDetail
 import com.huanli233.biliwebapi.httplib.annotation.Csrf
+import com.huanli233.biliwebapi.httplib.annotation.WbiSign
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -14,6 +16,7 @@ interface IPgcExApi {
 
     @GET("/pgc/season/index/condition")
     suspend fun getIndexCondition(
+        @Query("season_type") seasonType: Int = 1,
         @Query("type") type: Int = 1,
         @Query("area") area: String = "",
         @Query("is_finish") isFinish: Int = -1
@@ -28,7 +31,7 @@ interface IPgcExApi {
         @Query("ps") pageSize: Int = 20
     ): ApiResponse<PgcIndexResult>
 
-    @GET("/pgc/web/rank/list")
+    @WbiSign @GET("/pgc/season/rank/web/list")
     suspend fun getPgcRank(
         @Query("season_type") seasonType: Int = 1,
         @Query("day") day: Int = 3
@@ -47,10 +50,18 @@ interface IPgcExApi {
     ): ApiResponse<Unit>
 
     data class PgcIndexConditionResult(
-        val areas: List<PgcFilterOption> = emptyList(),
-        val seasons: List<PgcFilterOption> = emptyList()
+        val filter: List<PgcFilterGroup> = emptyList(),
+        val order: List<PgcFilterOption> = emptyList()
     )
-    data class PgcFilterOption(val id: Int = 0, val name: String = "")
+    data class PgcFilterGroup(
+        val field: String = "",
+        val name: String = "",
+        val values: List<PgcFilterOption> = emptyList()
+    )
+    data class PgcFilterOption(
+        @SerializedName("keyword") val id: String = "",
+        val name: String = ""
+    )
     data class PgcIndexResult(val list: List<BangumiDetail> = emptyList())
     data class PgcRankResult(val list: List<BangumiDetail> = emptyList())
 }

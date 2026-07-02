@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Velocity
 import kotlin.math.abs
 import kotlinx.coroutines.launch
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import rj.kilikili.UiType
@@ -58,7 +59,19 @@ import rj.kilikili.ui.screens.favorite.FavoriteScreen
 import rj.kilikili.ui.screens.favorite.FavoriteVideosScreen
 import rj.kilikili.ui.screens.favorite.OpusFavoriteScreen
 import rj.kilikili.ui.screens.follow.FollowingScreen
+import rj.kilikili.ui.screens.follow.SameFollowingScreen
+import rj.kilikili.ui.screens.follow.SearchFollowingScreen
 import rj.kilikili.ui.screens.history.HistoryScreen
+import rj.kilikili.ui.screens.article.ArticleScreen
+import rj.kilikili.ui.screens.bangumi.PgcIndexScreen
+import rj.kilikili.ui.screens.bangumi.PgcRankScreen
+import rj.kilikili.ui.screens.bangumi.PgcReviewScreen
+import rj.kilikili.ui.screens.topic.TopicScreen
+import rj.kilikili.ui.screens.video.DmFilterScreen
+import rj.kilikili.ui.screens.video.NoteListScreen
+import rj.kilikili.ui.screens.video.ReserveScreen
+import rj.kilikili.ui.screens.video.VoteScreen
+import rj.kilikili.ui.screens.history.SearchHistoryScreen
 import rj.kilikili.ui.screens.image.ImageViewerScreen
 import rj.kilikili.ui.screens.watchlater.WatchLaterScreen
 import rj.kilikili.ui.screens.opus.OpusDetailScreen
@@ -89,6 +102,11 @@ import rj.kilikili.ui.screens.message.ConversationScreen
 import rj.kilikili.ui.screens.message.DanmakuSendScreen
 import rj.kilikili.ui.screens.dynamic.SendDynamicScreen
 import rj.kilikili.ui.screens.live.LiveMedalWallScreen
+import rj.kilikili.ui.screens.live.FollowedLiveScreen
+import rj.kilikili.ui.screens.live.SuperChatScreen
+import rj.kilikili.ui.screens.live.DanmakuHistoryScreen
+import rj.kilikili.ui.screens.user.RecentCoinVideosScreen
+import rj.kilikili.ui.screens.user.RecentLikeVideosScreen
 import rj.kilikili.ui.screens.follow.FollowTagScreen
 import rj.kilikili.ui.screens.popular.PopularSeriesDetailScreen
 import rj.kilikili.ui.screens.popular.PopularSeriesScreen
@@ -119,9 +137,10 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
     // 会静默 return false 不弹 (androidx.navigation 2.9.3 NavControllerImpl.kt:462), 导致
     // "一级页 → 另一一级页"时旧页面残留。手动循环 popBackStack 是唯一可靠方式。
     val navigateTopLevel: (String) -> Unit = { route ->
-        while (contentNavController.popBackStack()) { /* 清空栈 */ }
         contentNavController.navigate(route) {
+            popUpTo(contentNavController.graph.findStartDestination().id) { saveState = true }
             launchSingleTop = true
+            restoreState = true
         }
     }
 
@@ -610,15 +629,27 @@ private fun MainNavHost(
             }
 
             appComposable(
-                route = "collection/{seasonId}",
+                route = "collection/{mid}/{seasonId}/{title}",
                 arguments = listOf(
-                    navArgument("seasonId") { type = NavType.LongType }
+                    navArgument("mid") { type = NavType.LongType },
+                    navArgument("seasonId") { type = NavType.LongType },
+                    navArgument("title") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
                 )
             ) { backStackEntry ->
-                val seasonId = backStackEntry.arguments?.getLong("seasonId") ?: 0
+                val mid = backStackEntry.arguments?.getLong("mid") ?: 0L
+                val seasonId = backStackEntry.arguments?.getLong("seasonId") ?: 0L
+                val title = backStackEntry.arguments?.getString("title")
+                    ?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+                    ?: ""
                 CollectionDetailScreen(
+                    mid = mid,
                     seasonId = seasonId,
-                    onNavigateBack = { contentNavController.popBackStack() }
+                    title = title,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onVideoClick = { contentNavController.navigate(Screen.VideoDetail.createRoute(it.aid, it.bvid)) }
                 )
             }
 
@@ -1039,6 +1070,174 @@ private fun MainNavHost(
                     onUserClick = { uid -> contentNavController.navigate("user/$uid") },
                     onNavigateBack = { contentNavController.popBackStack() }
                 )
+            }
+
+            appComposable(route = Screen.FollowedLive.route) {
+                FollowedLiveScreen(
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onRoomClick = { roomId -> /* navigate to live room if exists */ }
+                )
+            }
+
+            appComposable(
+                route = Screen.SuperChat.route,
+                arguments = listOf(navArgument("roomId") { type = NavType.LongType })
+            ) { entry ->
+                val roomId = entry.arguments?.getLong("roomId") ?: 0L
+                SuperChatScreen(
+                    roomId = roomId,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(
+                route = Screen.DanmakuHistory.route,
+                arguments = listOf(navArgument("roomId") { type = NavType.LongType })
+            ) { entry ->
+                val roomId = entry.arguments?.getLong("roomId") ?: 0L
+                DanmakuHistoryScreen(
+                    roomId = roomId,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(
+                route = Screen.SameFollowing.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                SameFollowingScreen(
+                    mid = mid,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onUserClick = { uid -> contentNavController.navigate("user/$uid") }
+                )
+            }
+
+            appComposable(
+                route = Screen.SearchFollowing.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                SearchFollowingScreen(
+                    mid = mid,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onUserClick = { uid -> contentNavController.navigate("user/$uid") }
+                )
+            }
+
+            appComposable(
+                route = Screen.RecentCoinVideos.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                RecentCoinVideosScreen(
+                    mid = mid,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onVideoClick = { v -> contentNavController.navigate(Screen.VideoDetail.createRoute(v.aid, v.bvid)) }
+                )
+            }
+
+            appComposable(
+                route = Screen.RecentLikeVideos.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                RecentLikeVideosScreen(
+                    mid = mid,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(
+                route = Screen.SearchHistory.route,
+                arguments = listOf(navArgument("mid") { type = NavType.LongType })
+            ) { entry ->
+                val mid = entry.arguments?.getLong("mid") ?: 0L
+                SearchHistoryScreen(
+                    mid = mid,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(route = Screen.DmFilter.route) {
+                DmFilterScreen(onNavigateBack = { contentNavController.popBackStack() })
+            }
+
+            appComposable(
+                route = Screen.NoteList.route,
+                arguments = listOf(navArgument("oid") { type = NavType.LongType })
+            ) { entry ->
+                val oid = entry.arguments?.getLong("oid") ?: 0L
+                NoteListScreen(oid = oid, onNavigateBack = { contentNavController.popBackStack() })
+            }
+
+            appComposable(
+                route = Screen.Vote.route,
+                arguments = listOf(navArgument("voteId") { type = NavType.LongType })
+            ) { entry ->
+                val voteId = entry.arguments?.getLong("voteId") ?: 0L
+                VoteScreen(voteId = voteId, onNavigateBack = { contentNavController.popBackStack() })
+            }
+
+            appComposable(
+                route = Screen.Reserve.route,
+                arguments = listOf(
+                    navArgument("reserveId") { type = NavType.LongType; defaultValue = 0L },
+                    navArgument("upMid") { type = NavType.LongType; defaultValue = 0L }
+                )
+            ) { entry ->
+                val reserveId = entry.arguments?.getLong("reserveId") ?: 0L
+                val upMid = entry.arguments?.getLong("upMid") ?: 0L
+                ReserveScreen(
+                    reserveId = reserveId,
+                    upMid = upMid,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(
+                route = Screen.Topic.route,
+                arguments = listOf(navArgument("topicId") { type = NavType.LongType })
+            ) { entry ->
+                val topicId = entry.arguments?.getLong("topicId") ?: 0L
+                TopicScreen(
+                    topicId = topicId,
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onItemClick = { idStr -> contentNavController.navigate(Screen.DynamicDetail.createRoute(idStr)) }
+                )
+            }
+
+            appComposable(route = Screen.PgcIndex.route) {
+                PgcIndexScreen(
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onBangumiClick = { seasonId -> /* TODO: navigate to bangumi detail */ }
+                )
+            }
+
+            appComposable(route = Screen.PgcRank.route) {
+                PgcRankScreen(
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onBangumiClick = { seasonId -> /* TODO: navigate to bangumi detail */ }
+                )
+            }
+
+            appComposable(
+                route = Screen.PgcReview.route,
+                arguments = listOf(navArgument("mediaId") { type = NavType.LongType })
+            ) { entry ->
+                val mediaId = entry.arguments?.getLong("mediaId") ?: 0L
+                PgcReviewScreen(
+                    mediaId = mediaId,
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
+            }
+
+            appComposable(
+                route = Screen.Article.route,
+                arguments = listOf(navArgument("cvid") { type = NavType.LongType })
+            ) { entry ->
+                val cvid = entry.arguments?.getLong("cvid") ?: 0L
+                ArticleScreen(cvid = cvid, onNavigateBack = { contentNavController.popBackStack() })
             }
 
             settingsGraph(

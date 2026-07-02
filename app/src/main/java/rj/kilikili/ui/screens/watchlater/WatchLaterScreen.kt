@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
@@ -45,6 +48,7 @@ fun WatchLaterScreen(
     
     var isRefreshing by remember { mutableStateOf(false) }
     val swipeRefreshState = rememberPullToRefreshState()
+    var showClearDialog by remember { mutableStateOf(false) }
 
     AppScreenScaffold(
         scrollState = scrollState,
@@ -52,9 +56,9 @@ fun WatchLaterScreen(
             AppTopBar(
                 title = stringResource(R.string.watch_later),
                 showBackIcon = true,
-                showMenuIcon = false,
+                showMenuIcon = true,
                 onBackClick = onNavigateBack,
-                onMenuClick = null
+                onMenuClick = { showClearDialog = true }
             )
         }
     ) { paddingValues ->
@@ -102,6 +106,23 @@ fun WatchLaterScreen(
                 }
             }
         }
+    }
+
+    if (showClearDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showClearDialog = false },
+            title = { Text(stringResource(R.string.watchlater_clear_all)) },
+            text = { Text(stringResource(R.string.watchlater_clear_confirm)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    viewModel.clearAll { ok, err ->
+                        rj.kilikili.utils.MsgUtil.showMsg(if (ok) "已清空" else err ?: "失败")
+                        showClearDialog = false
+                    }
+                }) { Text(stringResource(R.string.confirm)) }
+            },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { showClearDialog = false }) { Text(stringResource(R.string.cancel)) } }
+        )
     }
 }
 

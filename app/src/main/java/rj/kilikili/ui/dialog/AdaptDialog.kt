@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package rj.kilikili.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
