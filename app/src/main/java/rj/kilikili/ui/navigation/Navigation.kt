@@ -1,6 +1,7 @@
 package rj.kilikili.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import rj.kilikili.UiType
@@ -26,6 +27,7 @@ fun AppNavHostRoute(
     navController: NavHostController = rememberAppNavController(),
     startDestination: String,
     route: String? = null,
+    modifier: Modifier = Modifier,
     builder: NavGraphBuilder.(NavHostController) -> Unit
 ) {
     when (uiType) {
@@ -39,6 +41,7 @@ fun AppNavHostRoute(
             navController = navController,
             startDestination = startDestination,
             route = route,
+            modifier = modifier,
             builder = builder
         )
     }

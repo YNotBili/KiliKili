@@ -47,7 +47,7 @@ object AppSettingsSerializer : Serializer<AppSettings> {
         }
         theme = Theme.newBuilder().build {
             nightMode = NightMode.NIGHT_MODE_NIGHT
-            followSystemAccent = true
+            followSystemAccent = false
             colorTheme = "DEFAULT"
             animationsEnabled = true
             fullScreenDialogDisabled = false

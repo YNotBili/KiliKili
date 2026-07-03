@@ -1,6 +1,7 @@
 package rj.kilikili.ui.navigation.phone
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,12 +14,14 @@ fun PhoneNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String,
     route: String? = null,
+    modifier: Modifier = Modifier,
     builder: NavGraphBuilder.(NavHostController) -> Unit
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        route = route
+        route = route,
+        modifier = modifier
     ) {
         builder(navController)
     }

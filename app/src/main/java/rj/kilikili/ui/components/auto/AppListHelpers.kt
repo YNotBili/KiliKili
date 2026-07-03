@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -42,10 +44,10 @@ fun appHorizontalContentPadding(enabled: Boolean = true): PaddingValues = when (
 }
 
 @Composable
-fun appListTopSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 24.dp else 16.dp))
+fun appListTopSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 24.dp else 12.dp))
 
 @Composable
-fun appListBottomSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 20.dp else 16.dp))
+fun appListBottomSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 20.dp else 12.dp))
 
 @Composable
 fun appListHeader(title: String, modifier: Modifier = Modifier) {
@@ -56,14 +58,23 @@ fun appListHeader(title: String, modifier: Modifier = Modifier) {
             }
         }
         UiType.PHONE -> {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            Surface(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.surfaceContainer,
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
         }
     }
 }

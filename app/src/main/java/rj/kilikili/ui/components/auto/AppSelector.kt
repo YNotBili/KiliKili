@@ -1,19 +1,17 @@
 package rj.kilikili.ui.components.auto
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.size
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,20 +57,20 @@ private fun <T> PhoneSelector(
     var expanded by remember { mutableStateOf(false) }
     val selectedLabel = options.firstOrNull { it.first == selected }?.second
         ?: options.firstOrNull()?.second.orEmpty()
-    Box(modifier = modifier.fillMaxWidth()) {
-        OutlinedTextField(
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier.fillMaxWidth()
+    ) {
+        TextField(
             value = selectedLabel,
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
         )
-        Spacer(
-            modifier = Modifier
-                .matchParentSize()
-                .clickable { expanded = true }
-        )
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
@@ -82,7 +80,8 @@ private fun <T> PhoneSelector(
                     onClick = {
                         onSelected(id)
                         expanded = false
-                    }
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                 )
             }
         }

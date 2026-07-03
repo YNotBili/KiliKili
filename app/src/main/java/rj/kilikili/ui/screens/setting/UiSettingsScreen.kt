@@ -1,5 +1,6 @@
 package rj.kilikili.ui.screens.setting
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -129,12 +130,14 @@ fun UiSettingsScreen(
                 }
 
 
-                item {
-                    SwitchSettingsItem(
-                        title = stringResource(id = R.string.system_accent_color),
-                        checked = currentSettings.theme.followSystemAccent,
-                        onCheckedChange = viewModel::updateFollowSystemAccent
-                    )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    item {
+                        SwitchSettingsItem(
+                            title = stringResource(id = R.string.system_accent_color),
+                            checked = currentSettings.theme.followSystemAccent,
+                            onCheckedChange = viewModel::updateFollowSystemAccent
+                        )
+                    }
                 }
 
                 item {

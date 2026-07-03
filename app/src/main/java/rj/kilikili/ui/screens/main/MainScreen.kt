@@ -9,11 +9,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.systemGestureExclusion
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -24,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +46,7 @@ import androidx.navigation.navArgument
 import rj.kilikili.UiType
 import rj.kilikili.actualUiType
 import rj.kilikili.uiType
-import rj.kilikili.ui.components.phone.menu.PhoneMenuDrawerContent
+import rj.kilikili.ui.components.phone.PhoneBottomNavBar
 import rj.kilikili.ui.navigation.AppNavHostRoute
 import rj.kilikili.ui.navigation.appComposable
 import rj.kilikili.ui.navigation.rememberAppNavController
@@ -129,6 +133,11 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    // 当前路由 — 用于高亮底部导航项
+    val currentBackStackEntry by contentNavController.currentBackStackEntryFlow
+        .collectAsState(initial = contentNavController.currentBackStackEntry)
+    val currentRoute = currentBackStackEntry?.destination?.route
+
     val openMenu: () -> Unit = {
         when (uiType) {
             UiType.WEAR, UiType.FRESHWEAR -> isMenuExpanded = true
@@ -180,7 +189,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        PhoneMenuDrawerContent(
+                        AppMenuPanel(
                             menuItems = menuConfig.menuItems,
                             drawerState = drawerState,
                             scope = scope,
@@ -190,11 +199,21 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                         )
                     },
                     content = {
-                        MainNavHost(
-                            contentNavController = contentNavController,
-                            openMenu = openMenu,
-                            menuConfig = menuConfig
-                        )
+                        Scaffold(
+                            bottomBar = {
+                                PhoneBottomNavBar(
+                                    currentRoute = currentRoute,
+                                    onNavigate = { route -> navigateTopLevel(route) }
+                                )
+                            }
+                        ) { innerPadding ->
+                            MainNavHost(
+                                contentNavController = contentNavController,
+                                openMenu = openMenu,
+                                menuConfig = menuConfig,
+                                contentPadding = innerPadding
+                            )
+                        }
                     }
                 )
             }
@@ -265,11 +284,13 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 private fun MainNavHost(
     contentNavController: androidx.navigation.NavHostController,
     openMenu: () -> Unit,
-    menuConfig: rj.kilikili.data.menu.MenuConfig
+    menuConfig: rj.kilikili.data.menu.MenuConfig,
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     AppNavHostRoute(
         navController = contentNavController,
-        startDestination = Screen.Recommend.route
+        startDestination = Screen.Recommend.route,
+        modifier = Modifier.padding(contentPadding)
     ) { nc ->
         appComposable(Screen.Recommend.route) {
             RecommendScreen(
