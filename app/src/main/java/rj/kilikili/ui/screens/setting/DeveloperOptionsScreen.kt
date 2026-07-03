@@ -28,6 +28,9 @@ import rj.kilikili.data.setting.edit
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.dialog.AdaptDialog
 import rj.kilikili.data.setting.LocalData
+import rj.kilikili.UiType
+import rj.kilikili.uiType
+import androidx.compose.material.icons.outlined.Smartphone
 
 @Composable
 fun DeveloperOptionsScreen(
@@ -36,6 +39,7 @@ fun DeveloperOptionsScreen(
 ) {
     var showClearSettingsDialog by remember { mutableStateOf(false) }
     var showDanmakuSourceDialog by remember { mutableStateOf(false) }
+    var showUiTypeDialog by remember { mutableStateOf(false) }
 
     val settings by LocalData.settingsStateFlow.collectAsState()
     val currentSource = settings?.playerSettings?.danmakuSource
@@ -68,6 +72,19 @@ fun DeveloperOptionsScreen(
                         summary = stringResource(id = R.string.danmaku_source_desc) +
                             " · " + danmakuSourceLabel(currentSource),
                         onClick = { showDanmakuSourceDialog = true }
+                    )
+                }
+
+                item {
+                    SettingsItem(
+                        icon = Icons.Outlined.Smartphone,
+                        title = stringResource(id = R.string.ui_type),
+                        summary = when (uiType) {
+                            UiType.PHONE -> stringResource(R.string.ui_type_phone)
+                            UiType.FRESHWEAR -> stringResource(R.string.ui_type_freshwear)
+                            else -> stringResource(R.string.ui_type_wear)
+                        },
+                        onClick = { showUiTypeDialog = true }
                     )
                 }
 
@@ -106,6 +123,23 @@ fun DeveloperOptionsScreen(
                 TextButton(onClick = { showClearSettingsDialog = false }) {
                     Text(stringResource(id = R.string.cancel))
                 }
+            }
+        )
+    }
+
+    if (showUiTypeDialog) {
+        AppSelectionDialog(
+            title = stringResource(id = R.string.ui_type),
+            options = listOf(
+                UiType.WEAR to stringResource(R.string.ui_type_wear),
+                UiType.PHONE to stringResource(R.string.ui_type_phone),
+                UiType.FRESHWEAR to stringResource(R.string.ui_type_freshwear)
+            ),
+            currentValue = uiType,
+            onDismiss = { showUiTypeDialog = false },
+            onConfirm = { type ->
+                viewModel.updateUiType(type)
+                showUiTypeDialog = false
             }
         )
     }

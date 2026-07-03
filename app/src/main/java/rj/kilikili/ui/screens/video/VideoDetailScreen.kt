@@ -83,6 +83,7 @@ import rj.kilikili.ui.dialog.DownloadDialog
 import rj.kilikili.ui.dialog.FavoriteDialog
 import rj.kilikili.ui.dialog.ReportDialog
 import rj.kilikili.ui.dialog.VideoPage
+import rj.kilikili.ui.theme.BiliPink
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.utils.MsgUtil
@@ -1010,13 +1011,13 @@ private fun ActionButton(
     modifier: Modifier = Modifier
 ) {
     val containerColor = if (isActive) {
-        MaterialTheme.colorScheme.primaryContainer
+        BiliPink.copy(alpha = 0.18f)
     } else {
         MaterialTheme.colorScheme.surfaceVariant
     }
 
     val contentColor = if (isActive) {
-        MaterialTheme.colorScheme.onPrimaryContainer
+        BiliPink
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }

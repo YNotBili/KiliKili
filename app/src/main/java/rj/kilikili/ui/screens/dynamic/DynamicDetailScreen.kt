@@ -24,6 +24,9 @@ import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import androidx.wear.compose.material3.Button
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
+import rj.kilikili.actualUiType
+import rj.kilikili.UiType
+import rj.kilikili.ui.components.freshwear.FreshwearDynamicCard
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
 import rj.kilikili.ui.viewmodel.DynamicDetailUiState
@@ -84,18 +87,32 @@ fun DynamicDetailScreen(
                                 ) {
                                     Spacer(modifier = Modifier.height(8.dp))
                                     
-                                    DynamicCard(
-                                        dynamic = state.dynamic,
-                                        onClick = {},
-                                        onUserClick = onUserClick,
-                                        onVideoClick = onVideoClick,
-                                        onImageClick = onImageClick,
-                                        onLikeClick = { dynamicId, isLiked ->
-                                            viewModel.likeDynamic(dynamicId, isLiked)
-                                        },
-                                        onDynamicClick = onDynamicClick,
-                                        showFullContent = true
-                                    )
+                                    if (actualUiType == UiType.FRESHWEAR) {
+                                        FreshwearDynamicCard(
+                                            dynamic = state.dynamic,
+                                            onClick = {},
+                                            onUserClick = onUserClick,
+                                            onVideoClick = onVideoClick,
+                                            onImageClick = onImageClick,
+                                            onLikeClick = { dynamicId, isLiked ->
+                                                viewModel.likeDynamic(dynamicId, isLiked)
+                                            },
+                                            onDynamicClick = onDynamicClick
+                                        )
+                                    } else {
+                                        DynamicCard(
+                                            dynamic = state.dynamic,
+                                            onClick = {},
+                                            onUserClick = onUserClick,
+                                            onVideoClick = onVideoClick,
+                                            onImageClick = onImageClick,
+                                            onLikeClick = { dynamicId, isLiked ->
+                                                viewModel.likeDynamic(dynamicId, isLiked)
+                                            },
+                                            onDynamicClick = onDynamicClick,
+                                            showFullContent = true
+                                        )
+                                    }
                                     
                                     Spacer(modifier = Modifier.height(16.dp))
                                 }

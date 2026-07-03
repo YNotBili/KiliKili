@@ -29,6 +29,9 @@ import rj.kilikili.ui.components.auto.AppLazyColumn
 import rj.kilikili.ui.components.auto.rememberAppLazyListState
 import rj.kilikili.ui.components.auto.AppScreenScaffold
 import rj.kilikili.R
+import rj.kilikili.actualUiType
+import rj.kilikili.UiType
+import rj.kilikili.ui.components.freshwear.FreshwearDynamicCard
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
@@ -122,18 +125,32 @@ fun DynamicHomeScreen(
                         ) {
                             items(count=dynamics.itemCount) { index ->
                                 dynamics[index]?.let { dynamic ->
-                                    DynamicCard(
-                                        dynamic = dynamic,
-                                        onClick = { onDynamicClick(dynamic) },
-                                        onUserClick = onUserClick,
-                                        onVideoClick = onVideoClick,
-                                        onImageClick = onImageClick,
-                                        onLikeClick = { dynamicId, isLiked ->
-                                            viewModel.likeDynamic(dynamicId, isLiked)
-                                        },
-                                        onDynamicClick = onDynamicClick,
-                                        onMoreClick = { moreDynamic = dynamic }
-                                    )
+                                    if (actualUiType == UiType.FRESHWEAR) {
+                                        FreshwearDynamicCard(
+                                            dynamic = dynamic,
+                                            onClick = { onDynamicClick(dynamic) },
+                                            onUserClick = onUserClick,
+                                            onVideoClick = onVideoClick,
+                                            onImageClick = onImageClick,
+                                            onLikeClick = { dynamicId, isLiked ->
+                                                viewModel.likeDynamic(dynamicId, isLiked)
+                                            },
+                                            onDynamicClick = onDynamicClick
+                                        )
+                                    } else {
+                                        DynamicCard(
+                                            dynamic = dynamic,
+                                            onClick = { onDynamicClick(dynamic) },
+                                            onUserClick = onUserClick,
+                                            onVideoClick = onVideoClick,
+                                            onImageClick = onImageClick,
+                                            onLikeClick = { dynamicId, isLiked ->
+                                                viewModel.likeDynamic(dynamicId, isLiked)
+                                            },
+                                            onDynamicClick = onDynamicClick,
+                                            onMoreClick = { moreDynamic = dynamic }
+                                        )
+                                    }
                                 }
                             }
                             

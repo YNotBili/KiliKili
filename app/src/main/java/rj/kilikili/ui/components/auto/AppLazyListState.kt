@@ -68,7 +68,7 @@ fun rememberAppLazyListState(
     initialFirstVisibleItemIndex: Int = 0,
     initialFirstVisibleItemScrollOffset: Int = 0
 ): AppLazyListState = when (actualUiType) {
-    UiType.WEAR -> rj.kilikili.ui.components.wear.WearTransformingLazyListStateAdapter(
+    UiType.WEAR, UiType.FRESHWEAR -> rj.kilikili.ui.components.wear.WearTransformingLazyListStateAdapter(
         androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState(
             initialAnchorItemIndex = initialFirstVisibleItemIndex,
             initialAnchorItemScrollOffset = initialFirstVisibleItemScrollOffset

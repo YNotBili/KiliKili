@@ -18,7 +18,7 @@ fun AppScreenScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     when (actualUiType) {
-        UiType.WEAR -> {
+        UiType.WEAR, UiType.FRESHWEAR -> {
             val wearBehavior = rj.kilikili.ui.components.wear.rememberEnterAlwaysScrollBehavior()
             val wearScrollState = scrollState?.asTransformingLazyColumnState()
                 ?: androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState()

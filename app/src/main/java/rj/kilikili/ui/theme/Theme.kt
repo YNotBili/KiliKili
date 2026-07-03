@@ -99,7 +99,7 @@ fun BiliZepamTheme(
         rememberDynamicColorScheme(seedColor = seedColor, isDark = darkTheme)
     }
 
-    val wearColorScheme = colorScheme.toWearColorScheme()
+    val wearColorScheme = colorScheme.toWearColorScheme(isDark = darkTheme)
 
     androidx.compose.material3.MaterialTheme(
         colorScheme = colorScheme
@@ -117,7 +117,17 @@ fun BiliZepamTheme(
     }
 }
 
-private fun androidx.compose.material3.ColorScheme.toWearColorScheme(): WearColorScheme {
+private fun androidx.compose.material3.ColorScheme.toWearColorScheme(
+    isDark: Boolean = false
+): WearColorScheme {
+    // 暗色模式下覆盖 surface 层次，使用纯黑背景 + 深灰容器（参考 Orbit 方案）
+    val bg = if (isDark) WearDarkSurface else background
+    val onBg = if (isDark) WearDarkOnSurface else onBackground
+    val surfContainerLow = if (isDark) WearDarkSurfaceContainerLow else surfaceVariant
+    val surfContainer = if (isDark) WearDarkSurfaceContainer else surfaceVariant
+    val surfContainerHigh = if (isDark) WearDarkSurfaceContainerHigh else surface
+    val onSurf = if (isDark) WearDarkOnSurface else onSurface
+
     return WearColorScheme(
         primary = primary,
         primaryDim = primaryContainer,
@@ -134,13 +144,13 @@ private fun androidx.compose.material3.ColorScheme.toWearColorScheme(): WearColo
         tertiaryContainer = tertiaryContainer,
         onTertiary = onTertiary,
         onTertiaryContainer = onTertiaryContainer,
-        surfaceContainerLow = surfaceVariant,
-        surfaceContainer = surfaceVariant,
-        surfaceContainerHigh = surface,
-        onSurface = onSurface,
+        surfaceContainerLow = surfContainerLow,
+        surfaceContainer = surfContainer,
+        surfaceContainerHigh = surfContainerHigh,
+        onSurface = onSurf,
         onSurfaceVariant = onSurfaceVariant,
-        background = background,
-        onBackground = onBackground,
+        background = bg,
+        onBackground = onBg,
         error = error,
         errorDim = error,
         errorContainer = errorContainer,

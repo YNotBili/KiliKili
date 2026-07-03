@@ -3,8 +3,11 @@ package rj.kilikili.ui.screens.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.systemGestureExclusion
@@ -23,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -127,7 +131,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
 
     val openMenu: () -> Unit = {
         when (uiType) {
-            UiType.WEAR -> isMenuExpanded = true
+            UiType.WEAR, UiType.FRESHWEAR -> isMenuExpanded = true
             UiType.PHONE -> scope.launch { drawerState.open() }
         }
     }
@@ -165,7 +169,7 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
     }
 
     when (actualUiType) {
-            UiType.WEAR -> {
+            UiType.WEAR, UiType.FRESHWEAR -> {
                 MainNavHost(
                     contentNavController = contentNavController,
                     openMenu = openMenu,
@@ -196,11 +200,27 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
             }
         }
 
-        if (actualUiType == UiType.WEAR) {
+        if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) {
+            // 遮罩层 — 独立淡入淡出，不随菜单滑动
             AnimatedVisibility(
                 visible = isMenuExpanded,
-                enter = slideInHorizontally { it } + fadeIn(),
-                exit = slideOutHorizontally { it } + fadeOut(),
+                enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 200)),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .clickable { isMenuExpanded = false }
+                )
+            }
+
+            // 菜单面板 — 从上方滑入
+            AnimatedVisibility(
+                visible = isMenuExpanded,
+                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
                 modifier = Modifier
                     .fillMaxSize()
                     .then(

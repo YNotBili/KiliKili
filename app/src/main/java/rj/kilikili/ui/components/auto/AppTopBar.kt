@@ -20,7 +20,7 @@ fun AppTopBar(
     onMenuClick: (() -> Unit)? = null
 ) {
     when (actualUiType) {
-        UiType.WEAR -> wearScrollAwareTopBar(
+        UiType.WEAR, UiType.FRESHWEAR -> wearScrollAwareTopBar(
             title = title,
             modifier = modifier,
             showBackIcon = showBackIcon,

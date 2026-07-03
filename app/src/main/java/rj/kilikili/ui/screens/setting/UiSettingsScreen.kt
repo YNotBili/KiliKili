@@ -53,7 +53,6 @@ fun UiSettingsScreen(
     var showDensityDialog by remember { mutableStateOf(false) }
     var showNightModeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
-    var showUiTypeDialog by remember { mutableStateOf(false) }
 
     val currentSettings = settings ?: return
 
@@ -129,17 +128,6 @@ fun UiSettingsScreen(
                     )
                 }
 
-                item {
-                    SettingsItem(
-                        title = stringResource(id = R.string.ui_type),
-                        summary = if (rj.kilikili.uiType == rj.kilikili.UiType.PHONE) {
-                            stringResource(R.string.ui_type_phone)
-                        } else {
-                            stringResource(R.string.ui_type_wear)
-                        },
-                        onClick = { showUiTypeDialog = true }
-                    )
-                }
 
                 item {
                     SwitchSettingsItem(
@@ -265,21 +253,7 @@ fun UiSettingsScreen(
         )
     }
 
-    if (showUiTypeDialog) {
-        AppSelectionDialog(
-            title = stringResource(id = R.string.ui_type),
-            options = listOf(
-                rj.kilikili.UiType.WEAR to stringResource(R.string.ui_type_wear),
-                rj.kilikili.UiType.PHONE to stringResource(R.string.ui_type_phone)
-            ),
-            currentValue = rj.kilikili.uiType,
-            onDismiss = { showUiTypeDialog = false },
-            onConfirm = { type ->
-                viewModel.updateUiType(type)
-                showUiTypeDialog = false
-            }
-        )
-    }
+
 }
 
 @Composable

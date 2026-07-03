@@ -16,7 +16,7 @@ fun WearTopBar(
     onBackClick: (() -> Unit)? = null,
     onMenuClick: (() -> Unit)? = null
 ) = when (actualUiType) {
-    UiType.WEAR -> wearWearTopBar(
+    UiType.WEAR, UiType.FRESHWEAR -> wearWearTopBar(
         title = title,
         showBackIcon = showBackIcon,
         showMenuIcon = showMenuIcon,

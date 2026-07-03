@@ -373,6 +373,7 @@
     <string name="ui_type">界面模式</string>
     <string name="ui_type_wear">手表</string>
     <string name="ui_type_phone">手机</string>
+    <string name="ui_type_freshwear">Freshwear</string>
     <string name="ui_type_desc">手表=Wear OS 圆形/方形屏幕布局, 手机=Material3 列表/顶部应用栏</string>
 
     <array name="tutorial_space">

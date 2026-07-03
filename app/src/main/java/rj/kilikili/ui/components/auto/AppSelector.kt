@@ -42,7 +42,7 @@ fun <T> AppSelector(
     modifier: Modifier = Modifier
 ) {
     when (actualUiType) {
-        UiType.WEAR -> WearSelector(options, selected, onSelected, label, modifier)
+        UiType.WEAR, UiType.FRESHWEAR -> WearSelector(options, selected, onSelected, label, modifier)
         UiType.PHONE -> PhoneSelector(options, selected, onSelected, label, modifier)
     }
 }

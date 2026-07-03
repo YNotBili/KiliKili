@@ -15,6 +15,6 @@ fun <T> AppSelectionDialog(
     onDismiss: () -> Unit,
     onConfirm: (T) -> Unit
 ) = when (actualUiType) {
-    UiType.WEAR -> wearSelectionDialog(title, options, currentValue, onDismiss, onConfirm)
+    UiType.WEAR, UiType.FRESHWEAR -> wearSelectionDialog(title, options, currentValue, onDismiss, onConfirm)
     UiType.PHONE -> phoneSelectionDialog(title, options, currentValue, onDismiss, onConfirm)
 }

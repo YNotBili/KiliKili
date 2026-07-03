@@ -35,6 +35,22 @@ class SearchHistoryViewModel @Inject constructor(
         mid = value
     }
 
+    /**
+     * Deletes a single history entry by [kid] and removes it from the current results.
+     */
+    fun removeEntry(kid: Long) {
+        viewModelScope.launch {
+            repository.deleteHistoryEntry(kid).fold(
+                onSuccess = {
+                    _uiState.value = _uiState.value.copy(
+                        results = _uiState.value.results.filter { it.kid != kid }
+                    )
+                },
+                onFailure = { /* silently ignore – UI will keep the item */ }
+            )
+        }
+    }
+
     fun setKeyword(keyword: String) {
         _uiState.value = _uiState.value.copy(keyword = keyword)
         searchJob?.cancel()

@@ -29,6 +29,9 @@ import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.dialog.SortModeDialog
 import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
+import rj.kilikili.UiType
+import rj.kilikili.actualUiType
+import rj.kilikili.ui.components.freshwear.FreshwearCommentCardWithLikeState
 import rj.kilikili.utils.ArticleRedirectUtil
 import rj.kilikili.utils.MsgUtil
 import com.huanli233.biliwebapi.bean.reply.Reply
@@ -234,30 +237,53 @@ fun CommentScreen(
                 if (reply != null) {
                     // 判断是否为置顶评论（通过检查是否在置顶评论列表中）
                     val isTopReply = viewModel.isTopReply(reply.replyId)
+                    val isLiked = uiState.likedReplies.contains(reply.replyId) || (reply.actionState == 1)
+                    val likeClickHandler: (Reply, Boolean) -> Unit = { replyItem, liked ->
+                        viewModel.likeReply(replyItem.replyId, liked)
+                    }
 
-                    CommentItemWithLikeState(
-                        reply = reply,
-                        isLiked = uiState.likedReplies.contains(reply.replyId) || (reply.actionState == 1),
-                        onLikeClick = { replyItem, isLiked ->
-                            viewModel.likeReply(replyItem.replyId, isLiked)
-                        },
-                        isRound = isRound,
-                        isTopReply = isTopReply,
-                        onCommentClick = { clickedReply ->
-                            onCommentDetailClick(clickedReply.replyId)
-                        },
-                        onReplyClick = { replyToReply ->
-                            onWriteReplyClick(
-                                replyToReply.oid,
-                                replyToReply.replyId,
-                                replyToReply.replyId,
-                                replyToReply.member.name
-                            )
-                        },
-                        onUserClick = onUserClick,
-                        onOpusClick = onOpusClick,
-                        uiState = uiState
-                    )
+                    when (actualUiType) {
+                        UiType.FRESHWEAR -> FreshwearCommentCardWithLikeState(
+                            reply = reply,
+                            isLiked = isLiked,
+                            onLikeClick = likeClickHandler,
+                            onCommentClick = { clickedReply ->
+                                onCommentDetailClick(clickedReply.replyId)
+                            },
+                            onReplyClick = { replyToReply ->
+                                onWriteReplyClick(
+                                    replyToReply.oid,
+                                    replyToReply.replyId,
+                                    replyToReply.replyId,
+                                    replyToReply.member.name
+                                )
+                            },
+                            onUserClick = onUserClick,
+                            onOpusClick = onOpusClick,
+                            uiState = uiState
+                        )
+                        UiType.WEAR, UiType.PHONE -> CommentItemWithLikeState(
+                            reply = reply,
+                            isLiked = isLiked,
+                            onLikeClick = likeClickHandler,
+                            isRound = isRound,
+                            isTopReply = isTopReply,
+                            onCommentClick = { clickedReply ->
+                                onCommentDetailClick(clickedReply.replyId)
+                            },
+                            onReplyClick = { replyToReply ->
+                                onWriteReplyClick(
+                                    replyToReply.oid,
+                                    replyToReply.replyId,
+                                    replyToReply.replyId,
+                                    replyToReply.member.name
+                                )
+                            },
+                            onUserClick = onUserClick,
+                            onOpusClick = onOpusClick,
+                            uiState = uiState
+                        )
+                    }
                 }
             }
 

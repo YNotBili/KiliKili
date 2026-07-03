@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -57,6 +59,11 @@ import com.huanli233.biliwebapi.bean.video.VideoInfo
 import kotlinx.coroutines.launch
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import rj.kilikili.ui.components.auto.AppLazyListState
+import rj.kilikili.UiType
+import rj.kilikili.actualUiType
+import rj.kilikili.ui.components.freshwear.FreshwearSwipeToReveal
+import rj.kilikili.ui.components.freshwear.ImmersiveVideoCard
+import androidx.wear.compose.material3.rememberRevealState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,12 +215,48 @@ private fun ContentView(
             ) { index ->
                 val video = videos[index]
                 if (video != null && video.bvid.isNotEmpty()) {
-                    VideoCard(
-                        index = index,
-                        listState = scrollState,
-                        videoInfo = video,
-                        onClick = { onVideoClick(video) }
-                    )
+                    when (actualUiType) {
+                        UiType.FRESHWEAR -> {
+                            val revealState = key(video.bvid) { rememberRevealState() }
+                            val itemScope = rememberCoroutineScope()
+                            FreshwearSwipeToReveal(
+                                revealState = revealState,
+                                autoClose = true,
+                                primaryAction = {
+                                    PrimaryActionButton(
+                                        onClick = {
+                                            itemScope.launch {
+                                                revealState.animateTo(
+                                                    androidx.wear.compose.material3.RevealValue.Covered
+                                                )
+                                            }
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.ThumbDown,
+                                                contentDescription = "不感兴趣"
+                                            )
+                                        },
+                                        text = { Text("不感兴趣") }
+                                    )
+                                },
+                                onSwipePrimaryAction = { /* no-op for now */ }
+                            ) {
+                                ImmersiveVideoCard(
+                                    index = index,
+                                    listState = scrollState,
+                                    videoInfo = video,
+                                    onClick = { onVideoClick(video) }
+                                )
+                            }
+                        }
+                        UiType.WEAR, UiType.PHONE -> VideoCard(
+                            index = index,
+                            listState = scrollState,
+                            videoInfo = video,
+                            onClick = { onVideoClick(video) }
+                        )
+                    }
                 }
             }
 

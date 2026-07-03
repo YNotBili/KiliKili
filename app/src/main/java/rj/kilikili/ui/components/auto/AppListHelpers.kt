@@ -19,13 +19,13 @@ import rj.kilikili.actualUiType
 
 @Composable
 fun appVerticalOptContentPadding(): Dp = when (actualUiType) {
-    UiType.WEAR -> PaddingDefaults.verticalOptContentPadding()
+    UiType.WEAR, UiType.FRESHWEAR -> PaddingDefaults.verticalOptContentPadding()
     UiType.PHONE -> 8.dp
 }
 
 @Composable
 fun appVerticalContentPadding(): PaddingValues = when (actualUiType) {
-    UiType.WEAR -> {
+    UiType.WEAR, UiType.FRESHWEAR -> {
         val dp = PaddingDefaults.verticalContentPadding()
         PaddingValues(horizontal = 0.dp, vertical = dp)
     }
@@ -34,7 +34,7 @@ fun appVerticalContentPadding(): PaddingValues = when (actualUiType) {
 
 @Composable
 fun appHorizontalContentPadding(enabled: Boolean = true): PaddingValues = when (actualUiType) {
-    UiType.WEAR -> {
+    UiType.WEAR, UiType.FRESHWEAR -> {
         val dp = PaddingDefaults.horizontalContentPadding()
         PaddingValues(horizontal = if (enabled) dp else 0.dp, vertical = 0.dp)
     }
@@ -42,15 +42,15 @@ fun appHorizontalContentPadding(enabled: Boolean = true): PaddingValues = when (
 }
 
 @Composable
-fun appListTopSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR) 24.dp else 16.dp))
+fun appListTopSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 24.dp else 16.dp))
 
 @Composable
-fun appListBottomSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR) 20.dp else 16.dp))
+fun appListBottomSpacer() = Spacer(Modifier.height(if (actualUiType == UiType.WEAR || actualUiType == UiType.FRESHWEAR) 20.dp else 16.dp))
 
 @Composable
 fun appListHeader(title: String, modifier: Modifier = Modifier) {
     when (actualUiType) {
-        UiType.WEAR -> {
+        UiType.WEAR, UiType.FRESHWEAR -> {
             ListHeader(modifier = modifier.fillMaxWidth()) {
                 Text(text = title)
             }

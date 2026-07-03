@@ -13,7 +13,7 @@ import rj.kilikili.ui.navigation.wear.wearComposable
 /** 统一 remember — 返回 [NavHostController]。 */
 @Composable
 fun rememberAppNavController(): NavHostController = when (uiType) {
-    UiType.WEAR -> androidx.wear.compose.navigation.rememberSwipeDismissableNavController()
+    UiType.WEAR, UiType.FRESHWEAR -> androidx.wear.compose.navigation.rememberSwipeDismissableNavController()
     UiType.PHONE -> androidx.navigation.compose.rememberNavController()
 }
 
@@ -29,7 +29,7 @@ fun AppNavHostRoute(
     builder: NavGraphBuilder.(NavHostController) -> Unit
 ) {
     when (uiType) {
-        UiType.WEAR -> WearNavHost(
+        UiType.WEAR, UiType.FRESHWEAR -> WearNavHost(
             navController = navController,
             startDestination = startDestination,
             route = route,
@@ -52,7 +52,7 @@ fun NavGraphBuilder.appComposable(
     content: @Composable (androidx.navigation.NavBackStackEntry) -> Unit
 ) {
     when (uiType) {
-        UiType.WEAR -> wearComposable(
+        UiType.WEAR, UiType.FRESHWEAR -> wearComposable(
             route = route,
             arguments = arguments,
             deepLinks = deepLinks,
