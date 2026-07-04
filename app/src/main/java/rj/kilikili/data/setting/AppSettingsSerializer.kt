@@ -66,7 +66,8 @@ object AppSettingsSerializer : Serializer<AppSettings> {
             useSoftwareDecoder = false
             autoPlay = true
             defaultQuality = 64
-            useTextureView = false
+            useTextureView = true
+            enableOneFingerZoom = true
             defaultDanmakuEnabled = true
             defaultSpeed = 1.0f
             rememberDanmakuEnabled = false
@@ -91,7 +92,21 @@ object AppSettingsSerializer : Serializer<AppSettings> {
 
     override suspend fun readFrom(input: InputStream): AppSettings {
         try {
-            return AppSettings.parseFrom(input)
+            val settings = AppSettings.parseFrom(input)
+            // 迁移：旧版默认 SurfaceView(false)，新版默认 TextureView(true)
+            // 迁移：旧版单指缩放默认关闭(false)，新版默认开启(true)
+            // 对于从未主动设置过这两项的老用户，proto3 存储的值为 false，
+            // 此处将其迁移为新默认值 true
+            return if (!settings.playerSettings.useTextureView || !settings.playerSettings.enableOneFingerZoom) {
+                settings.edit {
+                    playerSettings = playerSettings.edit {
+                        if (!useTextureView) useTextureView = true
+                        if (!enableOneFingerZoom) enableOneFingerZoom = true
+                    }
+                }
+            } else {
+                settings
+            }
         } catch (exception: InvalidProtocolBufferException) {
             throw CorruptionException("Cannot read proto.", exception)
         }

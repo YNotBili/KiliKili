@@ -107,6 +107,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.wear.compose.foundation.isRoundDevice
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.layout.onSizeChanged
@@ -131,6 +134,7 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser
 import master.flame.danmaku.ui.widget.DanmakuView
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.min
@@ -184,6 +188,8 @@ fun PlayerScreen(
     var videoContainerSizePx by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
 
     var pendingDownload by remember { mutableStateOf(false) }
+    var wasPlayingBeforeStop by remember { mutableStateOf(false) }
+    var isLifecycleActive by remember { mutableStateOf(true) }
 
     val storagePermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -356,15 +362,16 @@ fun PlayerScreen(
 
     LaunchedEffect(viewModel.ijkPlayer) {
         while (true) {
-            currentPosition = viewModel.ijkPlayer.currentPosition
-            duration = viewModel.ijkPlayer.duration.coerceAtLeast(0L)
+            if (isLifecycleActive) {
+                currentPosition = viewModel.ijkPlayer.currentPosition
+                duration = viewModel.ijkPlayer.duration.coerceAtLeast(0L)
 
-            val actuallyPlaying = viewModel.ijkPlayer.isPlaying
-            if (actuallyPlaying != isPlaying) {
-                android.util.Log.d("PlayerScreen", "Syncing play state: $actuallyPlaying")
-                isPlaying = actuallyPlaying
+                val actuallyPlaying = viewModel.ijkPlayer.isPlaying
+                if (actuallyPlaying != isPlaying) {
+                    android.util.Log.d("PlayerScreen", "Syncing play state: $actuallyPlaying")
+                    isPlaying = actuallyPlaying
+                }
             }
-
             delay(250)
         }
     }
@@ -380,6 +387,31 @@ fun PlayerScreen(
         onDispose {
             viewModel.reportFinalProgress(viewModel.ijkPlayer.currentPosition)
         }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    isLifecycleActive = false
+                    wasPlayingBeforeStop = viewModel.ijkPlayer.isPlaying
+                    if (viewModel.ijkPlayer.isPlaying) {
+                        viewModel.ijkPlayer.pause()
+                    }
+                    viewModel.ijkPlayer.setDisplay(null)  // SurfaceView
+                    viewModel.ijkPlayer.setSurface(null)   // TextureView
+                }
+                Lifecycle.Event.ON_START -> {
+                    isLifecycleActive = true
+                    // Surface 会通过 surfaceCreated / onSurfaceTextureAvailable callback 重新绑定
+                    // 播放恢复在这些 callback 中处理
+                }
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     AppScreenScaffold {
@@ -653,6 +685,10 @@ fun PlayerScreen(
                                                         "TextureView surface available: ${width}x${height}"
                                                     )
                                                     viewModel.ijkPlayer.setSurface(Surface(surface))
+                                                    if (wasPlayingBeforeStop) {
+                                                        viewModel.ijkPlayer.start()
+                                                        wasPlayingBeforeStop = false
+                                                    }
                                                 }
 
                                                 override fun onSurfaceTextureSizeChanged(
@@ -672,6 +708,7 @@ fun PlayerScreen(
                                                         "PlayerScreen",
                                                         "TextureView surface destroyed"
                                                     )
+                                                    viewModel.ijkPlayer.setSurface(null)
                                                     return false
                                                 }
 
@@ -824,35 +861,37 @@ fun PlayerScreen(
                         AndroidView(
                             factory = { ctx ->
                                 android.util.Log.d("PlayerScreen", "Creating SurfaceView")
-                                SurfaceView(ctx)
-                            },
-                            update = { surfaceView ->
-                                surfaceView.holder.addCallback(object :
-                                    android.view.SurfaceHolder.Callback {
-                                    override fun surfaceCreated(holder: android.view.SurfaceHolder) {
-                                        android.util.Log.d("PlayerScreen", "SurfaceView created")
-                                        viewModel.ijkPlayer.setDisplay(holder)
+                                SurfaceView(ctx).apply {
+                                    holder.addCallback(object :
+                                        android.view.SurfaceHolder.Callback {
+                                        override fun surfaceCreated(holder: android.view.SurfaceHolder) {
+                                            android.util.Log.d("PlayerScreen", "SurfaceView created")
+                                            viewModel.ijkPlayer.setDisplay(holder)
+                                            if (wasPlayingBeforeStop) {
+                                                viewModel.ijkPlayer.start()
+                                                wasPlayingBeforeStop = false
+                                            }
+                                        }
 
-                                        // 自动播放逻辑已在PlayerViewModel的onPrepared中处理
-                                    }
+                                        override fun surfaceChanged(
+                                            holder: android.view.SurfaceHolder,
+                                            format: Int,
+                                            width: Int,
+                                            height: Int
+                                        ) {
+                                            android.util.Log.d(
+                                                "PlayerScreen",
+                                                "SurfaceView changed: ${width}x${height}"
+                                            )
+                                            viewModel.ijkPlayer.setDisplay(holder)
+                                        }
 
-                                    override fun surfaceChanged(
-                                        holder: android.view.SurfaceHolder,
-                                        format: Int,
-                                        width: Int,
-                                        height: Int
-                                    ) {
-                                        android.util.Log.d(
-                                            "PlayerScreen",
-                                            "SurfaceView changed: ${width}x${height}"
-                                        )
-                                        viewModel.ijkPlayer.setDisplay(holder)
-                                    }
-
-                                    override fun surfaceDestroyed(holder: android.view.SurfaceHolder) {
-                                        android.util.Log.d("PlayerScreen", "SurfaceView destroyed")
-                                    }
-                                })
+                                        override fun surfaceDestroyed(holder: android.view.SurfaceHolder) {
+                                            android.util.Log.d("PlayerScreen", "SurfaceView destroyed")
+                                            viewModel.ijkPlayer.setDisplay(null)
+                                        }
+                                    })
+                                }
                             },
                             modifier = Modifier.fillMaxSize()
                         )
@@ -1326,6 +1365,8 @@ fun PlayerControls(
             if (isRound) {
                 var sliderPosition by remember { mutableFloatStateOf(0f) }
                 var isSeeking by remember { mutableStateOf(false) }
+                var lastSeekTime by remember { mutableLongStateOf(0L) }
+                var lastSeekPosition by remember { mutableLongStateOf(0L) }
 
                 LaunchedEffect(currentPosition) {
                     if (!isSeeking) sliderPosition = currentPosition.toFloat()
@@ -1335,12 +1376,20 @@ fun PlayerControls(
                     ArcSeekbar(
                         value = sliderPosition,
                         valueRange = 0f..duration.toFloat().coerceAtLeast(1f),
-                        onValueChange = {
+                        onValueChange = { newPosition ->
                             isSeeking = true
-                            sliderPosition = it
+                            sliderPosition = newPosition
+                            // 节流 seek：每 500ms 或距离变化 > 2000ms 时 seek
+                            val now = System.currentTimeMillis()
+                            val positionMs = newPosition.toLong()
+                            if (now - lastSeekTime > 500 || abs(positionMs - lastSeekPosition) > 2000) {
+                                onSeek(positionMs)
+                                lastSeekTime = now
+                                lastSeekPosition = positionMs
+                            }
                         },
                         onValueChangeFinished = {
-                            onSeek(sliderPosition.toLong())
+                            onSeek(sliderPosition.toLong())  // 最终精确 seek
                             isSeeking = false
                         },
                         onDismissRequest = onDismissRequest,
@@ -1497,6 +1546,8 @@ fun PlayerControls(
                 ) {
                     var sliderPosition by remember { mutableFloatStateOf(0f) }
                     var isSeeking by remember { mutableStateOf(false) }
+                    var lastSeekTime by remember { mutableLongStateOf(0L) }
+                    var lastSeekPosition by remember { mutableLongStateOf(0L) }
 
                     LaunchedEffect(currentPosition) {
                         if (!isSeeking) sliderPosition = currentPosition.toFloat()
@@ -1504,12 +1555,20 @@ fun PlayerControls(
 
                     Slider(
                         value = sliderPosition,
-                        onValueChange = {
+                        onValueChange = { newPosition ->
                             isSeeking = true
-                            sliderPosition = it
+                            sliderPosition = newPosition
+                            // 节流 seek：每 500ms 或距离变化 > 2000ms 时 seek
+                            val now = System.currentTimeMillis()
+                            val positionMs = newPosition.toLong()
+                            if (now - lastSeekTime > 500 || abs(positionMs - lastSeekPosition) > 2000) {
+                                onSeek(positionMs)
+                                lastSeekTime = now
+                                lastSeekPosition = positionMs
+                            }
                         },
                         onValueChangeFinished = {
-                            onSeek(sliderPosition.toLong())
+                            onSeek(sliderPosition.toLong())  // 最终精确 seek
                             isSeeking = false
                         },
                         valueRange = 0f..duration.toFloat().coerceAtLeast(1f),

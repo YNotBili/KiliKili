@@ -73,7 +73,7 @@ fun ErrorDialog(
 
                 // 错误消息
                 Text(
-                    text = exception.message,
+                    text = exception.message ?: "",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Center

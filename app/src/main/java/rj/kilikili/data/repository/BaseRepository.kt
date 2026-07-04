@@ -15,8 +15,8 @@ import com.huanli233.biliwebapi.exception.ErrorCodeDefinitions
  */
 abstract class BaseRepository {
 
-    companion object {
-        private const val TAG = "Repository"
+    protected companion object {
+        const val TAG = "Repository"
     }
 
     /**

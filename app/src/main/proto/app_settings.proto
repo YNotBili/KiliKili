@@ -59,8 +59,8 @@ message PlayerSettings {
   bool use_software_decoder = 1;
   bool auto_play = 2;
   int32 default_quality = 3;
-  bool use_texture_view = 4;
-  bool enable_one_finger_zoom = 5;
+  bool use_texture_view = 4; // 默认 true (TextureView)，旧版默认 false (SurfaceView)
+  bool enable_one_finger_zoom = 5; // 默认 true，旧版默认 false
   bool default_danmaku_enabled = 6;
   float default_speed = 7;
   bool remember_danmaku_enabled = 8;

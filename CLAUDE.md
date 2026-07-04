@@ -114,3 +114,34 @@ Each feature follows this convention:
 - Proto DataStore for settings serialization
 - `autoResConfig` plugin for locale generation
 - Lint baseline at `app/lint-baseline.xml`
+
+## Testing
+
+- Only JVM unit tests exist — `app/src/test/` and `BiliWebApi/src/test/`. No `androidTest/` sources.
+- `./gradlew test` runs **all** module test tasks. Be specific to keep CI signal high:
+  - Single test class: `./gradlew :app:testDebugUnitTest --tests "rj.kilikili.utils.encode.MD5UtilTest"`
+  - Single test method: `./gradlew :app:testDebugUnitTest --tests "rj.kilikili.utils.encode.MD5UtilTest.someMethod"`
+  - All tests in a module: `./gradlew :BiliWebApi:test`
+- Lint baseline lives at `app/lint-baseline.xml`; Android lint output goes to `app/build/reports/lint-results-*.html`. The Gradle task is plain `./gradlew lint` — there is no ktlint/spotless configured.
+
+## Files agents must know about
+
+- `version.properties` — versionName/versionCode source. Auto-suffixed with git commit count + hash at build time.
+- `local.properties` — holds `MAPS_KEY` and signing key aliases/passwords. Don't print or commit changes.
+- `key.jks` — release signing key, **checked into the repo**. Treat as compromised-key territory: do not rotate, do not re-export, do not print the password in logs.
+- `app/proguard-rules.pro` — R8 keep rules (including for `BiliWebApi` DTOs and Hilt-generated code).
+- `gradle.properties` — ZGC + parallel + R8 incremental + R8 maxWorkers=8 already on. `org.gradle.daemon=false` is intentional.
+
+## Working tree gotchas
+
+- The current branch is `rewrite` (per CLAUDE.md, the project is being rewritten on this branch with Compose + Material3). Do not assume `main` semantics; the module table and screen list reflect the rewrite state.
+- `Orbit` and `PiliPlus` are **symlinks to external directories** (`~/Orbit`, `~/PiliPlus`). TODO.md uses them as comparison references. **Do not edit files reached through these symlinks** — changes there belong to those other repos, not this one.
+- `app/src/main/.../api/BilibiliApi.kt` and `data/repository/BaseRepository.kt` are commonly modified; check `git status` before assuming the tree is clean.
+- API result extensions referenced in the Screen Pattern section live at `app/src/main/java/rj/kilikili/data/repository/BaseRepository.kt` (`apiResultNonNull`, `apiResult`). `BilibiliApiException` is in `api/`.
+- `BiliWebApi/` is a library module vendored in-tree. Treat it as a dependency surface — bump it in lockstep rather than reaching across modules with workarounds.
+
+## Don't (this repo's specific landmines)
+
+- Don't add `androidTest/` sources or instrumentation-only dependencies without confirming a target device — the project targets Wear OS, and CI has no device farm configured.
+- Don't run `./gradlew --release` style flags; use the explicit `assembleDebug` / `assembleRelease` tasks to keep signing config predictable.
+- Don't commit `local.properties` changes that print secrets to build logs.

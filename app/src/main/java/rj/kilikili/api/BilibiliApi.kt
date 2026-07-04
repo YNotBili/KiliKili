@@ -195,7 +195,7 @@ object WbiDataManager : com.huanli233.biliwebapi.httplib.WbiDataManager {
 fun <T> ApiResponse<T>?.toResult(): Result<T?> {
     return if (this?.code == 0) {
         Result.success(data)
-    } else Result.failure(BilibiliApiException(this?.code ?: Int.MIN_VALUE, "${this?.code} ${this?.message}"))
+    } else Result.failure(BilibiliApiException.fromApiResponse(this?.code, this?.message))
 }
 
 fun <T> Result<ApiResponse<T>>.apiResult(): Result<T?> {
@@ -213,10 +213,7 @@ fun <T> ApiResponse<T>?.toResultNonNull(): Result<T> {
     return if (this?.code == 0 && data != null) {
         Result.success(data)
     } else {
-        val code = this?.code ?: Int.MIN_VALUE
-        val message = if (code == Int.MIN_VALUE) "未知错误"
-                       else rj.kilikili.utils.encode.ErrorMessages.resolve(code)
-        Result.failure(BilibiliApiException(code, message))
+        Result.failure(BilibiliApiException.fromApiResponse(this?.code, this?.message))
     }
 }
 
@@ -267,9 +264,11 @@ class BilibiliApiException(
     val code: Int,
     message: String,
     val errorType: ErrorType = ErrorType.fromCode(code),
-    val recoverySuggestion: String? = null,
+    recoverySuggestion: String? = null,
     cause: Throwable? = null
 ) : Exception(message, cause) {
+
+    private val _recoverySuggestion: String? = recoverySuggestion
 
     /**
      * 错误类型枚举
@@ -333,7 +332,7 @@ class BilibiliApiException(
      * 获取恢复建议
      */
     fun getRecoverySuggestion(): String {
-        return recoverySuggestion ?: com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(code)
+        return _recoverySuggestion ?: com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(code)
     }
 
     /**
@@ -344,7 +343,7 @@ class BilibiliApiException(
         return if (suggestion.isNotEmpty()) {
             "$message\n建议：$suggestion"
         } else {
-            message
+            message ?: "未知错误"
         }
     }
 

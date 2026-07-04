@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -12,7 +11,6 @@ import androidx.wear.compose.foundation.pager.HorizontalPager
 import androidx.wear.compose.foundation.pager.PagerState
 import androidx.wear.compose.foundation.pager.rememberPagerState
 import androidx.wear.compose.material3.HorizontalPageIndicator
-import kotlinx.coroutines.launch
 
 /**
  * WearPager - 封装 HorizontalPager 和 HorizontalPageIndicator 的通用组件
@@ -34,8 +32,6 @@ fun WearPager(
     indicatorPosition: IndicatorPosition = IndicatorPosition.Bottom,
     content: @Composable (page: Int) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     Box(modifier = modifier.fillMaxSize()) {
         // HorizontalPager 内容
         HorizontalPager(
@@ -53,12 +49,7 @@ fun WearPager(
                     IndicatorPosition.Bottom -> Alignment.BottomCenter
                     IndicatorPosition.Top -> Alignment.TopCenter
                 })
-                .padding(vertical = 8.dp),
-            onPageClick = { targetPage ->
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(targetPage)
-                }
-            }
+                .padding(vertical = 8.dp)
         )
     }
 }

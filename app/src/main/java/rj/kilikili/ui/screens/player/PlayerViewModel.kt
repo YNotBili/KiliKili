@@ -1,6 +1,7 @@
 package rj.kilikili.ui.screens.player
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,6 +70,9 @@ class PlayerViewModel @Inject constructor(
     private val currentPlayTag = AtomicInteger(0)
     private val preparationCancelled = AtomicBoolean(false)
 
+    /** 每次 seek 完成时更新，供 UI 观察以触发刷新 */
+    val seekCompletedPosition = mutableStateOf(0L)
+
     val ijkPlayer: IjkMediaPlayer = IjkMediaPlayer().apply {
         Log.d("PlayerViewModel", "Initializing IjkMediaPlayer")
         
@@ -83,7 +87,7 @@ class PlayerViewModel @Inject constructor(
         setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "safe", 0)
         
         // 播放器配置
-        setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1)
+        setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 0)
         setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "max_cached_duration", 3000)
         setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "infbuf", 1)
         setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0)
@@ -171,6 +175,11 @@ class PlayerViewModel @Inject constructor(
                 }
             }
             false
+        }
+
+        setOnSeekCompleteListener {
+            seekCompletedPosition.value = ijkPlayer.currentPosition
+            Log.d("PlayerViewModel", "Seek complete at ${ijkPlayer.currentPosition}ms")
         }
     }
 

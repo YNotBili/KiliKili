@@ -9,8 +9,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import rj.kilikili.data.proto.NightMode
 import rj.kilikili.data.setting.LocalData
@@ -43,14 +41,6 @@ fun BiliZepamTheme(
 
     val wearColorScheme = colorScheme.toWearColorScheme(isDark = darkTheme)
 
-    // 检测屏幕 shape（基于 LocalConfiguration.current.isScreenRound）
-    val configuration = LocalConfiguration.current
-    val screenShape = if (configuration.isScreenRound) {
-        ScreenShape.ROUND
-    } else {
-        ScreenShape.SQUARE
-    }
-
     // Phone 端使用官方 Material3 Expressive 主题
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     MaterialExpressiveTheme(
@@ -61,7 +51,6 @@ fun BiliZepamTheme(
             content = {
                 CompositionLocalProvider(
                     LocalContentColor provides colorScheme.onSurface,
-                    LocalScreenShape provides screenShape
                 ) {
                     content()
                 }
