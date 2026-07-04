@@ -84,8 +84,8 @@ import rj.kilikili.ui.dialog.FavoriteDialog
 import rj.kilikili.ui.dialog.ReportDialog
 import rj.kilikili.ui.dialog.VideoPage
 import rj.kilikili.ui.theme.BiliPink
-import rj.kilikili.ui.screens.recommend.LoadingState
-import rj.kilikili.ui.screens.recommend.LoadingView
+import rj.kilikili.ui.objects.Loading
+import rj.kilikili.ui.objects.LoadingState
 import rj.kilikili.utils.MsgUtil
 import rj.kilikili.utils.extensions.formatNumber
 import rj.kilikili.utils.extensions.formatToDate
@@ -105,8 +105,7 @@ import androidx.wear.compose.material3.TimeText
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.ui.components.auto.appTopBar
 import rj.kilikili.ui.screens.comment.CommentScreen
-import com.tbuonomo.viewpagerdotsindicator.compose.model.DotGraphic
-import com.tbuonomo.viewpagerdotsindicator.compose.type.WormIndicatorType
+import rj.kilikili.ui.objects.WearPager
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -216,16 +215,16 @@ fun VideoDetailScreen(
             Column(modifier = Modifier.fillMaxSize()) {
                 when {
                     uiState.isLoading -> {
-                        LoadingView(
-                            state = LoadingState.LOADING,
+                        Loading(
+                            state = LoadingState.Loading,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
                         )
                     }
                     uiState.error != null -> {
-                        LoadingView(
-                            state = LoadingState.ERROR,
+                        Loading(
+                            state = LoadingState.Error,
                             errorMessage = uiState.error,
                             onRetry = { viewModel.fetchData() },
                             modifier = Modifier
@@ -234,99 +233,78 @@ fun VideoDetailScreen(
                         )
                     }
                     uiState.videoInfo != null -> {
-                        Box(modifier = Modifier.weight(1f)) {
-                            androidx.wear.compose.foundation.pager.HorizontalPager(
-                                state = pagerState,
-                                modifier = Modifier.fillMaxSize()
-                            ) { page ->
-                                when (page) {
-                                    0 -> VideoDetailContent(
-                                        uiState = uiState,
-                                        scrollState = videoDetailScrollState,
-                                        padding = paddingValues,
-                                        onLikeClick = { viewModel.like() },
-                                        onCoinClick = { showCoinDialog = true },
-                                        onFavoriteClick = {
-                                            viewModel.loadFavoriteFolders()
-                                            showFavoriteDialog = true
-                                        },
-                                        onWatchLaterClick = { viewModel.addToWatchLater() },
-                                        onDownloadClick = { showDownloadDialog = true },
-                                        onShareClick = { },
-                                        onMoreClick = { showVideoMoreDialog = true },
-                                        onPlayClick = {
-                                            uiState.videoInfo?.let { video ->
-                                                navController.navigate("player/${video.aid}/${video.cid}")
-                                            }
-                                        },
-                                        onCoverClick = {
-                                            uiState.videoInfo?.let { video ->
-                                                val encodedUrl = java.net.URLEncoder.encode(video.pic, "UTF-8")
-                                                navController.navigate("image/$encodedUrl/0")
-                                            }
-                                        },
-                                        onUploaderClick = { mid ->
-                                            navController.navigate("user/$mid")
-                                        },
-                                        onCollectionClick = { seasonId ->
-                                            val videoInfo = uiState.videoInfo
-                                            if (videoInfo != null && videoInfo.ugcSeason != null) {
-                                                val season = videoInfo.ugcSeason
-                                                val encodedName = java.net.URLEncoder.encode(season?.title.toString(), "UTF-8")
-                                                navController.navigate("collection/${videoInfo.owner.mid}/$seasonId/$encodedName")
-                                            }
-                                        },
-                                        onTagClick = { }
-                                    )
-                                    1 -> CommentScreen(
-                                        aid = uiState.videoInfo?.aid ?: 0L,
-                                        scrollState = commentScrollState,
-                                        paddingValues = paddingValues,
-                                        onCommentDetailClick = { replyId ->
-                                            val oid = uiState.videoInfo?.aid ?: 0L
-                                            navController.navigate("comment_detail/$replyId?oid=$oid&type=1")
-                                        },
-                                        onWriteReplyClick = { oid, rpid, parent, parentSender ->
-                                            navController.navigate("write_reply/$oid/$rpid/$parent?parentSender=${parentSender ?: ""}")
-                                        },
-                                        onUserClick = { userId ->
-                                            navController.navigate("user/$userId")
-                                        },
-                                        onOpusClick = { opusId ->
-                                            navController.navigate("opus_detail/$opusId")
+                        WearPager(
+                            pageCount = 3,
+                            pagerState = pagerState,
+                            modifier = Modifier.weight(1f)
+                        ) { page ->
+                            when (page) {
+                                0 -> VideoDetailContent(
+                                    uiState = uiState,
+                                    scrollState = videoDetailScrollState,
+                                    padding = paddingValues,
+                                    onLikeClick = { viewModel.like() },
+                                    onCoinClick = { showCoinDialog = true },
+                                    onFavoriteClick = {
+                                        viewModel.loadFavoriteFolders()
+                                        showFavoriteDialog = true
+                                    },
+                                    onWatchLaterClick = { viewModel.addToWatchLater() },
+                                    onDownloadClick = { showDownloadDialog = true },
+                                    onShareClick = { },
+                                    onMoreClick = { showVideoMoreDialog = true },
+                                    onPlayClick = {
+                                        uiState.videoInfo?.let { video ->
+                                            navController.navigate("player/${video.aid}/${video.cid}")
                                         }
-                                    )
-                                    2 -> VideoRelatedScreen(
-                                        aid = uiState.videoInfo?.aid ?: 0L,
-                                        bvid = uiState.videoInfo?.bvid ?: "",
-                                        scrollState = relatedScrollState,
-                                        onVideoClick = { video ->
-                                            navController.navigate("video_detail/${video.aid}/${video.bvid}")
-                                        },
-                                        paddingValues = paddingValues
-                                    )
-                                }
+                                    },
+                                    onCoverClick = {
+                                        uiState.videoInfo?.let { video ->
+                                            val encodedUrl = java.net.URLEncoder.encode(video.pic, "UTF-8")
+                                            navController.navigate("image/$encodedUrl/0")
+                                        }
+                                    },
+                                    onUploaderClick = { mid ->
+                                        navController.navigate("user/$mid")
+                                    },
+                                    onCollectionClick = { seasonId ->
+                                        val videoInfo = uiState.videoInfo
+                                        if (videoInfo != null && videoInfo.ugcSeason != null) {
+                                            val season = videoInfo.ugcSeason
+                                            val encodedName = java.net.URLEncoder.encode(season?.title.toString(), "UTF-8")
+                                            navController.navigate("collection/${videoInfo.owner.mid}/$seasonId/$encodedName")
+                                        }
+                                    },
+                                    onTagClick = { }
+                                )
+                                1 -> CommentScreen(
+                                    aid = uiState.videoInfo?.aid ?: 0L,
+                                    scrollState = commentScrollState,
+                                    paddingValues = paddingValues,
+                                    onCommentDetailClick = { replyId ->
+                                        val oid = uiState.videoInfo?.aid ?: 0L
+                                        navController.navigate("comment_detail/$replyId?oid=$oid&type=1")
+                                    },
+                                    onWriteReplyClick = { oid, rpid, parent, parentSender ->
+                                        navController.navigate("write_reply/$oid/$rpid/$parent?parentSender=${parentSender ?: ""}")
+                                    },
+                                    onUserClick = { userId ->
+                                        navController.navigate("user/$userId")
+                                    },
+                                    onOpusClick = { opusId ->
+                                        navController.navigate("opus_detail/$opusId")
+                                    }
+                                )
+                                2 -> VideoRelatedScreen(
+                                    aid = uiState.videoInfo?.aid ?: 0L,
+                                    bvid = uiState.videoInfo?.bvid ?: "",
+                                    scrollState = relatedScrollState,
+                                    onVideoClick = { video ->
+                                        navController.navigate("video_detail/${video.aid}/${video.bvid}")
+                                    },
+                                    paddingValues = paddingValues
+                                )
                             }
-                            
-                            rj.kilikili.ui.widget.DotsIndicator(
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = appVerticalOptContentPadding()),
-                                dotCount = pagerState.pageCount,
-                                dotSpacing = 8.dp,
-                                type = WormIndicatorType(
-                                    dotsGraphic = DotGraphic(
-                                        16.dp,
-                                        borderWidth = 2.dp,
-                                        borderColor = MaterialTheme.colorScheme.primary,
-                                        color = Color.Transparent),
-                                    wormDotGraphic = DotGraphic(
-                                        16.dp,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                ),
-                                pagerState = pagerState
-                            )
                         }
                     }
                 }

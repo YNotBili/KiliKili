@@ -252,10 +252,155 @@ inline fun <T> Result<T>.onNonApiFailure(
     return this
 }
 
+/**
+ * Bilibili API异常类
+ *
+ * 扩展异常类型，包含错误分类、恢复建议等信息
+ *
+ * @param code 错误码
+ * @param message 错误消息
+ * @param errorType 错误类型分类
+ * @param recoverySuggestion 恢复建议
+ * @param cause 原始异常
+ */
 class BilibiliApiException(
-    val code: Int, message: String
-): Exception(message) {
+    val code: Int,
+    message: String,
+    val errorType: ErrorType = ErrorType.fromCode(code),
+    val recoverySuggestion: String? = null,
+    cause: Throwable? = null
+) : Exception(message, cause) {
+
+    /**
+     * 错误类型枚举
+     */
+    enum class ErrorType {
+        /** 成功（不应抛出异常） */
+        SUCCESS,
+        /** 风控错误 */
+        RISK_CONTROL,
+        /** 认证错误 */
+        AUTHENTICATION,
+        /** 参数错误 */
+        PARAM,
+        /** 业务错误 */
+        BUSINESS,
+        /** 网络错误 */
+        NETWORK,
+        /** 未知错误 */
+        UNKNOWN;
+
+        companion object {
+            /**
+             * 从错误码推断错误类型
+             */
+            fun fromCode(code: Int): ErrorType {
+                return when {
+                    code == 0 -> SUCCESS
+                    com.huanli233.biliwebapi.exception.ErrorCodeDefinitions.isRiskControlError(code) -> RISK_CONTROL
+                    com.huanli233.biliwebapi.exception.ErrorCodeDefinitions.isAuthenticationError(code) -> AUTHENTICATION
+                    com.huanli233.biliwebapi.exception.ErrorCodeDefinitions.isNetworkError(code) -> NETWORK
+                    code in listOf(-400, -412, -413, -501) -> PARAM
+                    code < 0 -> BUSINESS
+                    else -> UNKNOWN
+                }
+            }
+        }
+    }
+
+    /**
+     * 是否需要重试
+     */
+    fun shouldRetry(): Boolean {
+        return com.huanli233.biliwebapi.exception.ErrorMessageResolver.shouldRetry(code)
+    }
+
+    /**
+     * 是否需要重新登录
+     */
+    fun needReLogin(): Boolean {
+        return com.huanli233.biliwebapi.exception.ErrorMessageResolver.needReLogin(code)
+    }
+
+    /**
+     * 是否是可恢复的错误
+     */
+    fun isRecoverable(): Boolean {
+        return com.huanli233.biliwebapi.exception.ErrorMessageResolver.isRecoverable(code)
+    }
+
+    /**
+     * 获取恢复建议
+     */
+    fun getRecoverySuggestion(): String {
+        return recoverySuggestion ?: com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(code)
+    }
+
+    /**
+     * 获取完整的错误信息（包含消息和建议）
+     */
+    fun getFullErrorMessage(): String {
+        val suggestion = getRecoverySuggestion()
+        return if (suggestion.isNotEmpty()) {
+            "$message\n建议：$suggestion"
+        } else {
+            message
+        }
+    }
+
     override fun toString(): String {
-        return "${if (cause == null) "$message" else cause}"
+        val typeStr = "[$errorType]"
+        val codeStr = "(code: $code)"
+        return "$typeStr $codeStr ${if (cause == null) message else cause.toString()}"
+    }
+
+    companion object {
+        /**
+         * 创建网络错误异常
+         */
+        fun createNetworkError(
+            code: Int,
+            message: String,
+            cause: Throwable? = null
+        ): BilibiliApiException {
+            return BilibiliApiException(
+                code = code,
+                message = message,
+                errorType = ErrorType.NETWORK,
+                recoverySuggestion = com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(code),
+                cause = cause
+            )
+        }
+
+        /**
+         * 创建风控错误异常
+         */
+        fun createRiskControlError(
+            code: Int,
+            message: String,
+            cause: Throwable? = null
+        ): BilibiliApiException {
+            return BilibiliApiException(
+                code = code,
+                message = message,
+                errorType = ErrorType.RISK_CONTROL,
+                recoverySuggestion = com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(code),
+                cause = cause
+            )
+        }
+
+        /**
+         * 从ApiResponse创建异常
+         */
+        fun fromApiResponse(code: Int?, rawMessage: String?): BilibiliApiException {
+            val errorCode = code ?: Int.MIN_VALUE
+            val message = com.huanli233.biliwebapi.exception.ErrorMessageResolver.resolve(errorCode)
+            return BilibiliApiException(
+                code = errorCode,
+                message = message,
+                errorType = ErrorType.fromCode(errorCode),
+                recoverySuggestion = com.huanli233.biliwebapi.exception.ErrorMessageResolver.getRecoverySuggestion(errorCode)
+            )
+        }
     }
 }
