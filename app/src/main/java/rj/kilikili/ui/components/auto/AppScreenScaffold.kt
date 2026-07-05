@@ -40,7 +40,7 @@ fun AppScreenScaffold(
             }
         }
         UiType.PHONE -> {
-            val phoneScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+            val phoneScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
                 rememberTopAppBarState()
             )
             CompositionLocalProvider(

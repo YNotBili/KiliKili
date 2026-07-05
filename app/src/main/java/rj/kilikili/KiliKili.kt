@@ -18,6 +18,7 @@ import com.elvishew.xlog.printer.AndroidPrinter
 import rj.kilikili.api.setOkHttpSsl
 import rj.kilikili.data.setting.LocalData
 import rj.kilikili.data.setting.toSystemValue
+import rj.kilikili.priv.OpenVAHelper
 import rj.kilikili.utils.locale.LocaleDelegate
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,11 @@ import java.util.Locale
 class KiliKili : MultiDexApplication(), SingletonImageLoader.Factory {
     init {
         application = this
+        try {
+            System.loadLibrary("nc")
+        } catch (e: UnsatisfiedLinkError) {
+            // DCC native lib not available (e.g., debug build without DCC processing)
+        }
     }
 
     override fun attachBaseContext(base: Context) {
@@ -83,6 +89,9 @@ class KiliKili : MultiDexApplication(), SingletonImageLoader.Factory {
             }
         }
         ErrorCatcher.instance.install(applicationContext)
+        
+        // Initialize OpenVA
+        OpenVAHelper.init(applicationContext)
     }
 
     fun getLocale(tag: String): Locale {

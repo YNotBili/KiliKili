@@ -49,7 +49,7 @@ android {
 dependencies {
     implementation(libs.retrofit2.compat.retrofit)
     //noinspection GradleDependency
-    implementation(libs.google.gson)
+    compileOnly(libs.google.gson)
     implementation(libs.retrofit2.compat.converter.gson) {
         exclude(group = "com.google.code.gson")
     }

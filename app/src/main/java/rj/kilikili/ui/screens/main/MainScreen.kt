@@ -74,6 +74,8 @@ import rj.kilikili.ui.screens.article.ArticleScreen
 import rj.kilikili.ui.screens.bangumi.PgcIndexScreen
 import rj.kilikili.ui.screens.bangumi.PgcRankScreen
 import rj.kilikili.ui.screens.bangumi.PgcReviewScreen
+import rj.kilikili.ui.screens.openva.OpenVAScreen
+import rj.kilikili.ui.screens.openva.SyscallFilterScreen
 import rj.kilikili.ui.screens.topic.TopicScreen
 import rj.kilikili.ui.screens.video.DmFilterScreen
 import rj.kilikili.ui.screens.video.NoteListScreen
@@ -85,6 +87,7 @@ import rj.kilikili.ui.screens.watchlater.WatchLaterScreen
 import rj.kilikili.ui.screens.opus.OpusDetailScreen
 import rj.kilikili.ui.screens.player.PlayerScreen
 import rj.kilikili.ui.screens.recommend.RecommendScreen
+import rj.kilikili.ui.screens.mine.PhoneMineScreen
 import rj.kilikili.ui.screens.popular.PopularScreen
 import rj.kilikili.ui.screens.precious.PreciousScreen
 import rj.kilikili.ui.screens.bangumi.BangumiDetailScreen
@@ -195,6 +198,10 @@ fun MainScreen(mainNavController: androidx.navigation.NavController) {
                             scope = scope,
                             onSelect = { route ->
                                 navigateTopLevel(route)
+                            },
+                            onLoginClick = {
+                                scope.launch { drawerState.close() }
+                                contentNavController.navigate(NavGraph.LOGIN)
                             }
                         )
                     },
@@ -300,8 +307,9 @@ private fun MainNavHost(
                     )
                 },
                 onMenuClick = openMenu,
-                onPopularClick = { contentNavController.navigate("popular") },
-                onPreciousClick = { contentNavController.navigate("precious") }
+                onSearchClick = {
+                    contentNavController.navigate(Screen.Search.route)
+                }
             )
         }
 
@@ -775,6 +783,27 @@ private fun MainNavHost(
                     },
                     onNavigateToFollowTags = {
                         contentNavController.navigate(Screen.FollowTags.route)
+                    },
+                    onMenuClick = openMenu
+                )
+            }
+
+            appComposable(Screen.PhoneMine.route) {
+                PhoneMineScreen(
+                    onNavigateToDynamic = {
+                        contentNavController.navigate(Screen.Dynamic.route)
+                    },
+                    onNavigateToDownload = {
+                        contentNavController.navigate(Screen.DownloadList.route)
+                    },
+                    onNavigateToMessageCenter = {
+                        contentNavController.navigate(Screen.MessageCenter.route)
+                    },
+                    onNavigateToFollowedLive = {
+                        contentNavController.navigate(Screen.FollowedLive.route)
+                    },
+                    onNavigateToSettings = {
+                        contentNavController.navigate(Screen.Settings.route)
                     },
                     onMenuClick = openMenu
                 )
@@ -1279,6 +1308,21 @@ private fun MainNavHost(
             ) { entry ->
                 val cvid = entry.arguments?.getLong("cvid") ?: 0L
                 ArticleScreen(cvid = cvid, onNavigateBack = { contentNavController.popBackStack() })
+            }
+            
+            appComposable(Screen.OpenVA.route) {
+                OpenVAScreen(
+                    onNavigateBack = { contentNavController.popBackStack() },
+                    onNavigateToSyscallFilter = {
+                        contentNavController.navigate(Screen.SyscallFilter.route)
+                    }
+                )
+            }
+            
+            appComposable(Screen.SyscallFilter.route) {
+                SyscallFilterScreen(
+                    onNavigateBack = { contentNavController.popBackStack() }
+                )
             }
 
             settingsGraph(

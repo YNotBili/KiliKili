@@ -45,8 +45,11 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
     }
     
     data object MySpace : Screen("my_space", R.string.my_space)
+    data object PhoneMine : Screen("phone_mine", R.string.phone_mine)
 
     // ===== 新功能屏幕 =====
+    data object Popular : Screen("popular", R.string.popular)
+    data object Precious : Screen("precious", R.string.precious)
     data object Ranking : Screen("ranking", R.string.ranking)
     data object Timeline : Screen("timeline", R.string.timeline)
     data object MessageCenter : Screen("message_center", R.string.message_center)
@@ -126,11 +129,17 @@ sealed class Screen(val route: String, @StringRes val titleResId: Int) {
     data object Article : Screen("article/{cvid}", R.string.article) {
         fun createRoute(cvid: Long) = "article/$cvid"
     }
+    
+    // OpenVA
+    data object OpenVA : Screen("openva", R.string.openva)
+    data object SyscallFilter : Screen("syscall_filter", R.string.syscall_filter)
 }
 
 val allScreens = listOf(
     Screen.Recommend,
     Screen.Dynamic,
+    Screen.Popular,
+    Screen.Precious,
     Screen.Settings,
     Screen.UiSettings,
     Screen.PlayerSettings,
@@ -151,5 +160,7 @@ val allScreens = listOf(
     Screen.PopularSeries,
     Screen.HotSearch,
     Screen.FansList,
-    Screen.Blacklist
+    Screen.Blacklist,
+    Screen.OpenVA,
+    Screen.SyscallFilter
 )

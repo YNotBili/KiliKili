@@ -3,10 +3,8 @@ package rj.kilikili.ui.components.phone
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PlayCircle
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -31,13 +29,7 @@ private val bottomNavItems = listOf(
         unselectedIcon = Icons.Outlined.PlayCircle,
     ),
     BottomNavItem(
-        route = Screen.Search.route,
-        label = "搜索",
-        selectedIcon = Icons.Filled.Search,
-        unselectedIcon = Icons.Outlined.Search,
-    ),
-    BottomNavItem(
-        route = Screen.MySpace.route,
+        route = Screen.PhoneMine.route,
         label = "我的",
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,

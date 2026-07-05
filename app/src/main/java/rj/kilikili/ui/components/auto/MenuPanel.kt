@@ -26,7 +26,8 @@ fun AppMenuPanel(
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit = {},
     drawerState: DrawerState? = null,
-    scope: CoroutineScope? = null
+    scope: CoroutineScope? = null,
+    onLoginClick: () -> Unit = {}
 ) {
     when (actualUiType) {
         UiType.WEAR, UiType.FRESHWEAR -> {
@@ -42,7 +43,8 @@ fun AppMenuPanel(
                     menuItems = menuItems,
                     drawerState = drawerState,
                     scope = scope,
-                    onSelect = onSelect
+                    onSelect = onSelect,
+                    onLoginClick = onLoginClick
                 )
             }
         }

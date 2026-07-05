@@ -89,6 +89,7 @@ import rj.kilikili.ui.objects.LoadingState
 import rj.kilikili.utils.MsgUtil
 import rj.kilikili.utils.extensions.formatNumber
 import rj.kilikili.utils.extensions.formatToDate
+import rj.kilikili.utils.extensions.toHttpsUrl
 import rj.kilikili.utils.extensions.toTime
 import com.huanli233.biliwebapi.bean.user.UserInfo
 import androidx.core.graphics.toColorInt
@@ -481,7 +482,7 @@ private fun VideoDetailContent(
         ) {
             Box {
                 AsyncImage(
-                    model = videoInfo.pic,
+                    model = videoInfo.pic.toHttpsUrl(),
                     contentDescription = videoInfo.title,
                     modifier = Modifier
                         .fillMaxWidth()

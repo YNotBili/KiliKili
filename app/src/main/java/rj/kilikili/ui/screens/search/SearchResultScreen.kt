@@ -343,7 +343,7 @@ private fun UserResultItem(
                 
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(if (item.upic?.startsWith("http") == true) item.upic else "http:${item.upic}")
+                        .data(item.upic?.let { if (it.startsWith("http")) it else "http:$it" }?.toHttpsUrl() ?: "")
                         .crossfade(200)
                         .build(),
                     contentDescription = null,
@@ -464,7 +464,7 @@ private fun SearchArticleCardContent(
                     
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(if (cover.startsWith("http")) cover else "http:$cover")
+                            .data((if (cover.startsWith("http")) cover else "http:$cover").toHttpsUrl())
                             .crossfade(200)
                             .build(),
                         contentDescription = null,

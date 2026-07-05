@@ -46,6 +46,7 @@
 -keep class tv.danmaku.ijk.media.player.** { *; }
 
 -dontwarn androidx.navigation.NavType$Companion
+-dontwarn me.weishu.reflection.Reflection
 
 -keepclassmembers class * extends android.view.View {
     <init>(android.content.Context);

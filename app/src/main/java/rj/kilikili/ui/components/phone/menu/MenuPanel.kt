@@ -1,6 +1,8 @@
 package rj.kilikili.ui.components.phone.menu
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,7 +53,8 @@ fun PhoneMenuDrawerContent(
     menuItems: List<MenuItem>,
     drawerState: DrawerState,
     scope: CoroutineScope,
-    onSelect: (String) -> Unit
+    onSelect: (String) -> Unit,
+    onLoginClick: () -> Unit = {}
 ) {
     val loggedIn = AccountManager.loggedIn()
     val filteredItems = menuItems.filter { item ->
@@ -63,7 +68,7 @@ fun PhoneMenuDrawerContent(
             .width(300.dp)
             .fillMaxHeight()
     ) {
-        DrawerHeader(loggedIn = loggedIn)
+        DrawerHeader(loggedIn = loggedIn, onLoginClick = onLoginClick)
         HorizontalDivider(
             modifier = Modifier.padding(vertical = 8.dp),
             color = MaterialTheme.colorScheme.outlineVariant
@@ -84,7 +89,17 @@ fun PhoneMenuDrawerContent(
 }
 
 @Composable
-private fun DrawerHeader(loggedIn: Boolean) {
+private fun DrawerHeader(loggedIn: Boolean, onLoginClick: () -> Unit = {}) {
+    val loginModifier = if (!loggedIn) {
+        Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = ripple(bounded = false),
+            onClick = onLoginClick
+        )
+    } else {
+        Modifier
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +109,8 @@ private fun DrawerHeader(loggedIn: Boolean) {
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .then(loginModifier),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -113,13 +129,15 @@ private fun DrawerHeader(loggedIn: Boolean) {
             text = "KiliKili",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = loginModifier
         )
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            text = if (loggedIn) "已登录" else "未登录",
+            text = if (loggedIn) "已登录" else "未登录，点击登录",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = loginModifier
         )
     }
 }

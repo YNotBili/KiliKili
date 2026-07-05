@@ -26,7 +26,10 @@ import rj.kilikili.ui.components.auto.LocalPhoneTopBarScrollBehavior
  *
  * scrollBehavior 优先使用外部传入的 [scrollBehavior] 参数，
  * 其次从 [LocalPhoneTopBarScrollBehavior] CompositionLocal 获取（由 AppScreenScaffold 提供），
- * 最后回退到内部自建的 exitUntilCollapsedScrollBehavior。
+ * 最后回退到内部自建的 enterAlwaysScrollBehavior。
+ *
+ * 使用 enterAlwaysScrollBehavior 而非 exitUntilCollapsedScrollBehavior，
+ * 确保下拉时 TopBar 先展开，展开完毕后再触发列表下拉刷新，避免手势冲突。
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +62,7 @@ fun ScrollAwareTopBar(
     val localBehavior = LocalPhoneTopBarScrollBehavior.current
     val resolvedBehavior = scrollBehavior
         ?: localBehavior
-        ?: TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarState)
+        ?: TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
 
     MediumTopAppBar(
         modifier = modifier,

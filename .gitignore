@@ -11,3 +11,4 @@ local.properties
 .kotlin/sessions
 *.jks
 /.trae
+tools/dcc/

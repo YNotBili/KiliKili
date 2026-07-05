@@ -40,6 +40,7 @@ import rj.kilikili.ui.screens.recommend.LoadingState
 import rj.kilikili.ui.screens.recommend.LoadingView
 import rj.kilikili.ui.viewmodel.PopularSeriesDetailUiState
 import rj.kilikili.ui.viewmodel.PopularSeriesDetailViewModel
+import rj.kilikili.utils.extensions.toHttpsUrl
 
 @Composable
 fun PopularSeriesDetailScreen(
@@ -103,7 +104,7 @@ fun PopularSeriesDetailScreen(
                             ) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalContext.current)
-                                        .data(video.pic)
+                                        .data(video.pic.toHttpsUrl())
                                         .crossfade(200)
                                         .build(),
                                     contentDescription = null,

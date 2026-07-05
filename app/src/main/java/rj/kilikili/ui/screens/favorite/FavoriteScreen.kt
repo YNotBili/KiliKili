@@ -59,6 +59,7 @@ import rj.kilikili.ui.viewmodel.FavoriteViewModel
 import com.huanli233.biliwebapi.bean.favorite.FavoriteBox
 import kotlinx.coroutines.launch
 import rj.kilikili.data.setting.LocalData
+import rj.kilikili.utils.extensions.toHttpsUrl
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
@@ -309,7 +310,7 @@ private fun FavoriteFolderCard(
                 if (coverUrl.isNotEmpty()) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(coverUrl)
+                            .data(coverUrl.toHttpsUrl())
                             .crossfade(200)
                             .build(),
                         contentDescription = null,
@@ -389,7 +390,7 @@ private fun FavoriteFolderCardWithBackground(
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(coverUrl)
+                    .data(coverUrl.toHttpsUrl())
                     .crossfade(200)
                     .build(),
                 contentDescription = null,

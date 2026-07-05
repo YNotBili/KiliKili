@@ -249,6 +249,7 @@ dependencies {
     implementation(project(":BiliWebApi")) {
         exclude("com.google.code.gson", "gson")
     }
+    implementation(project(":private"))
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.multidex)
